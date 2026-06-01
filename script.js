@@ -1835,14 +1835,46 @@ function updateProfile() {
       " - " +
       levelNames[userProgress.level - 1];
   }
+
+  // Profile Section Level
+  var profileLevelSection = document.getElementById("profileLevelSection");
+  if (profileLevelSection) {
+    profileLevelSection.textContent =
+      "Level " +
+      userProgress.level +
+      " - " +
+      levelNames[userProgress.level - 1];
+  }
+
   var profileXP = document.getElementById("profileTotalXP");
   if (profileXP) profileXP.textContent = userProgress.xp.toLocaleString();
+
+  // Profile Section XP
+  var profileXPSection = document.getElementById("profileTotalXPSection");
+  if (profileXPSection)
+    profileXPSection.textContent = userProgress.xp.toLocaleString();
+
   var profileProblems = document.getElementById("profileProblems");
   if (profileProblems)
     profileProblems.textContent = userProgress.completedProblems.length;
+
+  // Profile Section Problems
+  var profileProblemsSection = document.getElementById(
+    "profileProblemsSection",
+  );
+  if (profileProblemsSection)
+    profileProblemsSection.textContent = userProgress.completedProblems.length;
+
   var profileStreak = document.getElementById("profileStreak");
   if (profileStreak) profileStreak.textContent = userProgress.streak;
+
+  // Profile Section Streak
+  var profileStreakSection = document.getElementById("profileStreakSection");
+  if (profileStreakSection)
+    profileStreakSection.textContent = userProgress.streak;
+
   var profileBadges = document.getElementById("profileBadges");
+
   if (profileBadges) {
     var badges = [
       userProgress.completedProblems.length >= 1,
@@ -1852,7 +1884,15 @@ function updateProfile() {
       userProgress.completedProblems.length >= 100,
       userProgress.completedProblems.length >= 25 && userProgress.xp >= 2500,
     ].filter(Boolean).length;
+
     profileBadges.textContent = badges;
+
+    // Profile Section Badges
+    var profileBadgesSection = document.getElementById("profileBadgesSection");
+
+    if (profileBadgesSection) {
+      profileBadgesSection.textContent = badges;
+    }
   }
 
   // Update profile name in dashboard
@@ -1878,17 +1918,40 @@ function updateProfile() {
 
 function updateLevelProgress() {
   var levels = [0, 1000, 2500, 5000, 10000, 20000, 50000, 100000];
+
   var currentLevel = userProgress.level;
+
   var currentLevelXP = levels[Math.max(0, currentLevel - 1)];
+
   var nextLevelXP = levels[currentLevel] || 100000;
+
   var xpProgress =
     ((userProgress.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+
   var progressPercent = Math.min(Math.max(xpProgress, 0), 100);
+
+  // Dashboard Progress Bar
   var progressBar = document.getElementById("profileProgressBar");
+
   var progressLabel = document.getElementById("profileLevelProgress");
+
   if (progressBar) progressBar.style.width = progressPercent + "%";
+
   if (progressLabel)
     progressLabel.textContent = Math.round(progressPercent) + "%";
+
+  // Profile Section Progress Bar
+  var progressBarSection = document.getElementById("profileProgressBarSection");
+
+  var progressLabelSection = document.getElementById(
+    "profileLevelProgressSection",
+  );
+
+  if (progressBarSection)
+    progressBarSection.style.width = progressPercent + "%";
+
+  if (progressLabelSection)
+    progressLabelSection.textContent = Math.round(progressPercent) + "%";
 }
 
 // ===== DASHBOARD =====
