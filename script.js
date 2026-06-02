@@ -1671,11 +1671,34 @@ function initPracticeSection() {
 
   // Search bar
   const searchInput = document.getElementById("searchInput");
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      renderProblems(currentFilter, e.target.value.toLowerCase());
-    });
-  }
+const clearBtn = document.getElementById("clearSearchBtn");
+
+if (searchInput) {
+  searchInput.addEventListener("input", (e) => {
+    const value = e.target.value.toLowerCase();
+
+    renderProblems(currentFilter, value);
+
+    // Show/hide clear button
+    if (value.length > 0) {
+      clearBtn.classList.add("visible");
+    } else {
+      clearBtn.classList.remove("visible");
+    }
+  });
+}
+
+// Clear search functionality
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    clearBtn.classList.remove("visible");
+
+    renderProblems(currentFilter, "");
+
+    searchInput.focus();
+  });
+}
 
   // Initial render
   renderProblems("all");
