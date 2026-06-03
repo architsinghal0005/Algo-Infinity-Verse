@@ -1813,7 +1813,7 @@ data-id="${problem.id}">
 
       const problemId = parseInt(btn.dataset.id);
       currentNotesProblemId = problemId;
-      openNotesModal();
+      openNotesModal(problemId);
     });
   });
 
@@ -2305,7 +2305,7 @@ function initChatbot() {
     if (!message) return;
 
     // Add user message
-    addChatMessage(`<p>${message}</p>`, "user");
+    addChatMessage(message, "user");
 
     // Store previous question
     lastQuestion = message;
@@ -2361,7 +2361,13 @@ function addChatMessage(message, sender) {
   const messagesContainer = document.getElementById("chatbotMessages");
   const messageEl = document.createElement("div");
   messageEl.className = `message ${sender}`;
-  messageEl.innerHTML = message;
+  // Safe rendering
+  if (sender === "user") {
+    messageEl.textContent = message;
+  } else {
+    messageEl.innerHTML = message;
+  }
+
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
@@ -2381,10 +2387,10 @@ function getBotResponse(question) {
   return `
     <div class="assistant-response">
       <h4>🧠 Problem Understanding</h4>
-      <p>${question}</p>
+      <p>${escapeHtml(question)}</p>
 
       <h4>⚡ Approach</h4>
-      <p>${response}</p>
+      <p>${escapeHtml(response)}</p>
 
       <h4>💻 Code Solution</h4>
       <pre><code>
@@ -2545,6 +2551,8 @@ function loadUserData() {
       xp: 0,
       level: 1,
       streak: 0,
+      favoriteProblems: [],
+      problemNotes: {},
       badges: [],
       lastActive: null,
       quizScores: {},

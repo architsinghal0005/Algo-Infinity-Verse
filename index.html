@@ -797,10 +797,16 @@
     </section>
 
     <!-- Notes Modal -->
-    <div class="modal" id="notesModal">
+    <div
+      class="modal"
+      id="notesModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="notesModalTitle"
+    >
       <div class="modal-content notes-modal-content">
         <div class="modal-header">
-          <h3>Problem Notes</h3>
+          <h3 id="notesModalTitle">Problem Notes</h3>
 
           <button class="modal-close" id="notesModalClose">
             <i class="fas fa-times"></i>
@@ -810,6 +816,7 @@
         <div class="modal-body">
           <textarea
             id="problemNotesInput"
+            aria-label="Problem notes"
             class="notes-textarea"
             placeholder="Write your notes, hints, edge cases, or observations here..."
           ></textarea>
