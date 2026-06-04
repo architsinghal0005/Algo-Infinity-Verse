@@ -660,6 +660,23 @@
             <div class="quiz-editor-panel">
               <div class="quiz-info-panel">
                 <h4>Quiz Instructions</h4>
+                <div class="quiz-timer-container">
+                  <div class="quiz-timer-box">
+                    <i class="fas fa-clock"></i>
+                    <div class="quiz-timer-content">
+                      <span class="timer-label">Current Time</span>
+                      <span class="timer-value" id="quizTimer">00:00</span>
+                    </div>
+                  </div>
+
+                  <div class="quiz-best-time-box">
+                    <i class="fas fa-trophy"></i>
+                    <div class="quiz-best-time-content">
+                      <span class="timer-label">Best Time</span>
+                      <span class="timer-value" id="bestQuizTime">--:--</span>
+                    </div>
+                  </div>
+                </div>
                 <ul>
                   <li>Select the correct answer for each question</li>
                   <li>You earn 10 XP per correct answer</li>
@@ -795,6 +812,43 @@
         </div>
       </div>
     </section>
+
+    <div
+      class="modal"
+      id="notesModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="notesModalTitle"
+    >
+      <div class="modal-content notes-modal-content">
+        <div class="modal-header">
+          <h3 id="notesModalTitle">Problem Notes</h3>
+
+          <button class="modal-close" id="notesModalClose">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <label for="problemNotesInput">Problem notes</label>
+
+          <textarea
+            id="problemNotesInput"
+            class="notes-textarea"
+            placeholder="Write your notes, hints, observations, or edge cases here..."
+          ></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="closeNotesBtn">Close</button>
+
+          <button class="btn btn-primary" id="saveNotesBtn">
+            <i class="fas fa-save"></i>
+            Save Notes
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

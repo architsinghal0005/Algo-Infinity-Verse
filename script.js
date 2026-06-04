@@ -969,12 +969,14 @@ let userProgress = {
   avatar: "🚀",
   completedProblems: [],
   favoriteProblems: [], //here i have added a new property to store the user's favorite problems
+  problemNotes: {},
   xp: 0,
   level: 1,
   streak: 0,
   badges: [],
   lastActive: null,
   quizScores: {}, // topic -> { bestScore, attempts, totalXP }
+  bestQuizTimes: {},
 };
 
 // ===== INITIALIZATION =====
@@ -1022,6 +1024,34 @@ document.addEventListener("DOMContentLoaded", () => {
     topicModal.addEventListener("click", (e) => {
       if (e.target === topicModal) {
         closeTopicModal();
+      }
+    });
+  }
+
+  const saveNotesBtn = document.getElementById("saveNotesBtn");
+
+  if (saveNotesBtn) {
+    saveNotesBtn.addEventListener("click", saveProblemNotes);
+  }
+
+  const notesModalClose = document.getElementById("notesModalClose");
+
+  if (notesModalClose) {
+    notesModalClose.addEventListener("click", closeNotesModal);
+  }
+
+  const closeNotesBtn = document.getElementById("closeNotesBtn");
+
+  if (closeNotesBtn) {
+    closeNotesBtn.addEventListener("click", closeNotesModal);
+  }
+
+  const notesModal = document.getElementById("notesModal");
+
+  if (notesModal) {
+    notesModal.addEventListener("click", (e) => {
+      if (e.target === notesModal) {
+        closeNotesModal();
       }
     });
   }
@@ -1330,6 +1360,9 @@ function getDifficultyClass(difficulty) {
 
 // Get quiz topic key from topic object
 function getQuizTopicKey(topic) {
+  if (typeof topic === "string") {
+    return topic;
+  }
   const name = topic.name.toLowerCase();
   // Map topic names to quiz keys
   const keyMap = {
@@ -1342,6 +1375,7 @@ function getQuizTopicKey(topic) {
   };
   return keyMap[name] || name.replace(/\s+/g, "");
 }
+
 function initQuizSection() {
   try {
     console.log("Initializing Quiz Section...");
@@ -1378,6 +1412,10 @@ function initQuizSection() {
                 </button>
             `;
       quizGrid.appendChild(card);
+      card.addEventListener("click", () => {
+        console.log("QUIZ CARD CLICKED");
+        startQuiz(topicKey);
+      });
       console.log(`Quiz card created for ${topic.name}`);
 
       // Update progress display
@@ -1388,7 +1426,9 @@ function initQuizSection() {
       if (startBtn) {
         startBtn.addEventListener("click", () => {
           console.log(`Start Quiz clicked for ${topic.name}`);
-          startQuiz(topic);
+          console.log("QUIZ BUTTON CLICKED");
+          console.log("Topic Key:", topicKey);
+          startQuiz(topicKey);
         });
       } else {
         console.error("Start quiz button not found for topic:", topic.name);
@@ -1420,43 +1460,38 @@ function updateQuizProgressDisplay(topic) {
   attemptsEl.textContent = quizData.attempts;
 }
 
-function startQuiz(topic) {
-  const topicKey = getQuizTopicKey(topic);
-  const questions = quizQuestions[topicKey];
-
-  if (!questions || questions.length === 0) {
-    showNotification(
-      "No quiz questions available for this topic yet!",
-      "error",
-    );
+function startQuiz(topicKey) {
+  console.log("startQuiz called");
+  console.log("topicKey =", topicKey);
+  console.log("startQuiz called with:", topicKey);
+  const topicQuiz = quizQuestions[topicKey];
+  if (!topicQuiz || topicQuiz.length === 0) {
+    console.error("Quiz data not found for:", topicKey);
     return;
   }
 
+  const resultEl = document.getElementById("topicQuizResult");
+
+if (resultEl) {
+  resultEl.classList.add("hidden");
+  resultEl.innerHTML = "";
+}
+document.getElementById("topicQuizQuestionText").style.display = "block";
+  document.getElementById("topicQuizOptions").style.display = "block";
+  document.getElementById("topicQuizProgress").style.display = "block";
+  document.getElementById("topicQuizCounter").style.display = "block";
   currentQuiz = {
-    topic: topic,
-    questions: shuffleArray([...questions]),
+    topic: topicKey,
+    questions: [...topicQuiz],
     currentQuestionIndex: 0,
     score: 0,
     answers: [],
   };
 
-  // Set modal header info
-  try {
-    document.getElementById("topicQuizBadge").textContent = topic.name;
-    document.getElementById("topicQuizDifficulty").textContent =
-      topic.difficulty;
-    document.getElementById("topicQuizTitle").textContent =
-      `${topic.name} Quiz`;
-
-    // Hide previous results
-    const prevResult = document.getElementById("topicQuizResult");
-    if (prevResult) prevResult.classList.add("hidden");
-  } catch (e) {
-    console.error("Error setting quiz modal header:", e);
-    return;
-  }
-
   openQuizModal();
+
+  startQuizTimer(topicKey);
+
   renderQuizQuestion();
 }
 
@@ -1469,10 +1504,59 @@ function shuffleArray(array) {
   return array;
 }
 
+function startQuizTimer(topicKey) {
+  clearInterval(quizTimerInterval);
+  quizStartTime = Date.now();
+
+  updateQuizTimerDisplay(topicKey);
+
+  quizTimerInterval = setInterval(() => {
+    updateQuizTimerDisplay(topicKey);
+  }, 1000);
+}
+
+function stopQuizTimer() {
+  clearInterval(quizTimerInterval);
+
+  const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+
+  return elapsedSeconds;
+}
+
+function updateQuizTimerDisplay(topicKey) {
+  const timerEl = document.getElementById("quizTimer");
+
+  const bestTimeEl = document.getElementById("bestQuizTime");
+
+  if (!timerEl || !bestTimeEl) return;
+
+  const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+
+  timerEl.textContent = formatQuizTime(elapsedSeconds);
+
+  const bestTime = userProgress.bestQuizTimes[topicKey];
+
+  bestTimeEl.textContent = bestTime ? formatQuizTime(bestTime) : "--:--";
+}
+
+function formatQuizTime(seconds) {
+  const mins = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+
+  const secs = (seconds % 60).toString().padStart(2, "0");
+
+  return `${mins}:${secs}`;
+}
+
 // Quiz Modal
 let currentQuiz = null;
+let quizStartTime = null;
+let quizTimerInterval = null;
+let currentNotesProblemId = null;
 
 function openQuizModal() {
+  console.log("Opening quiz modal");
   try {
     const modal = document.getElementById("quizModal");
     if (modal) {
@@ -1489,13 +1573,30 @@ function closeQuizModal() {
   try {
     const modal = document.getElementById("quizModal");
     if (modal) modal.classList.remove("active");
+
+    // Hide old quiz result
+    const resultEl = document.getElementById("topicQuizResult");
+    if (resultEl) {
+      resultEl.classList.add("hidden");
+      resultEl.innerHTML = "";
+    }
+
+    // Restore quiz elements for next attempt
+    document.getElementById("topicQuizQuestionText").style.display = "block";
+    document.getElementById("topicQuizOptions").style.display = "block";
+    document.getElementById("topicQuizProgress").style.display = "block";
+    document.getElementById("topicQuizCounter").style.display = "block";
   } catch (e) {
     console.error("Error closing quiz modal:", e);
   }
+
+  clearInterval(quizTimerInterval);
   currentQuiz = null;
 }
 
 function renderQuizQuestion() {
+  console.log("renderQuizQuestion called");
+  console.log(currentQuiz);
   if (
     !currentQuiz ||
     currentQuiz.currentQuestionIndex >= currentQuiz.questions.length
@@ -1507,6 +1608,9 @@ function renderQuizQuestion() {
   const question = currentQuiz.questions[currentQuiz.currentQuestionIndex];
   const questionEl = document.getElementById("topicQuizQuestionText");
   const optionsEl = document.getElementById("topicQuizOptions");
+  console.log("QUESTION =", question);
+  console.log("questionEl =", questionEl);
+  console.log("optionsEl =", optionsEl);
   const progressEl = document.getElementById("topicQuizProgress");
   const counterEl = document.getElementById("topicQuizCounter");
 
@@ -1573,13 +1677,17 @@ function selectQuizAnswer(selectedIndex) {
   }, 1200);
 }
 
+console.log("FINISH QUIZ");
+console.log("Score:", currentQuiz.score);
+console.log("Questions:", currentQuiz.questions.length);
+
 function finishQuiz() {
-  const topicKey = getQuizTopicKey(currentQuiz.topic);
+  const topicKey = currentQuiz.topic;
   const score = currentQuiz.score;
   const total = currentQuiz.questions.length;
   const percentage = Math.round((score / total) * 100);
+  const completionTime = stopQuizTimer();
 
-  // Update user progress
   if (!userProgress.quizScores[topicKey]) {
     userProgress.quizScores[topicKey] = {
       bestScore: 0,
@@ -1589,33 +1697,49 @@ function finishQuiz() {
   }
 
   const record = userProgress.quizScores[topicKey];
+  const bestTime = userProgress.bestQuizTimes[topicKey];
+
+  if (!bestTime || completionTime < bestTime) {
+    userProgress.bestQuizTimes[topicKey] = completionTime;
+  }
+  updateQuizTimerDisplay(topicKey);
+
   record.attempts++;
+
   if (percentage > record.bestScore) {
     record.bestScore = percentage;
   }
 
-  // Award XP
-  const xpEarned = Math.round(score * 10); // 10 XP per correct answer
+  const xpEarned = Math.round(score * 10);
+
   addXP(xpEarned);
+
   record.totalXP += xpEarned;
 
   saveUserData();
-
-  // Show results
-  showQuizResults(score, total, percentage, xpEarned);
-
-  // Update display
-  updateQuizProgressDisplay(currentQuiz.topic);
+  document.getElementById("topicQuizQuestionText").style.display = "none";
+  document.getElementById("topicQuizOptions").style.display = "none";
+  console.log("RESULTS:", score, total, percentage, xpEarned, completionTime);
+  showQuizResults(score, total, percentage, xpEarned, completionTime);
+  document.getElementById("topicQuizResult").scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+  updateQuizProgressDisplay(topicKey);
   updateDashboard();
   updateGamification();
-
-  setTimeout(() => {
-    closeQuizModal();
-    currentQuiz = null;
-  }, 1500);
 }
 
-function showQuizResults(score, total, percentage, xpEarned) {
+console.log("SHOW RESULTS");
+console.log({
+  score,
+  total,
+  percentage,
+  xpEarned,
+  completionTime,
+});
+
+function showQuizResults(score, total, percentage, xpEarned, completionTime) {
   const resultEl = document.getElementById("topicQuizResult");
   if (!resultEl) return;
 
@@ -1645,12 +1769,12 @@ function showQuizResults(score, total, percentage, xpEarned) {
             </div>
             <p>You got <strong>${score}</strong> out of <strong>${total}</strong> questions correct</p>
             <p class="xp-gained">+${xpEarned} XP earned!</p>
+            <p class="completion-time">Completion Time: ${formatQuizTime(completionTime)}</p>
         </div>
     `;
 
   resultEl.classList.remove("hidden");
 }
-
 // ===== PRACTICE SECTION =====
 function initPracticeSection() {
   const problemsGrid = document.querySelector(".problems-grid");
@@ -1737,6 +1861,11 @@ function renderProblems(filter = "all", searchQuery = "") {
 data-id="${problem.id}">
         <i class="fas fa-heart"></i>
     </button>
+    <button class="notes-btn ${
+      userProgress.problemNotes[problem.id] ? "has-notes" : ""
+    }" data-id="${problem.id}">
+  <i class="fas fa-sticky-note"></i>
+</button>
 
                 <span class="difficulty-badge ${getDifficultyClass(problem.difficulty)}">${problem.difficulty}</span>
             </div>
@@ -1772,6 +1901,17 @@ data-id="${problem.id}">
     });
   });
 
+  // Notes button handlers
+  problemsGrid.querySelectorAll(".notes-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      console.log("NOTES CLICKED");
+      const problemId = parseInt(btn.dataset.id);
+      currentNotesProblemId = problemId;
+      openNotesModal(problemId);
+    });
+  });
+
   // Add click handlers
   problemsGrid.querySelectorAll(".problem-card").forEach((card) => {
     card.addEventListener("click", () => {
@@ -1795,6 +1935,40 @@ function toggleFavorite(problemId) {
   }
 
   saveUserData();
+}
+
+function openNotesModal(problemId) {
+  console.log("OPENING MODAL", problemId);
+  currentNotesProblemId = problemId;
+
+  const modal = document.getElementById("notesModal");
+  const textarea = document.getElementById("problemNotesInput");
+
+  textarea.value = userProgress.problemNotes[problemId] || "";
+
+  modal.classList.add("active");
+}
+
+function closeNotesModal() {
+  const modal = document.getElementById("notesModal");
+
+  modal.classList.remove("active");
+}
+
+function saveProblemNotes() {
+  const textarea = document.getElementById("problemNotesInput");
+
+  const note = textarea.value.trim();
+
+  if (currentNotesProblemId !== null) {
+    userProgress.problemNotes[currentNotesProblemId] = note;
+
+    saveUserData();
+
+    showNotification("Notes saved successfully 📝", "success");
+  }
+
+  closeNotesModal();
 }
 
 // ===== ROADMAP =====
@@ -2227,7 +2401,7 @@ function initChatbot() {
     if (!message) return;
 
     // Add user message
-    addChatMessage(`<p>${message}</p>`, "user");
+    addChatMessage(message, "user");
 
     // Store previous question
     lastQuestion = message;
@@ -2283,7 +2457,13 @@ function addChatMessage(message, sender) {
   const messagesContainer = document.getElementById("chatbotMessages");
   const messageEl = document.createElement("div");
   messageEl.className = `message ${sender}`;
-  messageEl.innerHTML = message;
+  // Safe rendering
+  if (sender === "user") {
+    messageEl.textContent = message;
+  } else {
+    messageEl.innerHTML = message;
+  }
+
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
@@ -2303,10 +2483,10 @@ function getBotResponse(question) {
   return `
     <div class="assistant-response">
       <h4>🧠 Problem Understanding</h4>
-      <p>${question}</p>
+      <p>${escapeHtml(question)}</p>
 
       <h4>⚡ Approach</h4>
-      <p>${response}</p>
+      <p>${escapeHtml(response)}</p>
 
       <h4>💻 Code Solution</h4>
       <pre><code>
@@ -2467,9 +2647,12 @@ function loadUserData() {
       xp: 0,
       level: 1,
       streak: 0,
+      favoriteProblems: [],
+      problemNotes: {},
       badges: [],
       lastActive: null,
       quizScores: {},
+      bestQuizTimes: {},
     };
     saveUserData();
   }
