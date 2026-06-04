@@ -99,6 +99,8 @@ Users can now:
 - 👑 Master (100 problems)
 - 🎯 Sharpshooter (25 problems + 2,500 XP)
 
+**Badge tooltips:** Hover or tap any badge on the dashboard to see the badge name, description, and unlock criteria.
+
 ### Dashboard
 - Complete statistics overview
 - Recent activity feed
