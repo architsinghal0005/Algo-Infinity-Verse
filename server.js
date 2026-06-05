@@ -288,10 +288,7 @@ async function handleApi(req, res, pathname) {
       password: hashPassword(String(payload.password)),
       createdAt: new Date().toISOString(),
     };
-   const existing = useFirestore
-      ? await getUserByEmail(email)
-      : (await readUsers()).find((user) => user.email === email);
-    if (existing) {
+    await createUser(user);
 
     const token = createSessionToken(user);
     return sendJson(
@@ -393,6 +390,10 @@ const server = http.createServer(async (req, res) => {
 });
 
 export { server };
+if (process.env.VERCEL === "1") {
+  db = initializeFirebase();
+  useFirestore = !!db;
+}
 
 if (process.env.VERCEL !== "1") {
   loadEnvFile()

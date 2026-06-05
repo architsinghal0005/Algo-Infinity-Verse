@@ -2208,7 +2208,7 @@ body {
 }
 
 .quiz-loading h3 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: Orbitron, sans-serif;
     font-size: 1.6rem;
     margin-top: 1rem;
     background: var(--gradient-3);
@@ -2465,9 +2465,9 @@ body {
   resize: none;
   tab-size: 4;
   overflow: auto;
-  white-space: pre-wrap;
-  overflow-x: hidden;
-  overflow-wrap: break-word;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-wrap: normal;
   box-sizing: border-box;
   position: absolute;
   top: 0;
@@ -3085,6 +3085,7 @@ body {
   flex-direction: column;
 }
 
+.timer-label,
 .quiz-timer-label,
 .quiz-best-time-label {
   font-size: 0.72rem;
@@ -3093,12 +3094,13 @@ body {
   color: var(--text-secondary);
 }
 
+.timer-value,
 .quiz-timer,
 .quiz-best-time {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
-  font-family: "Orbitron", sans-serif;
+  font-family: Orbitron, sans-serif;
 }
 
 .quiz-counter {
