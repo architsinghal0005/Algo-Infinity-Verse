@@ -99,12 +99,22 @@ Users can now:
 - 👑 Master (100 problems)
 - 🎯 Sharpshooter (25 problems + 2,500 XP)
 
+**Badge tooltips:** Hover or tap any badge on the dashboard to see the badge name, description, and unlock criteria.
+
 ### Dashboard
 - Complete statistics overview
 - Recent activity feed
 - Achievement badges display
 - Leaderboard comparison
 - Roadmap progress visualization
+
+### Authentication
+- Secure signup and login pages
+- PBKDF2 password hashing with per-user salts
+- Signed JWT-style sessions stored in HTTP-only cookies
+- Logout endpoint that clears the session cookie
+- Protected community and support pages
+- Dashboard/profile hash routes redirected to login when unauthenticated
 
 ### Interactive Code Editor
 - Multi-language support (JavaScript, Python, Java, C++)
@@ -145,6 +155,8 @@ Users can now:
 - **HTML5**: Semantic markup
 - **CSS3**: Custom properties, Flexbox, Grid, animations
 - **JavaScript (ES6+)**: Vanilla JS, no frameworks
+- **Node.js**: Local HTTP server and authentication APIs
+- **Node Crypto**: Password hashing and signed session tokens
 - **LocalStorage**: Persistent user data
 - **Font Awesome**: Icon library
 - **Google Fonts**: Orbitron, Poppins, Fira Code
@@ -155,7 +167,7 @@ Users can now:
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (optional, can open directly)
+- Node.js 18+ for authentication
 
 ### Installation
 
@@ -165,17 +177,24 @@ Users can now:
    cd Algo-Infinity-Verse
    ```
 
-2. **Open the application**
-   - Simply open `index.html` in your browser
-   - Or use a local server:
+2. **Start the authenticated app**
+   Create your local environment file:
    ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx serve
+   cp .env.example .env
    ```
-   Then visit `http://localhost:8000`
+
+   Generate a session secret and paste it into `.env`:
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+   ```
+
+   Start the server:
+   ```bash
+   npm start
+   ```
+   Then visit `http://127.0.0.1:3000`
+
+   You can still open `index.html` directly for static browsing, but signup, login, protected routes, and HTTP-only sessions require the Node server.
 
 3. **Start learning!**
    - Create your profile
@@ -191,6 +210,10 @@ Users can now:
 ```
 Algo-Infinity-Verse/
 ├── index.html          # Main HTML structure
+├── login.html          # Login page
+├── signup.html         # Registration page
+├── server.js           # Static server and authentication API
+├── auth.js             # Client-side auth UI and route guards
 ├── styles.css          # All CSS styles and responsive design
 ├── script.js           # JavaScript logic, data, and interactivity
 └── README.md           # Project documentation

@@ -810,6 +810,14 @@ const practiceProblems = [
     tags: ["Arrays", "Hash Table"],
     acceptance: "48.2%",
     category: "arrays",
+    description:
+      "Given an array of integers nums and an integer target, return indices of the two numbers that add up to target. You may assume exactly one solution exists, and you may not use the same element twice. Return the answer in any order.",
+    constraints: [
+      "2 ≤ nums.length ≤ 10⁴",
+      "-10⁹ ≤ nums[i] ≤ 10⁹",
+      "Only one valid answer exists",
+    ],
+    followUp: "Can you solve it in O(n) time complexity?",
   },
   {
     id: 2,
@@ -818,6 +826,13 @@ const practiceProblems = [
     tags: ["Strings", "Stack"],
     acceptance: "40.2%",
     category: "strings",
+    description:
+      "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. A string is valid if every open bracket is closed by the same type of bracket in the correct order.",
+    constraints: [
+      "1 ≤ s.length ≤ 10⁴",
+      "s consists of parentheses only '()[]{}'",
+    ],
+    followUp: "Can you solve it in O(n) time and O(n) space?",
   },
   {
     id: 3,
@@ -968,14 +983,26 @@ let userProgress = {
   name: "Learner",
   avatar: "🚀",
   completedProblems: [],
+
   favoriteProblems: [], //here i have added a new property to store the user's favorite problems
+  recentProblems: [], //here i have added a new property to store the user's recent problems
+
+  favoriteProblems: [], //here i have added a new property to store the user's favorite problems
+  problemNotes: {},
   xp: 0,
   level: 1,
   streak: 0,
   badges: [],
   lastActive: null,
   quizScores: {}, // topic -> { bestScore, attempts, totalXP }
+  bestQuizTimes: {},
 };
+
+applySavedTheme();
+
+// ===== QUIZ EDITOR (state) =====
+// Declared early to avoid TDZ issues when referenced by event handlers.
+let currentProblem = null;
 
 // ===== INITIALIZATION =====
 document.addEventListener("DOMContentLoaded", () => {
@@ -984,6 +1011,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLoadingScreen();
   initNavbar();
   initHeroSection();
+  initTopicOfTheDay();
   initTopicsSection();
   initQuizSection();
   initPracticeSection();
@@ -992,8 +1020,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initGamification();
   initChatbot();
   initProfile();
-  initScrollEffects();
   initDarkMode();
+  initNewsletterValidation();
+  initScrollEffects();
 
   // Update profile display after loading
   updateProfile();
@@ -1022,6 +1051,34 @@ document.addEventListener("DOMContentLoaded", () => {
     topicModal.addEventListener("click", (e) => {
       if (e.target === topicModal) {
         closeTopicModal();
+      }
+    });
+  }
+
+  const saveNotesBtn = document.getElementById("saveNotesBtn");
+
+  if (saveNotesBtn) {
+    saveNotesBtn.addEventListener("click", saveProblemNotes);
+  }
+
+  const notesModalClose = document.getElementById("notesModalClose");
+
+  if (notesModalClose) {
+    notesModalClose.addEventListener("click", closeNotesModal);
+  }
+
+  const closeNotesBtn = document.getElementById("closeNotesBtn");
+
+  if (closeNotesBtn) {
+    closeNotesBtn.addEventListener("click", closeNotesModal);
+  }
+
+  const notesModal = document.getElementById("notesModal");
+
+  if (notesModal) {
+    notesModal.addEventListener("click", (e) => {
+      if (e.target === notesModal) {
+        closeNotesModal();
       }
     });
   }
@@ -1289,23 +1346,96 @@ document.addEventListener("click", (e) => {
   }
 });
 
+function getTopicProgress(topicName) {
+  // Map topic names to category keys used in practiceProblems
+  const categoryMap = {
+    Arrays: "arrays",
+    Strings: "strings",
+    "Linked List": "linkedlist",
+    Trees: "trees",
+    Graphs: "graphs",
+    "Dynamic Programming": "dp",
+  };
+
+  const category = categoryMap[topicName];
+  if (!category) return { completed: 0, total: 0, percentage: 0 };
+
+  const topicProblems = practiceProblems.filter((p) => p.category === category);
+  const total = topicProblems.length;
+  if (total === 0) return { completed: 0, total: 0, percentage: 0 };
+
+  const completed = topicProblems.filter((p) =>
+    userProgress.completedProblems.includes(p.id),
+  ).length;
+
+  const percentage = Math.round((completed / total) * 100);
+  return { completed, total, percentage };
+}
+
 // ===== TOPICS SECTION =====
+function getDailyTopic() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  const index = dayOfYear % dsaTopics.length;
+  return dsaTopics[index];
+}
+
+function initTopicOfTheDay() {
+  const topic = getDailyTopic();
+  if (!topic) return;
+
+  document.getElementById("totdIcon").textContent = topic.icon;
+  document.getElementById("totdTitle").textContent = topic.name;
+  document.getElementById("totdDesc").textContent = topic.description;
+
+  const diffEl = document.getElementById("totdDifficulty");
+  diffEl.textContent = topic.difficulty;
+  diffEl.className = `totd-difficulty difficulty-badge ${getDifficultyClass(topic.difficulty)}`;
+
+  const progress = getTopicProgress(topic.name);
+  document.getElementById("totdProblems").textContent =
+    `${progress.completed}/${progress.total} solved`;
+
+  document.getElementById("totdBtn").addEventListener("click", () => {
+    openTopicModal(topic);
+  });
+}
+
 function initTopicsSection() {
   const topicsGrid = document.querySelector(".topics-grid");
-
+  topicsGrid.innerHTML = "";
   dsaTopics.forEach((topic, index) => {
     const card = document.createElement("div");
     card.className = "topic-card animate-in";
     card.style.animationDelay = `${index * 0.1}s`;
+    const progress = getTopicProgress(topic.name);
+
     card.innerHTML = `
-            <div class="topic-icon">${topic.icon}</div>
-            <h3 class="topic-name">${topic.name}</h3>
-            <p class="topic-desc">${topic.description}</p>
-            <div class="topic-meta">
-                <span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span>
-                <span class="topic-count">${topic.problems.length} problems</span>
+        <div class="topic-icon">${topic.icon}</div>
+        <h3 class="topic-name">${topic.name}</h3>
+        <p class="topic-desc">${topic.description}</p>
+        <div class="topic-meta">
+            <span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span>
+            <span class="topic-count">${progress.total} problems</span>
+        </div>
+        <div class="topic-mastery">
+            <div class="mastery-header">
+                <span class="mastery-label">Progress</span>
+                <span class="mastery-stats">${progress.completed}/${progress.total} solved</span>
             </div>
-        `;
+            <div class="mastery-bar" role="progressbar" aria-valuenow="${progress.percentage}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} mastery progress">
+                <div class="mastery-fill" style="width: ${progress.percentage}%"></div>
+            </div>
+            </div>
+            <div class="mastery-bar" role="progressbar" aria-valuenow="${progress.percentage}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} mastery progress">
+                <div class="mastery-fill" style="width: ${progress.percentage}%"></div>
+            </div>
+            <span class="mastery-percentage">${progress.percentage}%</span>
+        </div>
+    `;
 
     topicsGrid.appendChild(card);
 
@@ -1330,6 +1460,9 @@ function getDifficultyClass(difficulty) {
 
 // Get quiz topic key from topic object
 function getQuizTopicKey(topic) {
+  if (typeof topic === "string") {
+    return topic;
+  }
   const name = topic.name.toLowerCase();
   // Map topic names to quiz keys
   const keyMap = {
@@ -1342,6 +1475,7 @@ function getQuizTopicKey(topic) {
   };
   return keyMap[name] || name.replace(/\s+/g, "");
 }
+
 function initQuizSection() {
   try {
     console.log("Initializing Quiz Section...");
@@ -1378,6 +1512,10 @@ function initQuizSection() {
                 </button>
             `;
       quizGrid.appendChild(card);
+      card.addEventListener("click", () => {
+        console.log("QUIZ CARD CLICKED");
+        startQuiz(topicKey);
+      });
       console.log(`Quiz card created for ${topic.name}`);
 
       // Update progress display
@@ -1388,7 +1526,9 @@ function initQuizSection() {
       if (startBtn) {
         startBtn.addEventListener("click", () => {
           console.log(`Start Quiz clicked for ${topic.name}`);
-          startQuiz(topic);
+          console.log("QUIZ BUTTON CLICKED");
+          console.log("Topic Key:", topicKey);
+          startQuiz(topicKey);
         });
       } else {
         console.error("Start quiz button not found for topic:", topic.name);
@@ -1420,43 +1560,38 @@ function updateQuizProgressDisplay(topic) {
   attemptsEl.textContent = quizData.attempts;
 }
 
-function startQuiz(topic) {
-  const topicKey = getQuizTopicKey(topic);
-  const questions = quizQuestions[topicKey];
-
-  if (!questions || questions.length === 0) {
-    showNotification(
-      "No quiz questions available for this topic yet!",
-      "error",
-    );
+function startQuiz(topicKey) {
+  console.log("startQuiz called");
+  console.log("topicKey =", topicKey);
+  console.log("startQuiz called with:", topicKey);
+  const topicQuiz = quizQuestions[topicKey];
+  if (!topicQuiz || topicQuiz.length === 0) {
+    console.error("Quiz data not found for:", topicKey);
     return;
   }
 
+  const resultEl = document.getElementById("topicQuizResult");
+
+  if (resultEl) {
+    resultEl.classList.add("hidden");
+    resultEl.innerHTML = "";
+  }
+  document.getElementById("topicQuizQuestionText").style.display = "block";
+  document.getElementById("topicQuizOptions").style.display = "block";
+  document.getElementById("topicQuizProgress").style.display = "block";
+  document.getElementById("topicQuizCounter").style.display = "block";
   currentQuiz = {
-    topic: topic,
-    questions: shuffleArray([...questions]),
+    topic: topicKey,
+    questions: [...topicQuiz],
     currentQuestionIndex: 0,
     score: 0,
     answers: [],
   };
 
-  // Set modal header info
-  try {
-    document.getElementById("topicQuizBadge").textContent = topic.name;
-    document.getElementById("topicQuizDifficulty").textContent =
-      topic.difficulty;
-    document.getElementById("topicQuizTitle").textContent =
-      `${topic.name} Quiz`;
-
-    // Hide previous results
-    const prevResult = document.getElementById("topicQuizResult");
-    if (prevResult) prevResult.classList.add("hidden");
-  } catch (e) {
-    console.error("Error setting quiz modal header:", e);
-    return;
-  }
-
   openQuizModal();
+
+  startQuizTimer(topicKey);
+
   renderQuizQuestion();
 }
 
@@ -1469,10 +1604,61 @@ function shuffleArray(array) {
   return array;
 }
 
+function startQuizTimer(topicKey) {
+  clearInterval(quizTimerInterval);
+  quizStartTime = Date.now();
+
+  updateQuizTimerDisplay(topicKey);
+
+  quizTimerInterval = setInterval(() => {
+    updateQuizTimerDisplay(topicKey);
+  }, 1000);
+}
+
+function stopQuizTimer() {
+  clearInterval(quizTimerInterval);
+
+  const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+
+  return elapsedSeconds;
+}
+
+function updateQuizTimerDisplay(topicKey) {
+  const timerEl = document.getElementById("quizTimer");
+
+  const bestTimeEl = document.getElementById("bestQuizTime");
+
+  if (!timerEl || !bestTimeEl) return;
+
+  const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+
+  timerEl.textContent = formatQuizTime(elapsedSeconds);
+
+  const bestTime = userProgress.bestQuizTimes[topicKey];
+
+  bestTimeEl.textContent = bestTime ? formatQuizTime(bestTime) : "--:--";
+}
+
+function formatQuizTime(seconds) {
+  const mins = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+
+  const secs = (seconds % 60).toString().padStart(2, "0");
+
+  return `${mins}:${secs}`;
+}
+
 // Quiz Modal
 let currentQuiz = null;
+let lastQuizReview = null;
+let lastQuizResultData = null;
+let quizStartTime = null;
+let quizTimerInterval = null;
+// let currentNotesProblemId = null; // duplicate declaration removed
 
 function openQuizModal() {
+  console.log("Opening quiz modal");
   try {
     const modal = document.getElementById("quizModal");
     if (modal) {
@@ -1489,13 +1675,30 @@ function closeQuizModal() {
   try {
     const modal = document.getElementById("quizModal");
     if (modal) modal.classList.remove("active");
+
+    // Hide old quiz result
+    const resultEl = document.getElementById("topicQuizResult");
+    if (resultEl) {
+      resultEl.classList.add("hidden");
+      resultEl.innerHTML = "";
+    }
+
+    // Restore quiz elements for next attempt
+    document.getElementById("topicQuizQuestionText").style.display = "block";
+    document.getElementById("topicQuizOptions").style.display = "block";
+    document.getElementById("topicQuizProgress").style.display = "block";
+    document.getElementById("topicQuizCounter").style.display = "block";
   } catch (e) {
     console.error("Error closing quiz modal:", e);
   }
+
+  clearInterval(quizTimerInterval);
   currentQuiz = null;
 }
 
 function renderQuizQuestion() {
+  console.log("renderQuizQuestion called");
+  console.log(currentQuiz);
   if (
     !currentQuiz ||
     currentQuiz.currentQuestionIndex >= currentQuiz.questions.length
@@ -1507,6 +1710,9 @@ function renderQuizQuestion() {
   const question = currentQuiz.questions[currentQuiz.currentQuestionIndex];
   const questionEl = document.getElementById("topicQuizQuestionText");
   const optionsEl = document.getElementById("topicQuizOptions");
+  console.log("QUESTION =", question);
+  console.log("questionEl =", questionEl);
+  console.log("optionsEl =", optionsEl);
   const progressEl = document.getElementById("topicQuizProgress");
   const counterEl = document.getElementById("topicQuizCounter");
 
@@ -1574,12 +1780,12 @@ function selectQuizAnswer(selectedIndex) {
 }
 
 function finishQuiz() {
-  const topicKey = getQuizTopicKey(currentQuiz.topic);
+  const topicKey = currentQuiz.topic;
   const score = currentQuiz.score;
   const total = currentQuiz.questions.length;
   const percentage = Math.round((score / total) * 100);
+  const completionTime = stopQuizTimer();
 
-  // Update user progress
   if (!userProgress.quizScores[topicKey]) {
     userProgress.quizScores[topicKey] = {
       bestScore: 0,
@@ -1589,36 +1795,61 @@ function finishQuiz() {
   }
 
   const record = userProgress.quizScores[topicKey];
+  const bestTime = userProgress.bestQuizTimes[topicKey];
+
+  if (!bestTime || completionTime < bestTime) {
+    userProgress.bestQuizTimes[topicKey] = completionTime;
+  }
+  updateQuizTimerDisplay(topicKey);
+
   record.attempts++;
+
   if (percentage > record.bestScore) {
     record.bestScore = percentage;
   }
 
-  // Award XP
-  const xpEarned = Math.round(score * 10); // 10 XP per correct answer
+  const xpEarned = Math.round(score * 10);
+
   addXP(xpEarned);
+
   record.totalXP += xpEarned;
 
   saveUserData();
+  document.getElementById("topicQuizQuestionText").style.display = "none";
+  document.getElementById("topicQuizOptions").style.display = "none";
+  console.log("RESULTS:", score, total, percentage, xpEarned, completionTime);
+  const reviewSnapshot = JSON.parse(JSON.stringify(currentQuiz));
+  lastQuizReview = reviewSnapshot;
+lastQuizResultData = {
+  score,
+  total,
+  percentage,
+  xpEarned,
+  completionTime,
+};
+const resultEl = document.getElementById("topicQuizResult");
 
-  // Show results
-  showQuizResults(score, total, percentage, xpEarned);
-
-  // Update display
-  updateQuizProgressDisplay(currentQuiz.topic);
+if (resultEl) {
+    resultEl.classList.remove("hidden");
+}
+  showQuizResults(score, total, percentage, xpEarned, completionTime);
+  document.getElementById("topicQuizResult").scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+  document.getElementById("topicQuizProgress").style.display = "none";
+document.getElementById("topicQuizCounter").style.display = "none";
+  updateQuizProgressDisplay(topicKey);
   updateDashboard();
   updateGamification();
-
-  setTimeout(() => {
-    closeQuizModal();
-    currentQuiz = null;
-  }, 1500);
+  console.log("SAVING REVIEW");
+  console.log(currentQuiz);
 }
 
-function showQuizResults(score, total, percentage, xpEarned) {
+function showQuizResults(score, total, percentage, xpEarned, completionTime) {
   const resultEl = document.getElementById("topicQuizResult");
   if (!resultEl) return;
-
+resultEl.classList.remove("hidden");
   let message = "";
   let icon = "";
 
@@ -1645,16 +1876,113 @@ function showQuizResults(score, total, percentage, xpEarned) {
             </div>
             <p>You got <strong>${score}</strong> out of <strong>${total}</strong> questions correct</p>
             <p class="xp-gained">+${xpEarned} XP earned!</p>
+            <p class="completion-time">Completion Time: ${formatQuizTime(completionTime)}</p>
         </div>
     `;
-
-  resultEl.classList.remove("hidden");
+  resultEl.innerHTML += `
+  <button class="btn btn-primary review-btn" onclick="showQuizReview()">
+    📖 Review Answers
+  </button>
+`;
 }
 
+function showQuizReview() {
+  if (
+    !lastQuizReview ||
+    !lastQuizReview.questions ||
+    !lastQuizReview.answers
+  ) {
+    showNotification("No review data found", "error");
+    return;
+  }
+
+  const resultEl = document.getElementById("topicQuizResult");
+
+  let html = `
+    <div class="quiz-review">
+      <h2>📖 Quiz Review</h2>
+  `;
+
+  lastQuizReview.questions.forEach((q, index) => {
+    const answer = lastQuizReview.answers[index] || {};
+
+    html += `
+      <div class="review-item">
+        <h4>Q${index + 1}. ${q.question}</h4>
+
+        <p>
+          <strong>Your Answer:</strong>
+          ${
+            answer.selected !== undefined
+              ? q.options[answer.selected]
+              : "Not Answered"
+          }
+          ${answer.isCorrect ? "✅" : "❌"}
+        </p>
+
+        <p class="correct-answer">
+          <strong>Correct Answer:</strong>
+          ${q.options[q.correct]}
+        </p>
+
+        <p>
+          <strong>Explanation:</strong>
+          ${q.explanation}
+        </p>
+      </div>
+    `;
+  });
+
+  html += `
+      <button class="btn btn-primary" onclick="restoreQuizResults()">
+        Back
+      </button>
+
+      <button class="btn btn-secondary" onclick="closeQuizModal()">
+        Close
+      </button>
+    </div>
+  `;
+
+  resultEl.innerHTML = html;
+}
+function restoreQuizResults() {
+  if (!lastQuizResultData) return;
+
+  showQuizResults(
+    lastQuizResultData.score,
+    lastQuizResultData.total,
+    lastQuizResultData.percentage,
+    lastQuizResultData.xpEarned,
+    lastQuizResultData.completionTime
+  );
+}
 // ===== PRACTICE SECTION =====
 function initPracticeSection() {
   const problemsGrid = document.querySelector(".problems-grid");
   if (!problemsGrid) return;
+
+  const notesCloseBtn = document.getElementById("notesModalClose");
+  const notesCancelBtn = document.getElementById("notesCancelBtn");
+  const notesSaveBtn = document.getElementById("notesSaveBtn");
+  const notesModal = document.getElementById("notesModal");
+
+  if (notesCloseBtn) {
+    notesCloseBtn.addEventListener("click", closeNotesModal);
+  }
+  if (notesCancelBtn) {
+    notesCancelBtn.addEventListener("click", closeNotesModal);
+  }
+  if (notesSaveBtn) {
+    notesSaveBtn.addEventListener("click", saveProblemNotes);
+  }
+  if (notesModal) {
+    notesModal.addEventListener("click", (e) => {
+      if (e.target === notesModal) {
+        closeNotesModal();
+      }
+    });
+  }
 
   // Filter buttons
   const filterButtons = document.querySelectorAll(".filter-btn");
@@ -1721,25 +2049,45 @@ function renderProblems(filter = "all", searchQuery = "") {
     return matchesFilter && matchesSearch;
   });
 
+  // Count updation functionality
+  const visibleCountEl = document.getElementById("visible-count");
+  const totalCountEl = document.getElementById("total-count");
+
+  if (visibleCountEl && totalCountEl) {
+    visibleCountEl.textContent = filteredProblems.length;
+    totalCountEl.textContent = practiceProblems.length;
+  }
+
   problemsGrid.innerHTML = filteredProblems
     .map(
       (problem) => `
         <div class="problem-card animate-in" data-id="${problem.id}">
             <div class="problem-header">
               <h3 class="problem-title">${problem.title}</h3>
-              <div class="problem-actions">
-              <button class="favorite-btn ${
-                //here we check if the problem is in the user's favorites and add the 'active' class to the button if it is
-                userProgress.favoriteProblems.includes(problem.id)
-                  ? "active"
-                  : ""
-              }"
+               <div class="problem-actions">
+               <button class="favorite-btn ${
+                 //here we check if the problem is in the user's favorites and add the 'active' class to the button if it is
+                 userProgress.favoriteProblems.includes(problem.id)
+                   ? "active"
+                   : ""
+               }"
 data-id="${problem.id}">
         <i class="fas fa-heart"></i>
     </button>
+    <button class="notes-btn ${
+      userProgress.problemNotes[problem.id] ? "has-notes" : ""
+    }" data-id="${problem.id}">
+  <i class="fas fa-sticky-note"></i>
+</button>
 
-                <span class="difficulty-badge ${getDifficultyClass(problem.difficulty)}">${problem.difficulty}</span>
-            </div>
+               <button class="notes-btn ${
+                 userProgress.problemNotes[problem.id] ? "active" : ""
+               }" data-id="${problem.id}">
+                 <i class="fas fa-sticky-note"></i>
+               </button>
+
+                 <span class="difficulty-badge ${getDifficultyClass(problem.difficulty)}">${problem.difficulty}</span>
+             </div>
             </div>
             <div class="problem-tags">
                 ${problem.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
@@ -1772,6 +2120,17 @@ data-id="${problem.id}">
     });
   });
 
+  // Notes button handlers
+  problemsGrid.querySelectorAll(".notes-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      console.log("NOTES CLICKED");
+      const problemId = parseInt(btn.dataset.id);
+      currentNotesProblemId = problemId;
+      openNotesModal(problemId);
+    });
+  });
+
   // Add click handlers
   problemsGrid.querySelectorAll(".problem-card").forEach((card) => {
     card.addEventListener("click", () => {
@@ -1795,6 +2154,40 @@ function toggleFavorite(problemId) {
   }
 
   saveUserData();
+}
+
+function openNotesModal(problemId) {
+  console.log("OPENING MODAL", problemId);
+  currentNotesProblemId = problemId;
+
+  const modal = document.getElementById("notesModal");
+  const textarea = document.getElementById("problemNotesInput");
+
+  textarea.value = userProgress.problemNotes[problemId] || "";
+
+  modal.classList.add("active");
+}
+
+function closeNotesModal() {
+  const modal = document.getElementById("notesModal");
+
+  modal.classList.remove("active");
+}
+
+function saveProblemNotes() {
+  const textarea = document.getElementById("problemNotesInput");
+
+  const note = textarea.value.trim();
+
+  if (currentNotesProblemId !== null) {
+    userProgress.problemNotes[currentNotesProblemId] = note;
+
+    saveUserData();
+
+    showNotification("Notes saved successfully 📝", "success");
+  }
+
+  closeNotesModal();
 }
 
 // ===== ROADMAP =====
@@ -1824,12 +2217,23 @@ function initProfile() {
     profileName.textContent = userProgress.name;
   }
   var joinDate = document.getElementById("joinDate");
-  if (joinDate) {
+  var joinDateSection = document.getElementById("joinDateSection");
+  if (joinDate || joinDateSection) {
     var today = new Date();
-    joinDate.textContent = today.toLocaleDateString("en-US", {
+    var formattedDate = today.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
+    });
+    if (joinDate) joinDate.textContent = formattedDate;
+    if (joinDateSection) joinDateSection.textContent = formattedDate;
+  }
+  var currentDate = document.getElementById("current-date");
+  if (currentDate) {
+    currentDate.textContent = new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
     });
   }
   var avatarIcon = document.querySelector(".avatar-icon");
@@ -1919,7 +2323,7 @@ function updateProfile() {
   }
 
   // Update profile name in dashboard
-  var dashboardProfileName = document.getElementById("dashboardProfileName");
+  var dashboardProfileName = document.getElementById("profileName");
   if (dashboardProfileName) {
     dashboardProfileName.textContent = userProgress.name;
   }
@@ -1931,10 +2335,9 @@ function updateProfile() {
   }
 
   // Update avatar
-  var avatarIcon = document.querySelector(".avatar-icon");
-  if (avatarIcon) {
-    avatarIcon.textContent = userProgress.avatar || "🚀";
-  }
+  document.querySelectorAll(".avatar-icon").forEach((el) => {
+    el.textContent = userProgress.avatar || "🚀";
+  });
 
   updateLevelProgress();
 }
@@ -1989,9 +2392,24 @@ function updateDashboard() {
   document.getElementById("currentStreak").textContent = userProgress.streak;
   document.getElementById("totalXP").textContent = userProgress.xp;
 
+  updateCurrentDate();
   updateActivityList();
   updateBadges();
+  updateRecentProblems(); // Recently Viewed Problems
   updateLeaderboard();
+}
+
+function updateCurrentDate() {
+  const dateEl = document.getElementById("dashboard-current-date");
+  if (dateEl) {
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
 }
 
 function updateActivityList() {
@@ -2025,6 +2443,46 @@ function updateActivityList() {
     )
     .join("");
 }
+// ===== RECENTLY VIEWED PROBLEMS ===== //
+function updateRecentProblems() {
+  const container = document.getElementById("recentProblemsList");
+
+  if (!container) return;
+
+  if (
+    !userProgress.recentProblems ||
+    userProgress.recentProblems.length === 0
+  ) {
+    container.innerHTML = "<p>No recently viewed problems</p>";
+    return;
+  }
+
+  container.innerHTML = userProgress.recentProblems
+    .map((id) => {
+      const problem = practiceProblems.find((p) => p.id === id);
+
+      if (!problem) return "";
+
+      return `
+        <div class="recent-problem" data-id="${problem.id}">
+          ${problem.title}
+        </div>
+      `;
+    })
+    .join("");
+
+  container.querySelectorAll(".recent-problem").forEach((item) => {
+    item.addEventListener("click", () => {
+      const problemId = parseInt(item.dataset.id);
+
+      const problem = practiceProblems.find((p) => p.id === problemId);
+
+      if (problem) {
+        openQuizEditor(problem);
+      }
+    });
+  });
+}
 
 function updateBadges() {
   const container = document.getElementById("badgesContainer");
@@ -2035,38 +2493,75 @@ function updateBadges() {
       id: 1,
       icon: "🌟",
       name: "First Steps",
+      description: "Begin your journey",
+      criteria: "Solve 1 problem",
       earned: userProgress.completedProblems.length >= 1,
     },
-    { id: 2, icon: "🔥", name: "On Fire", earned: userProgress.streak >= 7 },
-    { id: 3, icon: "💎", name: "Diamond", earned: userProgress.xp >= 5000 },
+    {
+      id: 2,
+      icon: "🔥",
+      name: "On Fire",
+      description: "Keep the momentum going",
+      criteria: "Maintain a 7-day streak",
+      earned: userProgress.streak >= 7,
+    },
+    {
+      id: 3,
+      icon: "💎",
+      name: "Diamond",
+      description: "Reach a major XP milestone",
+      criteria: "Earn 5,000 XP",
+      earned: userProgress.xp >= 5000,
+    },
     {
       id: 4,
       icon: "🚀",
       name: "Rocket",
+      description: "Speed through problems",
+      criteria: "Solve 50 problems",
       earned: userProgress.completedProblems.length >= 50,
     },
     {
       id: 5,
       icon: "👑",
       name: "Master",
+      description: "Achieve expert problem-solving",
+      criteria: "Solve 100 problems",
       earned: userProgress.completedProblems.length >= 100,
     },
     {
       id: 6,
       icon: "🎯",
       name: "Sharpshooter",
+      description: "Hit the target with consistency",
+      criteria: "Solve 25 problems and earn 2,500 XP",
       earned:
         userProgress.completedProblems.length >= 25 && userProgress.xp >= 2500,
     },
   ];
 
+  // Update userProgress badges
+  const newlyEarned = badges.filter((b) => b.earned).map((b) => b.id);
+
+  // Only save if badges changed to avoid unnecessary saves
+  const badgesChanged =
+    JSON.stringify(newlyEarned) !== JSON.stringify(userProgress.badges);
+  userProgress.badges = newlyEarned;
+  if (badgesChanged) {
+    saveUserData();
+  }
+
   // Dashboard badges
   container.innerHTML = badges
     .map(
       (badge) =>
-        `<div class="badge ${badge.earned ? "" : "locked"}">
+        `<div class="badge ${badge.earned ? "" : "locked"}" tabindex="0" aria-label="${badge.name}: ${badge.description}. ${badge.criteria}">
             ${badge.icon}
-            <span class="badge-tooltip">${badge.name}</span>
+            <span class="badge-tooltip">
+              <strong>${badge.name}</strong>
+              <span>${badge.description}</span>
+              <span>${badge.criteria}</span>
+            </span>
         </div>`,
     )
     .join("");
@@ -2075,9 +2570,13 @@ function updateBadges() {
   grid.innerHTML = badges
     .map(
       (badge) =>
-        `<div class="badge-lg ${badge.earned ? "" : "locked"}">
+        `<div class="badge-lg ${badge.earned ? "" : "locked"}" tabindex="0" aria-label="${badge.name}: ${badge.description}. ${badge.criteria}">
             ${badge.icon}
-            <span class="badge-tooltip">${badge.name}</span>
+            <span class="badge-tooltip">
+              <strong>${badge.name}</strong>
+              <span>${badge.description}</span>
+              <span>${badge.criteria}</span>
+            </span>
         </div>`,
     )
     .join("");
@@ -2326,18 +2825,39 @@ function solveProblem() {
 // ===== SCROLL EFFECTS =====
 function initScrollEffects() {
   const scrollTopBtn = document.getElementById("scrollTopBtn");
+  const backToTopBtn = document.getElementById("backToTopBtn");
 
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 500) {
-      scrollTopBtn.classList.add("visible");
-    } else {
-      scrollTopBtn.classList.remove("visible");
+  // Ensure missing elements don't break the rest of the page scripts.
+  const hasScrollTopBtn = !!scrollTopBtn;
+  const hasBackToTopBtn = !!backToTopBtn;
+
+  const setVisibleState = () => {
+    const shouldShow = window.scrollY > 500;
+
+    if (hasScrollTopBtn) {
+      scrollTopBtn.classList.toggle("visible", shouldShow);
     }
-  });
 
-  scrollTopBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+    // CSS for back-to-top uses .show
+    if (hasBackToTopBtn) {
+      backToTopBtn.classList.toggle("show", shouldShow);
+    }
+  };
+
+  window.addEventListener("scroll", setVisibleState);
+  setVisibleState();
+
+  if (hasScrollTopBtn) {
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  if (hasBackToTopBtn) {
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 
   // Intersection Observer for animations
   const observer = new IntersectionObserver(
@@ -2361,8 +2881,18 @@ function initScrollEffects() {
 }
 
 // ===== DARK MODE =====
+
+function applySavedTheme() {
+  const savedMode = localStorage.getItem("darkMode");
+
+  if (savedMode === "light") {
+    document.body.classList.add("light-mode");
+  }
+}
+
 function initDarkMode() {
   const toggle = document.getElementById("darkModeToggle");
+  if (!toggle) return;
   const icon = toggle.querySelector("i");
 
   // Check saved preference
@@ -2406,6 +2936,14 @@ function initializeAnimations() {
   });
 }
 
+function getDaysDifference(date1, date2) {
+  const d1 = new Date(date1);
+  d1.setHours(0, 0, 0, 0);
+  const d2 = new Date(date2);
+  d2.setHours(0, 0, 0, 0);
+  return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+
 // ===== LOCAL STORAGE =====
 function saveUserData() {
   try {
@@ -2427,14 +2965,15 @@ function loadUserData() {
       if (!userProgress.quizScores) {
         userProgress.quizScores = {};
       }
+      if (!userProgress.recentProblems) {
+        userProgress.recentProblems = [];
+      }
 
       // Update streak if user was active yesterday
       if (userProgress.lastActive) {
         const lastActive = new Date(userProgress.lastActive);
         const today = new Date();
-        const diffDays = Math.floor(
-          (today - lastActive) / (1000 * 60 * 60 * 24),
-        );
+        const diffDays = getDaysDifference(lastActive, today);
 
         if (diffDays === 0) {
           // Already active today
@@ -2467,9 +3006,12 @@ function loadUserData() {
       xp: 0,
       level: 1,
       streak: 0,
+      favoriteProblems: [],
+      problemNotes: {},
       badges: [],
       lastActive: null,
       quizScores: {},
+      bestQuizTimes: {},
     };
     saveUserData();
   }
@@ -2478,7 +3020,9 @@ function loadUserData() {
 }
 
 // ===== QUIZ EDITOR =====
-let currentProblem = null;
+// currentProblem declared near the top-level to avoid TDZ issues.
+
+// currentNotesProblemId is already declared earlier; do not redeclare it here.
 
 function openTopicModal(topic) {
   const modal = document.getElementById("topicModal");
@@ -2500,6 +3044,41 @@ function openTopicModal(topic) {
 
 function closeTopicModal() {
   document.getElementById("topicModal").classList.remove("active");
+}
+
+function openNotesModal(problemId) {
+  const modal = document.getElementById("notesModal");
+  if (!modal) return;
+
+  currentNotesProblemId = problemId;
+  const problem = practiceProblems.find((p) => p.id === problemId);
+  document.getElementById("notesModalTitle").textContent =
+    `Notes: ${problem ? problem.title : ""}`;
+  document.getElementById("notesEditor").value =
+    userProgress.problemNotes[problemId] || "";
+  modal.classList.add("active");
+}
+
+function closeNotesModal() {
+  const modal = document.getElementById("notesModal");
+  if (modal) {
+    modal.classList.remove("active");
+  }
+  currentNotesProblemId = null;
+}
+
+function saveProblemNotes() {
+  if (!currentNotesProblemId) return;
+
+  const notes = document.getElementById("notesEditor").value.trim();
+  userProgress.problemNotes[currentNotesProblemId] = notes;
+  saveUserData();
+  closeNotesModal();
+  showNotification("Notes saved successfully! 📝", "success");
+}
+
+function toggleNotesButton(btn, problemId) {
+  const hasNotes = btn.classList.toggle("active");
 }
 
 function closeQuizEditor() {
@@ -2569,6 +3148,7 @@ function submitQuizCode() {
   updateDashboard();
   updateGamification();
   initRoadmap();
+  initTopicsSection();
 
   closeQuizEditor();
   showNotification(
@@ -2579,21 +3159,82 @@ function submitQuizCode() {
 
 function generateExamples(problem) {
   const examples = {
-    1: "<strong>Example 1:</strong><br>Input: nums = [2,7,11,15], target = 9<br>Output: [0,1]<br>Explanation: nums[0] + nums[1] = 2 + 7 = 9",
-    2: '<strong>Example 1:</strong><br>Input: s = "()"<br>Output: true',
-    3: "<strong>Example 1:</strong><br>Input: l1 = [1,2,4], l2 = [1,3,4]<br>Output: [1,1,2,3,4,4]",
-    4: "<strong>Example 1:</strong><br>Input: nums = [-2,1,-3,4,-1,2,1,-5,4]<br>Output: 6<br>Explanation: [4,-1,2,1] has the largest sum = 6",
-    5: "<strong>Example:</strong><br>Design and implement LRU Cache",
-    6: "<strong>Example 1:</strong><br>Input: adjList = [[2,4],[1,3],[2,4],[1,3]]<br>Output: [[2,4],[1,3],[2,4],[1,3]]",
-    7: "<strong>Example 1:</strong><br>Input: nums = [10,9,2,5,3,7,101,18]<br>Output: 4",
-    8: '<strong>Example 1:</strong><br>Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]<br>Output: 5',
-    9: "<strong>Example 1:</strong><br>Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]<br>Output: 6",
-    10: "<strong>Example 1:</strong><br>Input: head = [1,2,3,4,5]<br>Output: [5,4,3,2,1]",
-    11: "<strong>Example 1:</strong><br>Input: root = [4,2,7,1,3,6,9]<br>Output: [4,7,2,9,6,3,1]",
-    12: "<strong>Example 1:</strong><br>Input: root = [2,1,3]<br>Output: true",
-    13: '<strong>Example 1:</strong><br>Input: grid = [["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]<br>Output: 3',
-    14: "<strong>Example 1:</strong><br>Input: nums = [1,2,3,1]<br>Output: 4",
-    15: "<strong>Example 1:</strong><br>Input: numCourses = 2, prerequisites = [[1,0]]<br>Output: [0,1]",
+    1: `<strong>Example 1:</strong><br>Input: nums = [2,7,11,15], target = 9<br>Output: [0,1]<br>Explanation: nums[0] + nums[1] = 2 + 7 = 9<br><br>
+        <strong>Example 2:</strong><br>Input: nums = [3,2,4], target = 6<br>Output: [1,2]<br>Explanation: nums[1] + nums[2] = 2 + 4 = 6<br><br>
+        <strong>Example 3:</strong><br>Input: nums = [3,3], target = 6<br>Output: [0,1]<br><br>
+        <strong>Edge Cases:</strong><br>• What if the array has duplicates?<br>• What if target is negative?<br><br>
+        <strong>Follow-up:</strong> Can you solve it in O(n) using a Hash Map?`,
+
+    2: `<strong>Example 1:</strong><br>Input: s = "()"<br>Output: true<br><br>
+        <strong>Example 2:</strong><br>Input: s = "()[]{}"<br>Output: true<br><br>
+        <strong>Example 3:</strong><br>Input: s = "(]"<br>Output: false<br>Explanation: Brackets are not closed in the correct order.<br><br>
+        <strong>Edge Cases:</strong><br>• Empty string → true<br>• Odd length string → always false<br><br>
+        <strong>Follow-up:</strong> Can you solve it in O(n) time using a Stack?`,
+
+    3: `<strong>Example 1:</strong><br>Input: l1 = [1,2,4], l2 = [1,3,4]<br>Output: [1,1,2,3,4,4]<br><br>
+        <strong>Example 2:</strong><br>Input: l1 = [], l2 = []<br>Output: []<br><br>
+        <strong>Example 3:</strong><br>Input: l1 = [], l2 = [0]<br>Output: [0]<br><br>
+        <strong>Edge Cases:</strong><br>• One or both lists are empty<br>• Lists of different lengths<br><br>
+        <strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`,
+
+    4: `<strong>Example 1:</strong><br>Input: nums = [-2,1,-3,4,-1,2,1,-5,4]<br>Output: 6<br>Explanation: [4,-1,2,1] has the largest sum = 6<br><br>
+        <strong>Example 2:</strong><br>Input: nums = [1]<br>Output: 1<br><br>
+        <strong>Example 3:</strong><br>Input: nums = [5,4,-1,7,8]<br>Output: 23<br><br>
+        <strong>Edge Cases:</strong><br>• All negative numbers → return the largest single element<br><br>
+        <strong>Follow-up:</strong> Can you solve it using Kadane's Algorithm in O(n)?`,
+
+    5: `<strong>Example:</strong><br>LRUCache cache = new LRUCache(2);<br>cache.put(1,1); // cache: {1=1}<br>cache.put(2,2); // cache: {1=1, 2=2}<br>cache.get(1);   // returns 1<br>cache.put(3,3); // evicts key 2, cache: {1=1, 3=3}<br>cache.get(2);   // returns -1 (not found)<br><br>
+        <strong>Edge Cases:</strong><br>• Capacity of 1<br>• Getting a key that was just evicted<br><br>
+        <strong>Follow-up:</strong> Can you achieve O(1) for both get and put using a HashMap + Doubly Linked List?`,
+
+    6: `<strong>Example 1:</strong><br>Input: adjList = [[2,4],[1,3],[2,4],[1,3]]<br>Output: [[2,4],[1,3],[2,4],[1,3]]<br><br>
+        <strong>Example 2:</strong><br>Input: adjList = [[]]<br>Output: [[]]<br><br>
+        <strong>Edge Cases:</strong><br>• Empty graph<br>• Single node with no neighbors<br><br>
+        <strong>Follow-up:</strong> Can you solve it using both BFS and DFS?`,
+
+    7: `<strong>Example 1:</strong><br>Input: nums = [10,9,2,5,3,7,101,18]<br>Output: 4<br>Explanation: [2,3,7,101] is the longest increasing subsequence<br><br>
+        <strong>Example 2:</strong><br>Input: nums = [0,1,0,3,2,3]<br>Output: 4<br><br>
+        <strong>Edge Cases:</strong><br>• All elements same → LIS = 1<br>• Already sorted → LIS = n<br><br>
+        <strong>Follow-up:</strong> Can you improve from O(n²) DP to O(n log n) using Binary Search?`,
+
+    8: `<strong>Example 1:</strong><br>Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]<br>Output: 5<br>Explanation: hit→hot→dot→dog→cog<br><br>
+        <strong>Example 2:</strong><br>Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]<br>Output: 0<br>Explanation: endWord not in wordList<br><br>
+        <strong>Follow-up:</strong> Can you find ALL shortest transformation sequences?`,
+
+    9: `<strong>Example 1:</strong><br>Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]<br>Output: 6<br><br>
+        <strong>Example 2:</strong><br>Input: height = [4,2,0,3,2,5]<br>Output: 9<br><br>
+        <strong>Edge Cases:</strong><br>• All same height → 0 water<br>• Monotonically increasing/decreasing → 0 water<br><br>
+        <strong>Follow-up:</strong> Can you solve it in O(n) time and O(1) space using Two Pointers?`,
+
+    10: `<strong>Example 1:</strong><br>Input: head = [1,2,3,4,5]<br>Output: [5,4,3,2,1]<br><br>
+        <strong>Example 2:</strong><br>Input: head = [1,2]<br>Output: [2,1]<br><br>
+        <strong>Edge Cases:</strong><br>• Empty list → null<br>• Single node → same node<br><br>
+        <strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`,
+
+    11: `<strong>Example 1:</strong><br>Input: root = [4,2,7,1,3,6,9]<br>Output: [4,7,2,9,6,3,1]<br><br>
+        <strong>Example 2:</strong><br>Input: root = [2,1,3]<br>Output: [2,3,1]<br><br>
+        <strong>Edge Cases:</strong><br>• Empty tree → null<br>• Single node → same node<br><br>
+        <strong>Follow-up:</strong> Can you solve it both recursively and iteratively?`,
+
+    12: `<strong>Example 1:</strong><br>Input: root = [2,1,3]<br>Output: true<br><br>
+        <strong>Example 2:</strong><br>Input: root = [5,1,4,null,null,3,6]<br>Output: false<br>Explanation: Root's right child value 4 is not greater than root 5<br><br>
+        <strong>Edge Cases:</strong><br>• Empty tree → true<br>• Duplicate values → false<br><br>
+        <strong>Follow-up:</strong> Can you solve it without recursion using Morris Traversal?`,
+
+    13: `<strong>Example 1:</strong><br>Input: grid = [["1","1","0"],["1","1","0"],["0","0","1"]]<br>Output: 2<br><br>
+        <strong>Example 2:</strong><br>Input: grid = [["1","1","1"],["0","1","0"],["1","1","1"]]<br>Output: 1<br><br>
+        <strong>Edge Cases:</strong><br>• All water → 0<br>• All land → 1<br><br>
+        <strong>Follow-up:</strong> Can you solve it using both DFS and Union-Find?`,
+
+    14: `<strong>Example 1:</strong><br>Input: nums = [1,2,3,1]<br>Output: 4<br>Explanation: Rob house 1 (1) then house 3 (3)<br><br>
+        <strong>Example 2:</strong><br>Input: nums = [2,7,9,3,1]<br>Output: 12<br>Explanation: Rob house 1 (2), house 3 (9), house 5 (1)<br><br>
+        <strong>Edge Cases:</strong><br>• Single house → rob it<br>• Two houses → rob the larger<br><br>
+        <strong>Follow-up:</strong> What if houses are arranged in a circle? (House Robber II)`,
+
+    15: `<strong>Example 1:</strong><br>Input: numCourses = 2, prerequisites = [[1,0]]<br>Output: true<br>Explanation: Take course 0 first, then course 1<br><br>
+        <strong>Example 2:</strong><br>Input: numCourses = 2, prerequisites = [[1,0],[0,1]]<br>Output: false<br>Explanation: Cycle detected — impossible to finish<br><br>
+        <strong>Edge Cases:</strong><br>• No prerequisites → always true<br>• Self-loop → false<br><br>
+        <strong>Follow-up:</strong> Can you return the actual course order? (Course Schedule II)`,
   };
   return (
     examples[problem.id] || "<strong>Example:</strong><br>Solve this problem"
@@ -2640,12 +3281,22 @@ function openQuizEditor(problem) {
         ? "difficulty-medium"
         : "difficulty-hard");
 
-  document.getElementById("quizDescription").textContent =
-    'Solve the "' +
-    problem.title +
-    '" problem. ' +
-    problem.tags.map((t) => "[" + t + "]").join(" ");
-
+  const descEl = document.getElementById("quizDescription");
+  if (problem.description) {
+    let descHTML = problem.description;
+    if (problem.constraints) {
+      descHTML +=
+        "<br><br><strong>Constraints:</strong><br>" +
+        problem.constraints.map((c) => `• ${c}`).join("<br>");
+    }
+    descEl.innerHTML = descHTML;
+  } else {
+    descEl.textContent =
+      'Solve the "' +
+      problem.title +
+      '" problem. ' +
+      problem.tags.map((t) => "[" + t + "]").join(" ");
+  }
   const examples = generateExamples(problem);
   document.getElementById("quizExamples").innerHTML = examples;
 
@@ -2725,7 +3376,7 @@ function updateStreak() {
     : null;
 
   if (lastActive) {
-    const diffDays = Math.floor((today - lastActive) / (1000 * 60 * 60 * 24));
+    const diffDays = getDaysDifference(lastActive, today);
     if (diffDays > 1) {
       userProgress.streak = 1;
     } else if (diffDays === 0) {
@@ -2745,7 +3396,27 @@ function handleProblemClick(problemId) {
   const problem = practiceProblems.find((p) => p.id === problemId);
   if (problem) {
     openQuizEditor(problem);
+    addRecentProblem(problemId);
   }
+}
+// ===== Made addRecentProblem() Function =====
+function addRecentProblem(problemId) {
+  if (!userProgress.recentProblems) {
+    userProgress.recentProblems = [];
+  }
+
+  // Remove existing occurrence
+  userProgress.recentProblems = userProgress.recentProblems.filter(
+    (id) => id !== problemId,
+  );
+
+  // Add to beginning
+  userProgress.recentProblems.unshift(problemId);
+
+  // Keep only last 5
+  userProgress.recentProblems = userProgress.recentProblems.slice(0, 5);
+
+  saveUserData();
 }
 
 // ===== SYNTAX HIGHLIGHTING =====
@@ -2935,3 +3606,137 @@ document.addEventListener("click", (e) => {
 window.addEventListener("load", () => {
   console.log("Algo Infinity Verse loaded successfully! 🚀");
 });
+
+// ===== NEWSLETTER FORM VALIDATION =====
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
+}
+
+function initNewsletterValidation() {
+  const forms = [
+    {
+      formId: "newsletterForm",
+      inputId: "newsletterEmail",
+      errorId: "newsletterError",
+    },
+  ];
+
+  forms.forEach(({ formId, inputId, errorId }) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    const input = document.getElementById(inputId);
+    const errorSpan = document.getElementById(errorId);
+
+    function showError(message) {
+      errorSpan.textContent = message;
+      input.classList.add("input-error");
+      input.classList.remove("input-success");
+      input.setAttribute("aria-invalid", "true");
+    }
+
+    function showSuccess() {
+      errorSpan.textContent = "";
+      input.classList.remove("input-error");
+      input.classList.add("input-success");
+      input.removeAttribute("aria-invalid");
+    }
+
+    function clearState() {
+      errorSpan.textContent = "";
+      input.classList.remove("input-error", "input-success");
+      input.removeAttribute("aria-invalid");
+    }
+
+    // Validate on blur (when user leaves the field)
+    input.addEventListener("blur", () => {
+      const value = input.value.trim();
+      if (!value) {
+        showError("Email address is required.");
+      } else if (!validateEmail(value)) {
+        showError(
+          "Please enter a valid email address (e.g. user@example.com).",
+        );
+      } else {
+        showSuccess();
+      }
+    });
+
+    // Clear error while user is typing
+    input.addEventListener("input", () => {
+      clearState();
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const value = input.value.trim();
+
+      if (!value) {
+        showError("Email address is required.");
+        input.focus();
+        return;
+      }
+
+      if (!validateEmail(value)) {
+        showError(
+          "Please enter a valid email address (e.g. user@example.com).",
+        );
+        input.focus();
+        return;
+      }
+
+      // Valid — show success notification and reset
+      showSuccess();
+      showNotification(
+        "🎉 Successfully subscribed to the newsletter!",
+        "success",
+      );
+      input.value = "";
+      setTimeout(() => clearState(), 1500);
+    });
+  });
+}
+// Back To Top Button (supports both ids: backToTopBtn and scrollTopBtn)
+function initBackToTopButtons() {
+  const backToTopBtn = document.getElementById("backToTopBtn");
+  const scrollTopBtn = document.getElementById("scrollTopBtn");
+
+  // backToTopBtn uses .back-to-top styles + .show class
+  if (backToTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        backToTopBtn.classList.add("show");
+      } else {
+        backToTopBtn.classList.remove("show");
+      }
+    });
+
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    });
+  }
+
+  // scrollTopBtn uses .scroll-top-btn styles + .visible class
+  if (scrollTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        scrollTopBtn.classList.add("visible");
+      } else {
+        scrollTopBtn.classList.remove("visible");
+      }
+    });
+
+    scrollTopBtn.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    });
+  }
+}
+
+initBackToTopButtons();
