@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Algo Infinity Verse - Master DSA & Crack Interviews</title>
+    <title>Algo Infinity Verse - Master DSA &amp; Crack Interviews</title>
     <link rel="stylesheet" href="styles.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Poppins:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500;600&amp;display=swap"
       rel="stylesheet"
     />
     <link
@@ -70,7 +70,7 @@
         <h1 class="hero-title">
           <span class="title-line">Welcome to</span>
           <span class="main-title gradient-text">Algo Infinity Verse</span>
-          <span class="subtitle">Master DSA & Crack Interviews</span>
+          <span class="subtitle">Master DSA &amp; Crack Interviews</span>
         </h1>
         <div class="typing-container">
           <span class="typing-text" id="typingText"></span>
@@ -272,9 +272,9 @@
             <p>
               Master the STAR method and answer behavioral questions confidently
             </p>
-            <button class="card-btn" data-category="behavioral">
+            <a href="behavioral-questions.html" class="card-btn" style="text-decoration: none; display: inline-block; text-align: center;">
               Start Learning
-            </button>
+            </a>
           </div>
           <div class="interview-card">
             <div class="card-icon">
@@ -421,26 +421,24 @@
           Your Dashboard
         </h2>
         <div class="dashboard-grid">
-          <!-- Profile Card -->
+          <div class="dashboard-card" id="dailyChallengeCard">
+            <h3>🔥 Daily Challenge</h3>
+            <p id="dailyChallengeText">Loading...</p>
+            <button id="completeChallengeBtn" class="btn btn-primary" aria-label="Complete daily challenge">
+              <i class="fas fa-bolt"></i> Complete Challenge (+50 XP)
+            </button>
+          </div>
           <div class="dashboard-card profile-card">
             <div class="profile-header">
               <div class="profile-avatar">
                 <span class="avatar-icon">🚀</span>
               </div>
               <div class="profile-info">
-                <h3 id="profileName">Learner</h3>
-                <p class="profile-level" id="profileLevel">
-                  Level 1 - Beginner
-                </p>
-                <p class="profile-join">
-                  Joined: <span id="joinDate">Today</span>
-                </p>
+                <h3 id="profileSectionName">Learner</h3>
+                <p id="profileLevel">Level 1 - Beginner</p>
+                <p>Joined: <span id="joinDate"></span></p>
               </div>
-              <button
-                class="profile-edit-btn"
-                id="profileEditBtn"
-                title="Edit Profile"
-              >
+              <button class="profile-edit-btn" id="profileEditBtn" title="Edit Profile">
                 <i class="fas fa-pen"></i>
               </button>
             </div>
@@ -456,6 +454,10 @@
               <div class="profile-stat">
                 <span class="profile-stat-value" id="profileStreak">0</span>
                 <span class="profile-stat-label">Day Streak</span>
+              </div>
+              <div class="profile-stat">
+                <span class="profile-stat-value" id="profileFreezes">0</span>
+                <span class="profile-stat-label">Freezes</span>
               </div>
               <div class="profile-stat">
                 <span class="profile-stat-value" id="profileBadges">0</span>
@@ -487,6 +489,10 @@
                 <span class="stat-desc">Day Streak</span>
               </div>
               <div class="stat-item">
+                <span class="stat-value" id="currentFreezes">0</span>
+                <span class="stat-desc">Freezes</span>
+              </div>
+              <div class="stat-item">
                 <span class="stat-value" id="totalXP">0</span>
                 <span class="stat-desc">Total XP</span>
               </div>
@@ -495,8 +501,20 @@
           <div class="dashboard-card">
             <h3>Recent Activity</h3>
             <div class="activity-list" id="activityList">
+              <p class="empty-state">No recent activity. Start solving problems!</p>
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <h3>Freeze Usage History</h3>
+            <div class="freeze-history-list" id="freezeHistoryList">
+              <p class="empty-state">No freezes used yet.</p>
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <h3>Personalized Recommendations</h3>
+            <div id="recommendationsContainer">
               <p class="empty-state">
-                No recent activity. Start solving problems!
+                Complete a quiz to get recommendations.
               </p>
             </div>
           </div>
@@ -533,9 +551,7 @@
               <span class="xp-text" id="xpText">0 / 1000 XP</span>
             </div>
             <div class="level-info">
-              <span class="level-badge" id="levelBadge"
-                >Level 1 - Beginner</span
-              >
+              <span class="level-badge" id="levelBadge">Level 1 - Beginner</span>
             </div>
           </div>
           <div class="badges-showcase big-box">
@@ -577,21 +593,9 @@
           </button>
         </div>
         <div class="quick-questions">
-          <button
-            class="quick-q"
-            data-question="What is the time complexity of this problem?"
-          >
-            Time Complexity
-          </button>
-          <button
-            class="quick-q"
-            data-question="Can you give me a hint for this problem?"
-          >
-            Hint
-          </button>
-          <button class="quick-q" data-question="What approach should I use?">
-            Approach
-          </button>
+          <button class="quick-q" data-question="What is the time complexity of this problem?">Time Complexity</button>
+          <button class="quick-q" data-question="Can you give me a hint for this problem?">Hint</button>
+          <button class="quick-q" data-question="What approach should I use?">Approach</button>
         </div>
       </div>
     </div>
@@ -600,16 +604,10 @@
     <div class="shortcuts-panel" id="shortcutsPanel">
       <div class="shortcuts-title">Keyboard Shortcuts</div>
       <ul class="shortcuts-list">
-        <li>
-          <span>Run Code</span><span class="shortcut-key">Ctrl+Enter</span>
-        </li>
+        <li><span>Run Code</span><span class="shortcut-key">Ctrl+Enter</span></li>
         <li><span>Submit</span><span class="shortcut-key">Ctrl+S</span></li>
-        <li>
-          <span>Format Code</span><span class="shortcut-key">Ctrl+Shift+F</span>
-        </li>
-        <li>
-          <span>Toggle Comment</span><span class="shortcut-key">Ctrl+/</span>
-        </li>
+        <li><span>Format Code</span><span class="shortcut-key">Ctrl+Shift+F</span></li>
+        <li><span>Toggle Comment</span><span class="shortcut-key">Ctrl+/</span></li>
         <li><span>Find</span><span class="shortcut-key">Ctrl+F</span></li>
         <li><span>Replace</span><span class="shortcut-key">Ctrl+H</span></li>
         <li><span>Go to Line</span><span class="shortcut-key">Ctrl+G</span></li>
@@ -623,9 +621,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="modalTitle"></h3>
-          <button class="modal-close" id="modalClose">
-            <i class="fas fa-times"></i>
-          </button>
+          <button class="modal-close" id="modalClose">&times;</button>
         </div>
         <div class="modal-body">
           <div class="topic-theory">
@@ -642,9 +638,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" id="startPracticeBtn">
-            Start Practicing
-          </button>
+          <button class="btn btn-primary" id="startPracticeBtn">Start Practicing</button>
         </div>
       </div>
     </div>
@@ -652,19 +646,21 @@
     <!-- Quiz Editor Modal -->
     <div class="modal quiz-modal" id="quizEditorModal">
       <div class="quiz-modal-content">
+        <div id="quizLoadingScreen" class="quiz-loading hidden">
+          <div class="quiz-spinner"></div>
+          <h3 class="loading-text">Vectoring Challenge...</h3>
+          <p id="loadingTopicName"></p>
+        </div>
         <div class="quiz-modal-header">
           <div class="quiz-problem-info">
             <span class="quiz-topic-badge" id="quizTopicBadge"></span>
             <span class="quiz-difficulty" id="quizDifficulty"></span>
           </div>
           <h3 id="quizTitle">Problem Title</h3>
-          <button class="modal-close" id="quizModalClose">
-            <i class="fas fa-times"></i>
-          </button>
+          <button class="modal-close" id="quizModalClose">&times;</button>
         </div>
         <div class="quiz-modal-body">
           <div class="quiz-layout">
-            <!-- Left: Problem Description -->
             <div class="quiz-problem-panel">
               <div class="problem-description">
                 <h4>Problem Description</h4>
@@ -675,8 +671,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Right: Code Editor -->
             <div class="quiz-editor-panel">
               <div class="code-editor-container">
                 <div class="editor-header">
@@ -689,43 +683,17 @@
                     </select>
                   </div>
                   <div class="editor-actions">
-                    <button
-                      class="editor-btn"
-                      onclick="insertSnippet('function')"
-                      title="Insert function"
-                    >
-                      <i class="fas fa-code"></i> Function
-                    </button>
-                    <button
-                      class="editor-btn"
-                      onclick="formatCode()"
-                      title="Format code"
-                    >
-                      <i class="fas fa-indent"></i> Format
-                    </button>
-                    <button
-                      class="editor-btn"
-                      onclick="toggleLineComment()"
-                      title="Toggle comment"
-                    >
-                      <i class="fas fa-comment"></i> //
-                    </button>
+                    <button class="editor-btn" onclick="insertSnippet('function')" title="Insert function"><i class="fas fa-code"></i> Function</button>
+                    <button class="editor-btn" onclick="formatCode()" title="Format code"><i class="fas fa-indent"></i> Format</button>
+                    <button class="editor-btn" onclick="toggleLineComment()" title="Toggle comment"><i class="fas fa-comment"></i> //</button>
                   </div>
                 </div>
                 <div class="editor-tabs">
-                  <div class="editor-tab active" data-tab="code">
-                    <i class="fas fa-code"></i> Code
-                  </div>
+                  <div class="editor-tab active" data-tab="code"><i class="fas fa-code"></i> Code</div>
                 </div>
                 <div class="code-editor">
-                  <div class="line-numbers" id="lineNumbers">
-                    <!-- Line numbers generated by JS -->
-                  </div>
-                  <textarea
-                    id="codeEditor"
-                    class="code-textarea"
-                    placeholder="// Write your solution here...&#10;&#10;function twoSum(nums, target) {&#10;    // Your code here&#10;}"
-                  ></textarea>
+                  <div class="line-numbers" id="lineNumbers"></div>
+                  <textarea id="codeEditor" class="code-textarea" placeholder="// Write your solution here...&#10;&#10;function twoSum(nums, target) {&#10;    // Your code here&#10;}"></textarea>
                   <div class="syntax-highlight" id="syntaxHighlight"></div>
                 </div>
                 <div class="editor-shortcuts">
@@ -738,30 +706,19 @@
                     <i class="fas fa-chevron-down" id="outputToggleIcon"></i>
                   </div>
                   <div class="output-content" id="quizOutputContent">
-                    <p class="output-placeholder">
-                      Run your code to see output...
-                    </p>
+                    <p class="output-placeholder">Run your code to see output...</p>
                   </div>
-                  <div
-                    class="test-cases-container"
-                    id="quizTestCasesContainer"
-                  ></div>
+                  <div class="test-cases-container" id="quizTestCasesContainer"></div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="quiz-modal-footer">
-          <div class="quiz-actions">
-            <button class="btn btn-secondary" onclick="closeQuizEditor()">
-              Close
-            </button>
-            <button class="btn btn-outline" onclick="runQuizCode()">
-              <i class="fas fa-play"></i> Run
-            </button>
-            <button class="btn btn-primary" onclick="submitQuizCode()">
-              <i class="fas fa-paper-plane"></i> Submit
-            </button>
+          <div class="quiz-modal-footer">
+            <div class="quiz-actions">
+              <button class="btn btn-secondary" onclick="closeQuizEditor()">Close</button>
+              <button class="btn btn-outline" onclick="runQuizCode()"><i class="fas fa-play"></i> Run</button>
+              <button class="btn btn-primary" onclick="submitQuizCode()"><i class="fas fa-paper-plane"></i> Submit</button>
+            </div>
           </div>
         </div>
       </div>
@@ -776,29 +733,20 @@
             <span class="quiz-difficulty" id="topicQuizDifficulty">Medium</span>
           </div>
           <h3 id="topicQuizTitle">Topic Quiz</h3>
-          <button class="modal-close" id="topicQuizModalClose">
-            <i class="fas fa-times"></i>
-          </button>
+          <button class="modal-close" id="topicQuizModalClose">&times;</button>
         </div>
         <div class="quiz-modal-body">
           <div class="quiz-layout">
-            <!-- Quiz Panel -->
             <div class="quiz-problem-panel">
               <div class="quiz-container">
                 <div class="quiz-progress-bar-container">
                   <div class="quiz-progress-bar" id="topicQuizProgress"></div>
                 </div>
                 <div class="quiz-counter" id="topicQuizCounter">1 / 10</div>
-                <div class="quiz-question" id="topicQuizQuestionText">
-                  Question will appear here
-                </div>
-                <div class="quiz-options" id="topicQuizOptions">
-                  <!-- Options generated by JS -->
-                </div>
+                <div class="quiz-question" id="topicQuizQuestionText">Question will appear here</div>
+                <div class="quiz-options" id="topicQuizOptions"></div>
               </div>
             </div>
-
-            <!-- Right: Quiz Info Panel -->
             <div class="quiz-editor-panel">
               <div class="quiz-info-panel">
                 <h4>Quiz Instructions</h4>
@@ -825,9 +773,7 @@
                   <li>Your best score is saved</li>
                   <li>Retake to improve your score</li>
                 </ul>
-                <div class="quiz-xp-display">
-                  <i class="fas fa-star"></i> 10 XP per correct answer
-                </div>
+                <div class="quiz-xp-display"><i class="fas fa-star"></i> 10 XP per correct answer</div>
               </div>
             </div>
           </div>
@@ -835,9 +781,7 @@
         <div class="quiz-modal-footer">
           <div class="quiz-result hidden" id="topicQuizResult"></div>
           <div class="quiz-actions">
-            <button class="btn btn-secondary" onclick="closeQuizModal()">
-              Close
-            </button>
+            <button class="btn btn-secondary" onclick="closeQuizModal()">Close</button>
           </div>
         </div>
       </div>
@@ -848,36 +792,23 @@
       <div class="modal-content profile-edit-modal">
         <div class="modal-header">
           <h3>Edit Profile</h3>
-          <button class="modal-close" id="profileModalClose">
-            <i class="fas fa-times"></i>
-          </button>
+          <button class="modal-close" id="profileModalClose">&times;</button>
         </div>
         <div class="modal-body">
           <div class="profile-edit-form">
             <div class="avatar-selector">
               <h4>Choose Avatar</h4>
-              <div class="avatar-options" id="avatarOptions">
-                <!-- Avatars generated by JS -->
-              </div>
+              <div class="avatar-options" id="avatarOptions"></div>
             </div>
             <div class="name-editor">
               <label for="profileNameInput">Display Name</label>
-              <input
-                type="text"
-                id="profileNameInput"
-                placeholder="Enter your name"
-                maxlength="20"
-              />
+              <input type="text" id="profileNameInput" placeholder="Enter your name" maxlength="20" />
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeProfileModal()">
-            Cancel
-          </button>
-          <button class="btn btn-primary" onclick="saveProfileChanges()">
-            <i class="fas fa-save"></i> Save Changes
-          </button>
+          <button class="btn btn-secondary" onclick="closeProfileModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveProfileChanges()"><i class="fas fa-save"></i> Save Changes</button>
         </div>
       </div>
     </div>
@@ -891,7 +822,6 @@
           Profile
         </h2>
         <div class="profile-container">
-          <!-- Profile Header -->
           <div class="profile-header">
             <div class="profile-avatar big-box">
               <span class="avatar-icon">🚀</span>
@@ -899,22 +829,13 @@
             </div>
             <div class="profile-info">
               <h3 id="profileSectionName">Learner</h3>
-              <p class="profile-level" id="profileLevelSection">
-                Level 1 - Beginner
-              </p>
-              <p class="profile-join">
-                Joined: <span id="joinDateSection">Today</span>
-              </p>
+              <p class="profile-level" id="profileLevel">Level 1 - Beginner</p>
+              <p class="profile-join">Joined: <span id="joinDate"></span></p>
             </div>
-            <button
-              class="profile-edit-btn"
-              id="profileSectionEditBtn"
-              title="Edit Profile"
-            >
+            <button class="profile-edit-btn" id="profileSectionEditBtn" title="Edit Profile">
               <i class="fas fa-pen"></i>
             </button>
           </div>
-          <!-- Profile Stats -->
           <div class="profile-stats">
             <div class="profile-stat big-box">
               <span class="profile-stat-value" id="profileTotalXPSection"
@@ -941,15 +862,14 @@
               <span class="profile-stat-label">Badges</span>
             </div>
           </div>
-          <!-- Profile Progress -->
           <div class="profile-progress">
             <div class="progress-bar-container big-box">
               <div class="progress-label">
                 <span>Level Progress</span>
-                <span id="profileLevelProgressSection">0%</span>
+                <span id="profileLevelProgress">0%</span>
               </div>
               <div class="progress-bar">
-                <div class="progress-fill" id="profileProgressBarSection"></div>
+                <div class="progress-fill" id="profileProgressBar"></div>
               </div>
             </div>
           </div>
@@ -1000,10 +920,7 @@
         <div class="footer-content">
           <div class="footer-section">
             <h3>∞ Algo Infinity Verse</h3>
-            <p>
-              Your ultimate destination for mastering Data Structures &
-              Algorithms and acing technical interviews.
-            </p>
+            <p>Your ultimate destination for mastering Data Structures &amp; Algorithms and acing technical interviews.</p>
             <div class="social-links">
               <a href="#"><i class="fab fa-github"></i></a>
               <a href="#"><i class="fab fa-twitter"></i></a>
@@ -1033,30 +950,10 @@
           <div class="footer-section">
             <h4>Quick Questions</h4>
             <div class="footer-questions">
-              <button
-                class="footer-question"
-                data-question="What is the time complexity of this problem?"
-              >
-                Time Complexity
-              </button>
-              <button
-                class="footer-question"
-                data-question="Can you give me a hint for this problem?"
-              >
-                Hint
-              </button>
-              <button
-                class="footer-question"
-                data-question="What approach should I use?"
-              >
-                Approach
-              </button>
-              <button
-                class="footer-question"
-                data-question="Are there any edge cases I should consider?"
-              >
-                Edge Cases
-              </button>
+              <button class="footer-question" data-question="What is the time complexity of this problem?">Time Complexity</button>
+              <button class="footer-question" data-question="Can you give me a hint for this problem?">Hint</button>
+              <button class="footer-question" data-question="What approach should I use?">Approach</button>
+              <button class="footer-question" data-question="Are there any edge cases I should consider?">Edge Cases</button>
             </div>
           </div>
           <div class="footer-section">
@@ -1098,10 +995,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>
-            &copy; 2024 Algo Infinity Verse. Crafted with 💜 for learners
-            worldwide.
-          </p>
+          <p>&copy; 2024 Algo Infinity Verse. Crafted with 💜 for learners worldwide.</p>
         </div>
       </div>
     </footer>

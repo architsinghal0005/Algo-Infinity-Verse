@@ -1459,16 +1459,56 @@ body {
   padding: 1rem;
   margin-bottom: 0.8rem;
   background: var(--dark-card);
+  border: 1px solid transparent;
   border-radius: 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+}
+
+.leaderboard-item.current-user {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35);
+}
+
+.leader-rank {
+  min-width: 3rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.leader-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.leader-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.leader-xp {
+  color: var(--text-secondary);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .activity-item .activity-type {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.activity-item {
+  justify-content: space-between;
 }
 
 .activity-icon {
@@ -1895,6 +1935,76 @@ body {
   color: white;
 }
 
+/* ===== IMPROVED ALGO ASSISTANT ===== */
+
+.assistant-response h4 {
+  color: var(--accent);
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.assistant-response p {
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+}
+
+.assistant-response pre {
+  background: #111827;
+  border-radius: 10px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-left: 3px solid var(--primary);
+}
+
+.assistant-response code {
+  color: #22c55e;
+  font-family: "Fira Code", monospace;
+  font-size: 0.85rem;
+}
+
+.message.loading {
+  opacity: 0.8;
+  animation: pulse-message 1s infinite;
+}
+
+@keyframes pulse-message {
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}
+
+.chatbot-messages {
+  scroll-behavior: smooth;
+}
+
+.message.bot {
+  line-height: 1.6;
+}
+
+.message.bot pre {
+  margin-top: 0.8rem;
+}
+
+.message.bot::-webkit-scrollbar {
+  height: 6px;
+}
+
+.message.bot::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
 /* ===== MODAL ===== */
 .modal {
   position: fixed;
@@ -2091,6 +2201,33 @@ body {
 }
 
 /* ===== QUIZ EDITOR MODAL ===== */
+/* ===== QUIZ LOADING SCREEN ===== */
+.quiz-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    width: 100%;
+}
+
+.quiz-loading h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    margin-top: 1rem;
+    background: var(--gradient-3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#loadingTopicName {
+    font-family: 'Fira Code', monospace;
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    letter-spacing: 1px;
+}
 #quizEditorModal {
   z-index: 3000;
 }
@@ -2860,6 +2997,69 @@ body {
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
+}
+
+.quiz-timer-box,
+.quiz-best-time-box {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+
+  padding: 0.7rem 1rem;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  min-width: 150px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.quiz-timer-box i,
+.quiz-best-time-box i {
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.quiz-timer-content,
+.quiz-best-time-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-timer-label,
+.quiz-best-time-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.quiz-timer,
+.quiz-best-time {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: "Orbitron", sans-serif;
+}
+
+.quiz-counter {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+
+  padding: 0.7rem 1rem;
+
+  background: var(--glass-bg);
+
+  border-radius: 14px;
+
+  border: 1px solid var(--glass-border);
+
+  backdrop-filter: blur(10px);
+
+  font-weight: 600;
 }
 
 .quiz-timer-box,

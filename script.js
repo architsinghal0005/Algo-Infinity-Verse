@@ -940,6 +940,60 @@ const practiceProblems = [
   },
 ];
 
+const dailyChallenges = [
+  {
+    id: "daily-1",
+    title: "Two Sum Warmup",
+    description: "Solve Two Sum using a hash map for O(n) time complexity.",
+    problemId: 1,
+    xpReward: 50,
+  },
+  {
+    id: "daily-2",
+    title: "Valid Parentheses Challenge",
+    description:
+      "Check if all brackets are correctly matched and nested.",
+    problemId: 2,
+    xpReward: 50,
+  },
+  {
+    id: "daily-3",
+    title: "Reverse a Linked List",
+    description: "Iteratively reverse a singly linked list.",
+    problemId: 10,
+    xpReward: 75,
+  },
+  {
+    id: "daily-4",
+    title: "Maximum Subarray Sprint",
+    description: "Find the contiguous subarray with the largest sum.",
+    problemId: 4,
+    xpReward: 75,
+  },
+  {
+    id: "daily-5",
+    title: "Invert Binary Tree",
+    description: "Flip every node’s left and right children.",
+    problemId: 11,
+    xpReward: 75,
+  },
+  {
+    id: "daily-6",
+    title: "Clone a Graph",
+    description: "Return a deep copy of an undirected connected graph.",
+    problemId: 6,
+    xpReward: 100,
+  },
+  {
+    id: "daily-7",
+    title: "Climbing Stairs Combo",
+    description:
+      "Use Fibonacci-style DP to count ways to reach the top.",
+    problemId: null,
+    xpReward: 100,
+  },
+];
+
 const chatbotResponses = {
   "time complexity":
     "Time complexity measures how an algorithm's runtime grows with input size. Common complexities: O(1) constant, O(log n) logarithmic, O(n) linear, O(n log n) linearithmic, O(n²) quadratic, O(2^n) exponential.",
@@ -992,6 +1046,8 @@ let userProgress = {
   xp: 0,
   level: 1,
   streak: 0,
+  freezes: 0,
+  freezeHistory: [],
   badges: [],
   lastActive: null,
   quizScores: {}, // topic -> { bestScore, attempts, totalXP }
@@ -1018,6 +1074,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initRoadmap();
   initDashboard();
   initGamification();
+  initDailyChallenge();
   initChatbot();
   initProfile();
   initDarkMode();
@@ -2295,10 +2352,16 @@ function updateProfile() {
   var profileStreak = document.getElementById("profileStreak");
   if (profileStreak) profileStreak.textContent = userProgress.streak;
 
-  // Profile Section Streak
-  var profileStreakSection = document.getElementById("profileStreakSection");
-  if (profileStreakSection)
-    profileStreakSection.textContent = userProgress.streak;
+  var profileFreezes = document.getElementById("profileFreezes");
+  if (profileFreezes) profileFreezes.textContent = userProgress.freezes || 0;
+
+  var profileSectionStreak = document.getElementById("profileSectionStreak");
+  if (profileSectionStreak)
+    profileSectionStreak.textContent = userProgress.streak;
+    
+  var profileSectionFreezes = document.getElementById("profileSectionFreezes");
+  if (profileSectionFreezes)
+    profileSectionFreezes.textContent = userProgress.freezes || 0;
 
   var profileBadges = document.getElementById("profileBadges");
 
@@ -2390,10 +2453,15 @@ function updateDashboard() {
   document.getElementById("completedProblems").textContent =
     userProgress.completedProblems.length;
   document.getElementById("currentStreak").textContent = userProgress.streak;
+  var currentFreezes = document.getElementById("currentFreezes");
+  if (currentFreezes) currentFreezes.textContent = userProgress.freezes || 0;
   document.getElementById("totalXP").textContent = userProgress.xp;
 
   updateCurrentDate();
   updateActivityList();
+  if (typeof updateFreezeHistoryList === "function") {
+    updateFreezeHistoryList();
+  }
   updateBadges();
   updateRecentProblems(); // Recently Viewed Problems
   updateLeaderboard();
@@ -2442,6 +2510,71 @@ function updateActivityList() {
     `,
     )
     .join("");
+}
+// ===== RECENTLY VIEWED PROBLEMS ===== //
+function updateRecentProblems() {
+  const container = document.getElementById("recentProblemsList");
+
+  if (!container) return;
+
+  if (
+    !userProgress.recentProblems ||
+    userProgress.recentProblems.length === 0
+  ) {
+    container.innerHTML = "<p>No recently viewed problems</p>";
+    return;
+  }
+
+  container.innerHTML = userProgress.recentProblems
+    .map((id) => {
+      const problem = practiceProblems.find((p) => p.id === id);
+
+      if (!problem) return "";
+
+      return `
+        <div class="recent-problem" data-id="${problem.id}">
+          ${problem.title}
+        </div>
+      `;
+    })
+    .join("");
+
+  container.querySelectorAll(".recent-problem").forEach((item) => {
+    item.addEventListener("click", () => {
+      const problemId = parseInt(item.dataset.id);
+
+      const problem = practiceProblems.find((p) => p.id === problemId);
+
+      if (problem) {
+        openQuizEditor(problem);
+      }
+    });
+  });
+}
+
+function updateFreezeHistoryList() {
+  const freezeHistoryList = document.getElementById("freezeHistoryList");
+  if (!freezeHistoryList) return;
+
+  const history = userProgress.freezeHistory || [];
+  if (history.length === 0) {
+    freezeHistoryList.innerHTML = '<p class="empty-state">No freezes used yet.</p>';
+    return;
+  }
+
+  const historyItems = history.slice(-5).reverse().map(h => {
+    return `
+      <div class="activity-item">
+        <div class="activity-type">
+            <span class="activity-icon"><i class="fas fa-snowflake" style="color: #00d2ff;"></i></span>
+            <span>${h.reason}</span>
+        </div>
+        <span class="activity-time">${new Date(h.date).toLocaleDateString()}</span>
+      </div>
+    `;
+  });
+
+  freezeHistoryList.innerHTML = historyItems.join("");
 }
 // ===== RECENTLY VIEWED PROBLEMS ===== //
 function updateRecentProblems() {
@@ -2585,25 +2718,117 @@ function updateBadges() {
 function updateLeaderboard() {
   const leaderboardList = document.getElementById("leaderboardList");
 
-  // Mock leaderboard data
-  const leaders = [
-    { name: "CodeMaster", xp: 15420, rank: 1 },
-    { name: "AlgoNinja", xp: 14890, rank: 2 },
-    { name: "DevGuru", xp: 13200, rank: 3 },
-    { name: "You", xp: userProgress.xp, rank: 4 },
-    { name: "BinaryBeast", xp: 11500, rank: 5 },
-  ];
+  if (!leaderboardList) return;
 
-  leaderboardList.innerHTML = leaders
-    .map(
-      (user) => `
-        <div class="leaderboard-item ${user.name === "You" ? "current-user" : ""}" style="${user.name === "You" ? "border: 2px solid var(--primary);" : ""}">
+  const requestId = ++leaderboardRequestId;
+  renderLeaderboardRows(buildLeaderboardRows([], getCurrentUserId()), getCurrentUserId(), {
+    emptyMessage: "Loading leaderboard...",
+  });
+
+  loadLeaderboard()
+    .then(({ leaders, currentUserId }) => {
+      if (requestId !== leaderboardRequestId) return;
+      const resolvedCurrentUserId = currentUserId || getCurrentUserId();
+      const rows = buildLeaderboardRows(leaders, resolvedCurrentUserId);
+      renderLeaderboardRows(rows, resolvedCurrentUserId);
+    })
+    .catch((error) => {
+      console.warn("Could not load leaderboard:", error);
+      if (requestId !== leaderboardRequestId) return;
+      renderLeaderboardRows(buildLeaderboardRows([], getCurrentUserId()), getCurrentUserId(), {
+        emptyMessage: "Leaderboard unavailable. Showing your local progress.",
+      });
+    });
+}
+
+async function loadLeaderboard() {
+  if (location.protocol === "file:") {
+    return { leaders: [], currentUserId: null };
+  }
+
+  const response = await fetch("/api/leaderboard", { credentials: "include" });
+  if (!response.ok) throw new Error("Leaderboard request failed.");
+  return response.json();
+}
+
+function buildLeaderboardRows(leaders = [], currentUserId = getCurrentUserId()) {
+  const rowsById = new Map();
+  leaders.forEach((leader) => {
+    const normalized = normalizeLeaderboardEntry(leader);
+    if (normalized.id) rowsById.set(normalized.id, normalized);
+  });
+
+  const currentEntry = getCurrentLeaderboardEntry(currentUserId);
+  // Prevent duplicate 'You' entries for guests unless they've actually earned XP locally
+  if (currentUserId !== "local-user" || userProgress.xp > 350 || leaders.length === 0) {
+    rowsById.set(currentEntry.id, currentEntry);
+  }
+
+  const rankedRows = Array.from(rowsById.values())
+    .sort((a, b) => b.xp - a.xp || a.name.localeCompare(b.name))
+    .map((leader, index) => ({ ...leader, rank: index + 1 }));
+
+  const visibleRows = rankedRows.slice(0, LEADERBOARD_LIMIT);
+  if (!visibleRows.some((leader) => leader.id === currentEntry.id)) {
+    const currentRow = rankedRows.find((leader) => leader.id === currentEntry.id);
+    if (currentRow) visibleRows[visibleRows.length - 1] = currentRow;
+  }
+
+  return visibleRows;
+}
+
+function normalizeLeaderboardEntry(entry) {
+  return {
+    id: String(entry.id || ""),
+    name: String(entry.name || "Learner"),
+    xp: Math.max(0, Number(entry.xp) || 0),
+    level: Math.max(1, Number(entry.level) || 1),
+    avatar: String(entry.avatar || "🚀"),
+    rank: Number(entry.rank) || null,
+  };
+}
+
+function getCurrentLeaderboardEntry(currentUserId = getCurrentUserId()) {
+  return normalizeLeaderboardEntry({
+    id: currentUserId || "local-user",
+    name: getCurrentDisplayName(),
+    xp: userProgress.xp,
+    level: userProgress.level,
+    avatar: userProgress.avatar,
+  });
+}
+
+function getCurrentUserId() {
+  return window.algoAuth?.user?.sub || window.algoAuth?.user?.id || cachedSession?.user?.sub || "local-user";
+}
+
+function getCurrentDisplayName() {
+  return window.algoAuth?.user?.name || cachedSession?.user?.name || userProgress.name || "Learner";
+}
+
+function renderLeaderboardRows(rows, currentUserId = getCurrentUserId(), options = {}) {
+  const leaderboardList = document.getElementById("leaderboardList");
+  if (!leaderboardList) return;
+
+  if (!rows.length) {
+    leaderboardList.innerHTML = `<p class="empty-state">${options.emptyMessage || "No leaderboard data yet."}</p>`;
+    return;
+  }
+
+  leaderboardList.innerHTML = rows
+    .map((user) => {
+      const isCurrentUser = user.id === currentUserId || (currentUserId === "local-user" && user.id === "local-user");
+      const displayName = isCurrentUser ? `${user.name} (You)` : user.name;
+
+      return `
+        <div class="leaderboard-item ${isCurrentUser ? "current-user" : ""}">
             <span class="leader-rank">#${user.rank}</span>
-            <span class="leader-name">${user.name}</span>
+            <span class="leader-avatar" aria-hidden="true">${escapeHtml(user.avatar)}</span>
+            <span class="leader-name">${escapeHtml(displayName)}</span>
             <span class="leader-xp">${user.xp.toLocaleString()} XP</span>
         </div>
-    `,
-    )
+    `;
+    })
     .join("");
 }
 
@@ -2949,9 +3174,77 @@ function saveUserData() {
   try {
     userProgress.lastActive = new Date().toISOString();
     localStorage.setItem("algoInfinityVerse", JSON.stringify(userProgress));
+    queueProgressSync();
   } catch (error) {
     console.warn("Could not save user data to localStorage:", error);
   }
+}
+
+let progressSyncInFlight = null;
+let pendingProgressSync = false;
+
+function queueProgressSync() {
+  if (location.protocol === "file:") return;
+  clearTimeout(progressSyncTimer);
+  progressSyncTimer = setTimeout(syncUserProgress, 600);
+}
+
+async function syncUserProgress() {
+  if (progressSyncInFlight) {
+    pendingProgressSync = true;
+    return progressSyncInFlight;
+  }
+
+  const session = await getAuthenticatedSession();
+  if (!session?.authenticated) return;
+
+  const payload = {
+    name: userProgress.name,
+    xp: userProgress.xp,
+    level: userProgress.level,
+    avatar: userProgress.avatar,
+  };
+
+  progressSyncInFlight = (async () => {
+    try {
+      const response = await fetch("/api/progress", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Progress sync failed.");
+      updateLeaderboard();
+    } catch (error) {
+      console.warn("Could not sync user progress:", error);
+    } finally {
+      progressSyncInFlight = null;
+      if (pendingProgressSync) {
+        pendingProgressSync = false;
+        queueProgressSync();
+      }
+    }
+  })();
+
+  return progressSyncInFlight;
+}
+
+
+async function getAuthenticatedSession() {
+  if (window.algoAuth) {
+    cachedSession = window.algoAuth;
+    return cachedSession;
+  }
+  if (cachedSession) return cachedSession;
+
+  try {
+    const response = await fetch("/api/session", { credentials: "include" });
+    cachedSession = response.ok ? await response.json() : { authenticated: false, user: null };
+  } catch {
+    cachedSession = { authenticated: false, user: null };
+  }
+
+  return cachedSession;
 }
 
 function loadUserData() {
@@ -2977,10 +3270,25 @@ function loadUserData() {
 
         if (diffDays === 0) {
           // Already active today
-        } else if (diffDays === 1) {
-          userProgress.streak += 1;
         } else {
-          userProgress.streak = 0;
+          let daysMissed = diffDays > 0 ? diffDays - 1 : 0;
+          while (daysMissed > 0 && userProgress.freezes > 0) {
+            userProgress.freezes -= 1;
+            daysMissed -= 1;
+            userProgress.freezeHistory.push({
+              date: new Date(today.getTime() - (daysMissed + 1) * 24 * 60 * 60 * 1000).toISOString(),
+              reason: "Missed day automatically frozen"
+            });
+          }
+          if (daysMissed > 0) {
+            userProgress.streak = 0;
+          } else {
+            userProgress.streak += 1;
+            if (userProgress.streak > 0 && userProgress.streak % 7 === 0) {
+              userProgress.freezes += 1;
+              showNotification("Milestone reached! You earned a Streak Freeze!", "success");
+            }
+          }
         }
         saveUserData();
       }
@@ -3017,6 +3325,15 @@ function loadUserData() {
   }
   // Update profile display after loading
   updateProfile();
+  
+  // Also fetch session to get real name
+  getAuthenticatedSession().then(session => {
+    if (session && session.user && session.user.name) {
+      userProgress.name = session.user.name;
+      updateProfile();
+      saveUserData();
+    }
+  });
 }
 
 // ===== QUIZ EDITOR =====
@@ -3382,7 +3699,24 @@ function updateStreak() {
     } else if (diffDays === 0) {
       // Already active today, don't increment streak
     } else {
-      userProgress.streak += 1;
+      let daysMissed = diffDays > 0 ? diffDays - 1 : 0;
+      while (daysMissed > 0 && userProgress.freezes > 0) {
+        userProgress.freezes -= 1;
+        daysMissed -= 1;
+        userProgress.freezeHistory.push({
+          date: new Date(today.getTime() - (daysMissed + 1) * 24 * 60 * 60 * 1000).toISOString(),
+          reason: "Missed day automatically frozen"
+        });
+      }
+      if (daysMissed > 0) {
+        userProgress.streak = 1;
+      } else {
+        userProgress.streak += 1;
+        if (userProgress.streak > 0 && userProgress.streak % 7 === 0) {
+          userProgress.freezes += 1;
+          showNotification("Milestone reached! You earned a Streak Freeze!", "success");
+        }
+      }
     }
   } else {
     userProgress.streak = 1;
