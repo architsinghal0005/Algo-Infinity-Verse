@@ -14,5 +14,8 @@
     "algorithms",
     "authentication"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+   "firebase-admin": "^12.0.0"
+  }
 }

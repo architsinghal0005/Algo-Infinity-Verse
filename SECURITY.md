@@ -4,11 +4,10 @@
 
 We aim to keep `Algo Infinity Verse` up to date and secure. Please see below for the versions we currently support with security updates.
 
-| Version | Supported          |
-|---------|--------------------|
-| Latest  | ✅ Yes              |
-| Older   | ❌ No               |
-
+| Version | Supported |
+|---------|-----------|
+| v1.x    | ✅ Yes |
+| < v1.0  | ❌ No |
 ---
 
 ## 📬 Reporting a Vulnerability
@@ -17,7 +16,10 @@ If you discover a security vulnerability, **please do not open an issue** on Git
 
 Instead, follow these steps:
 
-1. **Email the maintainer directly**
+1. 1. **Email the maintainer directly**
+   - Primary contact: `security@algoinfinityverse.com`
+   - Subject format: `[SECURITY] Brief description of the issue`
+   - Alternative reporting method: GitHub Private Vulnerability Reporting (if enabled for this repository)
 2. Include the following details:
    - Description of the vulnerability
    - Steps to reproduce (if possible)

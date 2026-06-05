@@ -106,9 +106,8 @@
 
     <!-- Topic of the Day Section -->
     <section id="topic-of-the-day" class="section totd-section">
-      <div class="container">
-        <div class="totd-card glass-card">
-        <div class="totd-card glass-card big-box">
+      <div class="container"></div>
+      <div class="totd-card glass-card big-box">
           <div class="totd-badge">
             <i class="fas fa-calendar-day"></i>
             Topic of the Day
@@ -322,99 +321,6 @@
 
     <!-- Dashboard Section -->
     <section id="dashboard" class="section dashboard-section">
-        <div class="container">
-            <h2 class="section-title">
-                <span class="title-icon">📊</span>
-                Your Dashboard
-            </h2>
-            <div class="dashboard-grid">
-                <!-- Profile Card -->
-                <div class="dashboard-card profile-card">
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            <span class="avatar-icon">🚀</span>
-                        </div>
-                        <div class="profile-info">
-                            <h3 id="profileSectionName">Learner</h3>
-                            <p id="profileLevel">Level 1 - Beginner</p>
-                            <p>Joined: <span id="joinDate"></span></p>
-                            
-                            <p>
-                                <span id="dashboard-current-date"></span>
-                            </p>
-                        </div>
-                        <button class="profile-edit-btn" id="profileEditBtn" title="Edit Profile">
-                            <i class="fas fa-pen"></i>
-                        </button>
-                    </div>
-                    <div class="profile-stats">
-                        <div class="profile-stat">
-                            <span class="profile-stat-value" id="profileTotalXP">0</span>
-                            <span class="profile-stat-label">Total XP</span>
-                        </div>
-                        <div class="profile-stat">
-                            <span class="profile-stat-value" id="profileProblems">0</span>
-                            <span class="profile-stat-label">Problems</span>
-                        </div>
-                        <div class="profile-stat">
-                            <span class="profile-stat-value" id="profileStreak">0</span>
-                            <span class="profile-stat-label">Day Streak</span>
-                        </div>
-                        <div class="profile-stat">
-                            <span class="profile-stat-value" id="profileBadges">0</span>
-                            <span class="profile-stat-label">Badges</span>
-                        </div>
-                    </div>
-                    <div class="profile-progress">
-                        <div class="progress-bar-container">
-                            <div class="progress-label">
-                                <span>Level Progress</span>
-                                <span id="profileLevelProgress">0%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="profileProgressBar"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="dashboard-card stats-card">
-                    <h3>Progress Overview</h3>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-value" id="completedProblems">0</span>
-                            <span class="stat-desc">Problems Solved</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="currentStreak">0</span>
-                            <span class="stat-desc">Day Streak</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="totalXP">0</span>
-                            <span class="stat-desc">Total XP</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Recent Activity</h3>
-                    <div class="activity-list" id="activityList">
-                        <p class="empty-state">No recent activity. Start solving problems!</p>
-                    </div>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Personalized Recommendations</h3>
-                    <div id="recommendationsContainer">
-                        <p class="empty-state">
-                            Complete a quiz to get recommendations.
-                        </p>
-                    </div>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Achievements</h3>
-                    <div class="badges-container" id="badgesContainer">
-                    </div>
-                </div>
-            </div>
-
             <div class="container">
         <h2 class="section-title">
           <span class="title-icon">📊</span>
@@ -999,24 +905,6 @@
         </div>
       </div>
     </footer>
-
-    <div class="modal" id="notesModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="notesModalTitle">Problem Notes</h3>
-          <button class="modal-close" id="notesModalClose">&times;</button>
-        </div>
-        <div class="modal-body">
-          <textarea id="notesEditor" placeholder="Write your notes here..."></textarea>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" id="notesCancelBtn">Cancel</button>
-          <button class="btn btn-primary" id="notesSaveBtn">
-            <i class="fas fa-save"></i> Save Notes
-          </button>
-        </div>
-      </div>
-    </div>
     <!-- Back To Top Button -->
 <button id="backToTopBtn" class="back-to-top" aria-label="Back to Top">
   <i class="fas fa-arrow-up"></i>

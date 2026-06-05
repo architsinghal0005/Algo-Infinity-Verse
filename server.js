@@ -77,11 +77,12 @@ function fromBase64Url(input) {
 }
 
 function sessionSecret() {
-  return (
-    process.env.SESSION_SECRET ||
-    "dev-only-change-me-with-SESSION_SECRET-before-deploying"
-  );
-}
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
+  if (process.env.NODE_ENV === "production") {
+   throw new Error("SESSION_SECRET is required in production.");
+  }
+  return "dev-only-change-me-with-SESSION_SECRET-before-deploying";
+ }
 
 function sign(value) {
   return crypto.createHmac("sha256", sessionSecret()).update(value).digest("base64url");
@@ -153,8 +154,8 @@ function clearSessionCookie() {
   return `${SESSION_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`;
 }
 
-const db = initializeFirebase();
-const useFirestore = !!db;
+let db = null;
+let useFirestore = false;
 
 async function getUserByEmail(email) {
   if (!useFirestore) {
@@ -272,9 +273,11 @@ async function handleApi(req, res, pathname) {
     const validationError = validateSignup(payload);
     if (validationError) return sendJson(res, 400, { error: validationError });
 
-    const users = await readUsers();
     const email = String(payload.email).trim().toLowerCase();
-    if (users.some((user) => user.email === email)) {
+   const existing = useFirestore
+      ? await getUserByEmail(email)
+      : (await readUsers()).find((user) => user.email === email);
+    if (existing) {
       return sendJson(res, 409, { error: "An account with this email already exists." });
     }
 
@@ -285,8 +288,10 @@ async function handleApi(req, res, pathname) {
       password: hashPassword(String(payload.password)),
       createdAt: new Date().toISOString(),
     };
-    users.push(user);
-    await writeUsers(users);
+   const existing = useFirestore
+      ? await getUserByEmail(email)
+      : (await readUsers()).find((user) => user.email === email);
+    if (existing) {
 
     const token = createSessionToken(user);
     return sendJson(
@@ -301,9 +306,9 @@ async function handleApi(req, res, pathname) {
     const payload = await readJsonBody(req);
     const email = String(payload.email || "").trim().toLowerCase();
     const password = String(payload.password || "");
-    const users = await readUsers();
-    const user = users.find((candidate) => candidate.email === email);
-
+   const user = useFirestore
+     ? await getUserByEmail(email)
+      : (await readUsers()).find((candidate) => candidate.email === email);
     if (!user || !passwordMatches(password, user.password)) {
       return sendJson(res, 401, { error: "Invalid email or password." });
     }
@@ -335,7 +340,8 @@ function resolveStaticPath(pathname) {
   };
   const mapped = routes[pathname] || pathname.slice(1);
   const filePath = path.resolve(ROOT, mapped);
-  if (!filePath.startsWith(ROOT)) return null;
+  const rel = path.relative(ROOT, filePath);
+  if (rel.startsWith("..") || path.isAbsolute(rel)) return null;
   return filePath;
 }
 
@@ -391,6 +397,8 @@ export { server };
 if (process.env.VERCEL !== "1") {
   loadEnvFile()
     .then(() => {
+      db = initializeFirebase();
+      useFirestore = !!db;
       const port = Number(process.env.PORT || 3000);
       const host = process.env.HOST || "127.0.0.1";
 

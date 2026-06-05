@@ -78,16 +78,18 @@
       }
 
       if (currentSession?.authenticated) {
-        slot.innerHTML = `
-          <span class="nav-user-chip" title="${currentSession.user.email}">
-            <i class="fas fa-user-circle"></i>
-            <span>${currentSession.user.name}</span>
-          </span>
-          <button class="nav-auth-link" type="button" data-auth-logout>
-            <i class="fas fa-right-from-bracket"></i>
-            Logout
-          </button>
-        `;
+       slot.innerHTML = "";
+        const chip = document.createElement("span");
+        chip.className = "nav-user-chip";
+        chip.title = currentSession.user.email;
+        chip.innerHTML = `<i class="fas fa-user-circle"></i><span></span>`;
+        chip.querySelector("span").textContent = currentSession.user.name;
+        const btn = document.createElement("button");
+        btn.className = "nav-auth-link";
+        btn.type = "button";
+        btn.setAttribute("data-auth-logout", "");
+        btn.innerHTML = `<i class="fas fa-right-from-bracket"></i> Logout`;
+        slot.append(chip, btn);
       } else {
         slot.innerHTML = `
           <a class="nav-auth-link" href="${authUrl("/login")}">

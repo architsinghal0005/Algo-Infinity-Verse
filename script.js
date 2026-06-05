@@ -1040,8 +1040,6 @@ let userProgress = {
 
   favoriteProblems: [], //here i have added a new property to store the user's favorite problems
   recentProblems: [], //here i have added a new property to store the user's recent problems
-
-  favoriteProblems: [], //here i have added a new property to store the user's favorite problems
   problemNotes: {},
   xp: 0,
   level: 1,
@@ -1486,10 +1484,6 @@ function initTopicsSection() {
             <div class="mastery-bar" role="progressbar" aria-valuenow="${progress.percentage}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} mastery progress">
                 <div class="mastery-fill" style="width: ${progress.percentage}%"></div>
             </div>
-            </div>
-            <div class="mastery-bar" role="progressbar" aria-valuenow="${progress.percentage}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} mastery progress">
-                <div class="mastery-fill" style="width: ${progress.percentage}%"></div>
-            </div>
             <span class="mastery-percentage">${progress.percentage}%</span>
         </div>
     `;
@@ -1581,12 +1575,13 @@ function initQuizSection() {
       // Add click handler
       const startBtn = card.querySelector(".start-quiz-btn");
       if (startBtn) {
-        startBtn.addEventListener("click", () => {
-          console.log(`Start Quiz clicked for ${topic.name}`);
-          console.log("QUIZ BUTTON CLICKED");
-          console.log("Topic Key:", topicKey);
-          startQuiz(topicKey);
-        });
+        startBtn.addEventListener("click", (e) => {
+         e.stopPropagation();
+           console.log(`Start Quiz clicked for ${topic.name}`);
+           console.log("QUIZ BUTTON CLICKED");
+           console.log("Topic Key:", topicKey);
+           startQuiz(topicKey);
+         });
       } else {
         console.error("Start quiz button not found for topic:", topic.name);
       }
@@ -2020,15 +2015,11 @@ function initPracticeSection() {
   if (!problemsGrid) return;
 
   const notesCloseBtn = document.getElementById("notesModalClose");
-  const notesCancelBtn = document.getElementById("notesCancelBtn");
   const notesSaveBtn = document.getElementById("notesSaveBtn");
   const notesModal = document.getElementById("notesModal");
 
   if (notesCloseBtn) {
     notesCloseBtn.addEventListener("click", closeNotesModal);
-  }
-  if (notesCancelBtn) {
-    notesCancelBtn.addEventListener("click", closeNotesModal);
   }
   if (notesSaveBtn) {
     notesSaveBtn.addEventListener("click", saveProblemNotes);
@@ -2131,11 +2122,6 @@ function renderProblems(filter = "all", searchQuery = "") {
 data-id="${problem.id}">
         <i class="fas fa-heart"></i>
     </button>
-    <button class="notes-btn ${
-      userProgress.problemNotes[problem.id] ? "has-notes" : ""
-    }" data-id="${problem.id}">
-  <i class="fas fa-sticky-note"></i>
-</button>
 
                <button class="notes-btn ${
                  userProgress.problemNotes[problem.id] ? "active" : ""
@@ -2951,7 +2937,7 @@ function initChatbot() {
     if (!message) return;
 
     // Add user message
-    addChatMessage(`<p>${message}</p>`, "user");
+     addChatMessage(message, "user");
 
     // Store previous question
     lastQuestion = message;
@@ -2985,7 +2971,7 @@ function initChatbot() {
       const response = getBotResponse(message);
 
       // Add bot response
-      addChatMessage(response, "bot");
+      addChatMessage(response, "bot", { html: true });
     }, 1000);
   }
 
@@ -3003,11 +2989,15 @@ function initChatbot() {
   });
 }
 
-function addChatMessage(message, sender) {
+function addChatMessage(message, sender, { html = false } = {}) {
   const messagesContainer = document.getElementById("chatbotMessages");
   const messageEl = document.createElement("div");
   messageEl.className = `message ${sender}`;
-  messageEl.innerHTML = message;
+  if (html) {
+    messageEl.innerHTML = message;
+  } else {
+    messageEl.textContent = message;
+  }
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
@@ -3027,7 +3017,7 @@ function getBotResponse(question) {
   return `
     <div class="assistant-response">
       <h4>🧠 Problem Understanding</h4>
-      <p>${question}</p>
+      <p>${escapeHtml(question)}</p>
 
       <h4>⚡ Approach</h4>
       <p>${response}</p>
@@ -3361,37 +3351,6 @@ function openTopicModal(topic) {
 
 function closeTopicModal() {
   document.getElementById("topicModal").classList.remove("active");
-}
-
-function openNotesModal(problemId) {
-  const modal = document.getElementById("notesModal");
-  if (!modal) return;
-
-  currentNotesProblemId = problemId;
-  const problem = practiceProblems.find((p) => p.id === problemId);
-  document.getElementById("notesModalTitle").textContent =
-    `Notes: ${problem ? problem.title : ""}`;
-  document.getElementById("notesEditor").value =
-    userProgress.problemNotes[problemId] || "";
-  modal.classList.add("active");
-}
-
-function closeNotesModal() {
-  const modal = document.getElementById("notesModal");
-  if (modal) {
-    modal.classList.remove("active");
-  }
-  currentNotesProblemId = null;
-}
-
-function saveProblemNotes() {
-  if (!currentNotesProblemId) return;
-
-  const notes = document.getElementById("notesEditor").value.trim();
-  userProgress.problemNotes[currentNotesProblemId] = notes;
-  saveUserData();
-  closeNotesModal();
-  showNotification("Notes saved successfully! 📝", "success");
 }
 
 function toggleNotesButton(btn, problemId) {

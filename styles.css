@@ -2,6 +2,7 @@
 :root {
   /* Colors */
   --primary: #7c3aed;
+  --primary-rgb: 124, 58, 237;
   --primary-light: #a78bfa;
   --secondary: #3b82f6;
   --accent: #06b6d4;
@@ -28,12 +29,6 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
 }
 
 body {
@@ -2470,11 +2465,9 @@ body {
   resize: none;
   tab-size: 4;
   overflow: auto;
-  white-space: pre;
-  overflow-x: auto;
-  white-space: pre-wrap; /*  changed from pre to pre-wrap */
-  overflow-x: hidden; /*  changed from auto to hidden */
-  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
   box-sizing: border-box;
   position: absolute;
   top: 0;
@@ -3342,7 +3335,7 @@ body {
 .review-item {
   margin-bottom: 25px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .review-question {
@@ -4238,51 +4231,6 @@ body.light-mode {
   margin-bottom: 8px;
 }
 
-.totd-desc {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 0.8rem;
-}
-
-.totd-meta {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.totd-problems {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-}
-
-.totd-btn {
-  width: fit-content;
-}
-
-@media (max-width: 768px) {
-  .totd-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .totd-icon {
-    font-size: 2.5rem;
-  }
-
-  .totd-title {
-    font-size: 1.4rem;
-  }
-
-  .totd-btn {
-    width: 100%;
-    text-align: center;
-  }
-}
 .back-to-top {
   position: fixed;
   bottom: 105px;
