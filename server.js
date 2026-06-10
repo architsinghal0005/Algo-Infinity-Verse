@@ -542,6 +542,8 @@ function resolveStaticPath(pathname) {
     "/cplusplus-learning": "cplusplus-learning.html",
     "/learning/php": "php-learning.html",
     "/php-learning": "php-learning.html",
+    "/learning/oop": "oop-learning.html",
+    "/oop-learning": "oop-learning.html",
     "/feedback": "feedback.html",
     "/feedback.html": "feedback.html",
     "/support-page": "support-page/index.html",

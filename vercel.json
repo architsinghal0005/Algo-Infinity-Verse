@@ -40,6 +40,14 @@
     {
       "source": "/php-learning",
       "destination": "/php-learning.html"
+    },
+    {
+      "source": "/learning/oop",
+      "destination": "/oop-learning.html"
+    },
+    {
+      "source": "/oop-learning",
+      "destination": "/oop-learning.html"
     }
   ],
   "headers": [
