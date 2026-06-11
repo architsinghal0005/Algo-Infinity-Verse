@@ -1322,31 +1322,6 @@ const practiceProblems = [
     ],
   },
   {
-    id: 8,
-    name: "Shortest Path",
-    icon: "🛣️",
-    description: "Dijkstra's, Bellman-Ford, and Floyd-Warshall algorithms for finding optimal paths in graphs",
-    difficulty: "Medium-Hard",
-    theory: `
-    <h3 style="color:var(--accent); margin-bottom:1rem;">🛣️ Shortest Path — Graph Optimization</h3>
-    <p style="margin-bottom:1rem;">Shortest path algorithms find the <strong>minimum cost route</strong> between nodes in a weighted graph.</p>
-    <h4 style="color:var(--primary); margin:1rem 0 0.5rem;">⚡ Algorithm Comparison</h4>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:1rem; font-size:0.9rem;">
-      <tr style="background:var(--dark-card);"><th style="padding:0.5rem 1rem; text-align:left; border:1px solid var(--glass-border);">Algorithm</th><th style="padding:0.5rem 1rem; text-align:left; border:1px solid var(--glass-border);">Time</th></tr>
-      <tr><td style="padding:0.5rem 1rem; border:1px solid var(--glass-border);">Dijkstra's</td><td style="padding:0.5rem 1rem; border:1px solid var(--glass-border); color:#22c55e;">O((V+E) log V) ✅</td></tr>
-      <tr style="background:var(--dark-card);"><td style="padding:0.5rem 1rem; border:1px solid var(--glass-border);">Bellman-Ford</td><td style="padding:0.5rem 1rem; border:1px solid var(--glass-border);">O(V×E)</td></tr>
-      <tr><td style="padding:0.5rem 1rem; border:1px solid var(--glass-border);">Floyd-Warshall</td><td style="padding:0.5rem 1rem; border:1px solid var(--glass-border);">O(V³)</td></tr>
-    </table>
-    <h4 style="color:var(--primary); margin:1rem 0 0.5rem;">🎯 When to Use What</h4>
-    <ul style="list-style:none; padding:0; margin-bottom:1rem;">
-      <li style="padding:0.3rem 0;">→ <strong>Dijkstra's</strong> — non-negative weights, single source</li>
-      <li style="padding:0.3rem 0;">→ <strong>Bellman-Ford</strong> — negative weights, negative cycle detection</li>
-      <li style="padding:0.3rem 0;">→ <strong>Floyd-Warshall</strong> — all-pairs shortest paths</li>
-    </ul>
-    <h4 style="color:var(--primary); margin:1rem 0 0.5rem;">🏆 Real Interview Questions from FAANG</h4>
-    <p style="color:var(--text-secondary);">Network Delay Time (Amazon), Cheapest Flights (Google), Path with Min Effort (Meta)</p>
-    `,
-    problems: ["Network Delay Time", "Cheapest Flights Within K Stops", "Path With Minimum Effort", "Find the City With Smallest Neighbors", "Shortest Path in Binary Matrix"],
     id: 7,
     name: "Matrix",
     icon: "🔢",
@@ -1376,7 +1351,6 @@ const practiceProblems = [
     problems: ["Spiral Matrix", "Rotate Image", "Number of Islands", "Set Matrix Zeroes", "Search a 2D Matrix"],
   },
 ];
-
 
 const practiceProblems = [
   {
@@ -1895,7 +1869,6 @@ const dailyChallenges = [
     problemId: null,
     xpReward: 100,
   },
-
 ];
 
 const chatbotResponses = {
@@ -1938,16 +1911,6 @@ const chatbotResponses = {
 
 // ===== STATE MANAGEMENT =====
 let userProgress = {
-    name: "Learner",
-    avatar: "🚀",
-    completedProblems: [],
-    xp: 0,
-    level: 1,
-    streak: 0,
-    badges: [],
-    lastActive: null,
-    joinDate: null, // Will be set on first load
-    quizScores: {}, // topic -> { bestScore, attempts, totalXP }
   name: "Learner",
   avatar: "🚀",
   completedProblems: [],
@@ -1967,7 +1930,6 @@ let userProgress = {
   quizScores: {}, // topic -> { bestScore, attempts, totalXP }
   bestQuizTimes: {},
   activityData: {}, // date-string -> count (e.g. "2026-06-05" -> 3)
-
 };
 
 applySavedTheme();
@@ -1977,38 +1939,6 @@ applySavedTheme();
 let currentProblem = null;
 
 // ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded fired, initializing app...');
-    loadUserData();
-    initLoadingScreen();
-    initNavbar();
-    initHeroSection();
-    initTopicsSection();
-    initQuizSection();
-    initPracticeSection();
-    initRoadmap();
-    initDashboard();
-    initGamification();
-    initChatbot();
-    initProfile();
-    initScrollEffects();
-    initDarkMode();
-
-    // Update profile display after loading
-    
-    console.log('App initialization complete');
-
-    // Language change handler for code editor
-    const langSelect = document.getElementById('languageSelect');
-    if (langSelect) {
-        langSelect.addEventListener('change', () => {
-            if (currentProblem) {
-                const editor = document.getElementById('codeEditor');
-                editor.value = getDefaultCode(langSelect.value, currentProblem);
-                editor.dispatchEvent(new Event('input'));
-            }
-        });
-    }
 document.addEventListener("DOMContentLoaded", () => {
 
   loadUserData();
@@ -2059,7 +1989,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
 
   const saveNotesBtn = document.getElementById("saveNotesBtn");
 
@@ -2559,16 +2488,6 @@ function getDifficultyClass(difficulty) {
 
 // Get quiz topic key from topic object
 function getQuizTopicKey(topic) {
-    const name = topic.name.toLowerCase();
-    // Map topic names to quiz keys
-    const keyMap = {
-        'arrays': 'arrays',
-        'strings': 'strings',
-        'linked list': 'linkedlist',
-        'trees': 'trees',
-        'graphs': 'graphs',
-        'dynamic programming': 'dp',
-        'greedy algorithms': 'greedy'
   const normalize = (s) =>
     String(s)
       .trim()
@@ -2585,7 +2504,6 @@ function getQuizTopicKey(topic) {
       graphs: "graphs",
       "dynamic programming": "dp",
       dp: "dp",
-
     };
     return map[normalize(key)] || null;
   };
@@ -2643,19 +2561,6 @@ function initQuizSection() {
                     <i class="fas fa-play"></i> Start Quiz
                 </button>
             `;
-            quizGrid.appendChild(card);
-            console.log(`Quiz card created for ${topic.name}`);
-
-            // Update progress display
-            updateQuizProgressDisplay(topic);
-
-            // Add click handler
-            
-        });
-        console.log('Quiz Section initialization complete');
-    } catch (error) {
-        console.error('Error initializing quiz section:', error);
-    }
       quizGrid.appendChild(card);
       card.addEventListener("click", () => {
         startQuiz(topicKey);
@@ -2678,23 +2583,8 @@ function initQuizSection() {
   } catch (error) {
     console.error("Error initializing quiz section:", error);
   }
-
 }
-document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.start-quiz-btn');
-    if (!btn) return;
 
-    e.preventDefault();
-    e.stopPropagation();
-
-    const topicKey = btn.dataset.topic;
-    const topic = dsaTopics.find(t => getQuizTopicKey(t) === topicKey);
-
-    if (!topic) return;
-
-    console.log("QUIZ OPEN:", topic.name);
-    startQuiz(topic);
-}, true);
 function updateQuizProgressDisplay(topic) {
   const topicKey = getQuizTopicKey(topic);
   const progressFill = document.getElementById(`progress-${topicKey}`);
@@ -2732,24 +2622,8 @@ function startQuiz(topicKey) {
 
   // Ensure we use the normalized key everywhere below.
   topicKey = normalizedTopicKey;
-    // Header update
-    document.getElementById('topicQuizBadge').textContent = topic.name;
-    document.getElementById('topicQuizDifficulty').textContent = topic.difficulty;
-    document.getElementById('topicQuizTitle').textContent = `${topic.name} Quiz`;
 
-    const prevResult = document.getElementById('topicQuizResult');
-    if (prevResult) prevResult.classList.add('hidden');
 
-    // 🔥 FIX IMPORTANT STATE RESET
-    openQuizModal();
-
-    const loader = document.getElementById('quizLoader');
-    const panel = document.querySelector('.quiz-problem-panel');
-
-    if (loader) loader.classList.add('hidden');
-    if (panel) panel.style.display = 'block';
-
-    renderQuizQuestion();
   const resultEl = document.getElementById("topicQuizResult");
 
   if (resultEl) {
@@ -2773,7 +2647,6 @@ function startQuiz(topicKey) {
   startQuizTimer(topicKey);
 
   renderQuizQuestion();
-
 }
 
 // Fisher-Yates shuffle
@@ -4144,56 +4017,6 @@ window.openRoadmapStepModal = openRoadmapStepModal;
 
 // ===== PROFILE =====
 function initProfile() {
-    var profileName = document.getElementById("profileName");
-    if (profileName) {
-        profileName.textContent = userProgress.name;
-    }
-    
-    // Set joined date
-    var joinDate = document.getElementById("joinDate");
-    if (joinDate) {
-        let joinDateObj;
-        if (userProgress.joinDate) {
-            joinDateObj = new Date(userProgress.joinDate);
-        } else {
-            joinDateObj = new Date();
-            userProgress.joinDate = joinDateObj.toISOString();
-            saveUserData();
-        }
-        joinDate.textContent = joinDateObj.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-        });
-    }
-    
-    // Set current date in dashboard
-    var currentDateElement = document.getElementById("current-date");
-    if (currentDateElement) {
-        var today = new Date();
-        currentDateElement.textContent = "Today: " + today.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-        });
-    }
-    
-    // Set current date in dashboard card
-    var dashboardCurrentDateElement = document.getElementById("dashboard-current-date");
-    if (dashboardCurrentDateElement) {
-        var today = new Date();
-        dashboardCurrentDateElement.textContent = "Today: " + today.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-        });
-    }
-    
-    var avatarIcon = document.querySelector('.avatar-icon');
-    if (avatarIcon) {
-        avatarIcon.textContent = userProgress.avatar || '🚀';
-    }
-    updateProfile();
   var profileName = document.getElementById("profileName") || document.getElementById("profileDashboardName");
   if (profileName) {
     profileName.textContent = userProgress.name;
@@ -4230,7 +4053,6 @@ function initProfile() {
     avatarIcon.textContent = userProgress.avatar || "🚀";
   }
   updateProfile();
-
 }
 
 function updateProfile() {
@@ -5207,22 +5029,6 @@ async function getAuthenticatedSession() {
 }
 
 function loadUserData() {
-    try {
-        const saved = localStorage.getItem('algoInfinityVerse');
-        if (saved) {
-            const data = JSON.parse(saved);
-            userProgress = { ...userProgress, ...data };
-
-            // Ensure quizScores exists
-            if (!userProgress.quizScores) {
-                userProgress.quizScores = {};
-            }
-            
-            // Initialize joinDate if not set
-            if (!userProgress.joinDate) {
-                userProgress.joinDate = new Date().toISOString();
-                saveUserData();
-            }
   try {
     const saved = localStorage.getItem("algoInfinityVerse");
     if (saved) {
@@ -5262,7 +5068,6 @@ function loadUserData() {
         userProgress.activityData = {};
       }
 
-
       // Backfill activity heatmap from existing completed problems
       backfillActivityData();
 
@@ -5276,35 +5081,6 @@ function loadUserData() {
         if (diffDays === 0) {
           // Already active today
         } else {
-
-            // Initialize with some demo data
-            userProgress.name = "Learner";
-            userProgress.avatar = "🚀";
-            userProgress.completedProblems = [1, 2, 10];
-            userProgress.xp = 350;
-            userProgress.level = 2;
-            userProgress.streak = 3;
-            userProgress.badges = [1];
-            userProgress.joinDate = new Date().toISOString();
-            userProgress.quizScores = {};
-            saveUserData();
-        }
-    } catch (error) {
-        console.error('Error loading user data, resetting to defaults:', error);
-        // Reset to defaults
-        userProgress = {
-            name: "Learner",
-            avatar: "🚀",
-            completedProblems: [],
-            xp: 0,
-            level: 1,
-            streak: 0,
-            badges: [],
-            lastActive: null,
-            joinDate: new Date().toISOString(),
-            quizScores: {}
-        };
-
           let daysMissed = diffDays > 0 ? diffDays - 1 : 0;
           while (daysMissed > 0 && userProgress.freezes > 0) {
             userProgress.freezes -= 1;
@@ -5324,7 +5100,6 @@ function loadUserData() {
             }
           }
         }
-
         saveUserData();
       }
     } else {
@@ -5371,11 +5146,7 @@ function loadUserData() {
       updateProfile();
       saveUserData();
     }
-    // Update profile display after loading
-    initProfile();
-
   });
-
 }
 
 // ===== QUIZ EDITOR =====
@@ -6455,48 +6226,6 @@ if (document.readyState === 'loading') {
 // Initialize some animations after page load
 window.addEventListener("load", () => {
 });
-function setJoinDate() {
-    const joinElement = document.getElementById("joinDate");
-
-    if (!joinElement) return;
-
-    const options = {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    };
-
-    const today = new Date().toLocaleDateString(undefined, options);
-
-    joinElement.innerText = today;
-}
-
-setJoinDate();
-// ✅ FIX: Current Date feature for dashboard + profile
-
-function updateDate() {
-    const today = new Date();
-
-    const formattedDate = today.toLocaleDateString(undefined, {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    });
-
-    const dashboardDate = document.getElementById("dashboard-current-date");
-    if (dashboardDate) {
-        dashboardDate.textContent = formattedDate;
-    }
-
-    const profileDate = document.getElementById("profile-current-date");
-    if (profileDate) {
-        profileDate.textContent = formattedDate;
-    }
-}
-
-updateDate();
-setInterval(updateDate, 60 * 60 * 1000);
 
 // ===== NEWSLETTER FORM VALIDATION =====
 function validateEmail(email) {
@@ -6647,4 +6376,3 @@ function initBackToTopButtons() {
 }
 
 initBackToTopButtons();
-
