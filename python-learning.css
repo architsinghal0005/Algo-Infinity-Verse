@@ -1,0 +1,499 @@
+/* ─────────────────────────────────────────────
+   Python Learning Page – Reusable Component Styles
+   ───────────────────────────────────────────── */
+
+/* Hero typing text */
+.typing-text_python {
+  color: var(--primary-light);
+  font-weight: 600;
+}
+
+/* ── Topic Navigation Sidebar ── */
+.py-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.py-sidebar {
+  position: sticky;
+  top: 100px;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.py-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.py-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.py-sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.py-sidebar-nav li a:hover,
+.py-sidebar-nav li a.active {
+  color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.08);
+  border-left-color: var(--primary);
+}
+
+.py-sidebar-nav li a .nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.py-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Lesson Section Card ── */
+.py-lesson {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease;
+}
+
+.py-lesson:target {
+  border-color: var(--primary);
+}
+
+.py-lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.py-lesson-number {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.py-lesson-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.py-lesson p,
+.py-lesson li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+
+.py-lesson ul,
+.py-lesson ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.py-lesson li {
+  margin-bottom: 0.4rem;
+}
+
+.py-lesson strong {
+  color: var(--text-primary);
+}
+
+/* ── Concept Card (inline sub-card) ── */
+.py-concept-card {
+  background: var(--dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.py-concept-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.py-concept-card p {
+  margin-bottom: 0;
+}
+
+/* ── Syntax-highlighted Code Block ── */
+.py-code-block {
+  position: relative;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.py-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.py-code-lang {
+  font-family: "Fira Code", monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.py-code-copy {
+  background: none;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.py-code-copy:hover {
+  color: var(--text-primary);
+  border-color: var(--primary-light);
+}
+
+.py-code-copy.copied {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.py-code-block pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  background: #0d1117;
+  overflow-x: auto;
+}
+
+.py-code-block code {
+  font-family: "Fira Code", Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #e6edf3;
+}
+
+/* Token colors – consistent with existing project */
+.py-code-block .tok-kw { color: #c792ea; }
+.py-code-block .tok-fn { color: #82aaff; }
+.py-code-block .tok-str { color: #c3e88d; }
+.py-code-block .tok-num { color: #f78c6c; }
+.py-code-block .tok-cmt { color: #546e7a; font-style: italic; }
+.py-code-block .tok-op { color: #89ddff; }
+.py-code-block .tok-bi { color: #ffcb6b; }
+.py-code-block .tok-var { color: #f07178; }
+.py-code-block .tok-bool { color: #ff5370; }
+.py-code-block .tok-param { color: #e6edf3; }
+
+/* ── Exercise Box ── */
+.py-exercise {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.py-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-bottom: 0.75rem;
+}
+
+.py-exercise-title i {
+  font-size: 1.1rem;
+}
+
+.py-exercise ol,
+.py-exercise ul {
+  margin-bottom: 0.75rem;
+}
+
+.py-exercise-toggle {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.py-exercise-toggle:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.py-exercise-solution {
+  display: none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.py-exercise-solution.visible {
+  display: block;
+}
+
+.py-exercise-solution p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Output / Result Block ── */
+.py-output {
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.py-output-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.py-output pre {
+  margin: 0;
+  font-family: "Fira Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Progress Tracker (topic-level) ── */
+.py-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.py-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dark-surface);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.py-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gradient-4);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.py-progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ── Key Takeaway / Tip Callout ── */
+.py-callout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(124, 58, 237, 0.06);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.py-callout-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.py-callout p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Table (for data types, etc.) ── */
+.py-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.py-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.py-table th {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--primary-light);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.py-table td {
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.py-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .py-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .py-lesson {
+    padding: 1.5rem;
+  }
+
+  .py-lesson-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .py-code-block pre {
+    padding: 1rem;
+  }
+
+  .py-code-block code {
+    font-size: 0.78rem;
+  }
+
+  .py-progress-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .py-progress-text {
+    text-align: center;
+  }
+
+  .py-callout {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .py-lesson {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .py-lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .py-exercise {
+    padding: 1rem;
+  }
+}
+
+/* ── Accessibility: focus-visible ── */
+.py-sidebar-nav li a:focus-visible,
+.py-code-copy:focus-visible,
+.py-exercise-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Print styles ── */
+@media print {
+  .py-sidebar,
+  .py-progress-bar,
+  .py-exercise-toggle,
+  .py-code-copy,
+  .navbar,
+  .footer {
+    display: none !important;
+  }
+
+  .py-lesson {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  .py-code-block pre {
+    background: #f5f5f5;
+    color: #333;
+  }
+}

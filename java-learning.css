@@ -1,0 +1,507 @@
+/* ─────────────────────────────────────────────
+   Java Learning Page – Scoped Component Styles
+   ───────────────────────────────────────────── */
+
+:root {
+  --java-primary: #e63946;
+  --java-secondary: #f4a261;
+  --java-gradient: linear-gradient(135deg, #e63946 0%, #f4a261 100%);
+  --java-bg: rgba(230, 57, 70, 0.06);
+  --java-bg-hover: rgba(230, 57, 70, 0.12);
+}
+
+/* Hero typing text */
+.typing-text_java {
+  color: var(--java-primary);
+  font-weight: 600;
+}
+
+/* ── Topic Navigation Sidebar ── */
+.java-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.java-sidebar {
+  position: sticky;
+  top: 100px;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.java-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.java-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.java-sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.java-sidebar-nav li a:hover,
+.java-sidebar-nav li a.active {
+  color: var(--java-primary);
+  background: var(--java-bg);
+  border-left-color: var(--java-primary);
+}
+
+.java-sidebar-nav li a .nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.java-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Lesson Section Card ── */
+.java-lesson {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease;
+}
+
+.java-lesson:target {
+  border-color: var(--java-primary);
+}
+
+.java-lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.java-lesson-number {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--java-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.java-lesson-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.java-lesson p,
+.java-lesson li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+
+.java-lesson ul,
+.java-lesson ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.java-lesson li {
+  margin-bottom: 0.4rem;
+}
+
+.java-lesson strong {
+  color: var(--text-primary);
+}
+
+/* ── Concept Card ── */
+.java-concept-card {
+  background: var(--dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.java-concept-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--java-primary);
+  margin: 0 0 0.5rem;
+}
+
+.java-concept-card p {
+  margin-bottom: 0;
+}
+
+/* ── Code Block ── */
+.java-code-block {
+  position: relative;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.java-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.java-code-lang {
+  font-family: "Fira Code", monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--java-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.java-code-copy {
+  background: none;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.java-code-copy:hover {
+  color: var(--text-primary);
+  border-color: var(--java-secondary);
+}
+
+.java-code-copy.copied {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.java-code-block pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  background: #0d1117;
+  overflow-x: auto;
+}
+
+.java-code-block code {
+  font-family: "Fira Code", Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #e6edf3;
+}
+
+/* Token colors */
+.java-code-block .tok-kw { color: #c792ea; }
+.java-code-block .tok-fn { color: #82aaff; }
+.java-code-block .tok-str { color: #c3e88d; }
+.java-code-block .tok-num { color: #f78c6c; }
+.java-code-block .tok-cmt { color: #546e7a; font-style: italic; }
+.java-code-block .tok-op { color: #89ddff; }
+.java-code-block .tok-bi { color: #ffcb6b; }
+.java-code-block .tok-var { color: #f07178; }
+.java-code-block .tok-bool { color: #ff5370; }
+.java-code-block .tok-param { color: #e6edf3; }
+
+/* ── Exercise Box ── */
+.java-exercise {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.java-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-bottom: 0.75rem;
+}
+
+.java-exercise-title i {
+  font-size: 1.1rem;
+}
+
+.java-exercise ol,
+.java-exercise ul {
+  margin-bottom: 0.75rem;
+}
+
+.java-exercise-toggle {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.java-exercise-toggle:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.java-exercise-solution {
+  display: none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.java-exercise-solution.visible {
+  display: block;
+}
+
+.java-exercise-solution p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Output Block ── */
+.java-output {
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.java-output-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.java-output pre {
+  margin: 0;
+  font-family: "Fira Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Progress Tracker ── */
+.java-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.java-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dark-surface);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.java-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--java-gradient);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.java-progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ── Key Takeaway / Tip Callout ── */
+.java-callout {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--java-bg);
+  border: 1px solid rgba(230, 57, 70, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.java-callout-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.java-callout p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Table ── */
+.java-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.java-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.java-table th {
+  background: rgba(230, 57, 70, 0.12);
+  color: var(--java-primary);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.java-table td {
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.java-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .java-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .java-lesson {
+    padding: 1.5rem;
+  }
+
+  .java-lesson-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .java-code-block pre {
+    padding: 1rem;
+  }
+
+  .java-code-block code {
+    font-size: 0.78rem;
+  }
+
+  .java-progress-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .java-progress-text {
+    text-align: center;
+  }
+
+  .java-callout {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .java-lesson {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .java-lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .java-exercise {
+    padding: 1rem;
+  }
+}
+
+/* ── Accessibility: focus-visible ── */
+.java-sidebar-nav li a:focus-visible,
+.java-code-copy:focus-visible,
+.java-exercise-toggle:focus-visible {
+  outline: 2px solid var(--java-primary);
+  outline-offset: 2px;
+}
+
+/* ── Print styles ── */
+@media print {
+  .java-sidebar,
+  .java-progress-bar,
+  .java-exercise-toggle,
+  .java-code-copy,
+  .navbar,
+  .footer {
+    display: none !important;
+  }
+
+  .java-lesson {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  .java-code-block pre {
+    background: #f5f5f5;
+    color: #333;
+  }
+}

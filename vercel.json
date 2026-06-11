@@ -1,0 +1,64 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/community",
+      "destination": "/community.html"
+    },
+    {
+      "source": "/python-learning",
+      "destination": "/python-learning.html"
+    },
+    {
+      "source": "/javascript-learning",
+      "destination": "/javascript-learning.html"
+    },
+    {
+      "source": "/dbms-learning",
+      "destination": "/dbms-learning.html"
+    },
+    {
+      "source": "/cplusplus-learning",
+      "destination": "/cplusplus-learning.html"
+    },
+    {
+      "source": "/learning/php",
+      "destination": "/php-learning.html"
+    },
+    {
+      "source": "/php-learning",
+      "destination": "/php-learning.html"
+    },
+    {
+      "source": "/learning/oop",
+      "destination": "/oop-learning.html"
+    },
+    {
+      "source": "/oop-learning",
+      "destination": "/oop-learning.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
+  ]
+}

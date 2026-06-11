@@ -1,0 +1,529 @@
+/* ─────────────────────────────────────────────
+   Power BI Learning Page – Scoped Component Styles
+   ───────────────────────────────────────────── */
+
+/* Hero typing text */
+.typing-text_powerbi {
+  color: #ffd000;
+  font-weight: 600;
+}
+
+/* ── Topic Navigation Sidebar ── */
+.pbi-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.pbi-sidebar {
+  position: sticky;
+  top: 100px;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.pbi-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.pbi-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pbi-sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.pbi-sidebar-nav li a:hover,
+.pbi-sidebar-nav li a.active {
+  color: #ffd000;
+  background: rgba(242, 200, 17, 0.08);
+  border-left-color: #ffd000;
+}
+
+.pbi-sidebar-nav li a .nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.pbi-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Lesson Section Card ── */
+.pbi-lesson {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease;
+}
+
+.pbi-lesson:target {
+  border-color: #ffd000;
+}
+
+.pbi-lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pbi-lesson-number {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffd000 0%, #f2a100 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.pbi-lesson-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.pbi-lesson p,
+.pbi-lesson li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+
+.pbi-lesson ul,
+.pbi-lesson ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.pbi-lesson li {
+  margin-bottom: 0.4rem;
+}
+
+.pbi-lesson strong {
+  color: var(--text-primary);
+}
+
+/* ── Concept Card (inline sub-card) ── */
+.pbi-concept-card {
+  background: var(--dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.pbi-concept-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffd000;
+  margin: 0 0 0.5rem;
+}
+
+.pbi-concept-card p {
+  margin-bottom: 0;
+}
+
+/* ── Syntax-highlighted Code Block ── */
+.pbi-code-block {
+  position: relative;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.pbi-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.pbi-code-lang {
+  font-family: "Fira Code", monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #ffd000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pbi-code-copy {
+  background: none;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.pbi-code-copy:hover {
+  color: var(--text-primary);
+  border-color: #ffd000;
+}
+
+.pbi-code-copy.copied {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.pbi-code-block pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  background: #0d1117;
+  overflow-x: auto;
+}
+
+.pbi-code-block code {
+  font-family: "Fira Code", Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #e6edf3;
+}
+
+/* Token colors */
+.pbi-code-block .tok-kw { color: #c792ea; }      /* keyword */
+.pbi-code-block .tok-fn { color: #82aaff; }      /* function */
+.pbi-code-block .tok-str { color: #c3e88d; }     /* string */
+.pbi-code-block .tok-num { color: #f78c6c; }     /* number */
+.pbi-code-block .tok-cmt { color: #546e7a; font-style: italic; } /* comment */
+.pbi-code-block .tok-op { color: #89ddff; }      /* operator */
+.pbi-code-block .tok-bi { color: #ffcb6b; }      /* built-in / class */
+.pbi-code-block .tok-var { color: #f07178; }     /* variable */
+.pbi-code-block .tok-bool { color: #ff5370; }    /* boolean */
+.pbi-code-block .tok-param { color: #e6edf3; }   /* parameter */
+
+/* ── Exercise Box ── */
+.pbi-exercise {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.pbi-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-bottom: 0.75rem;
+}
+
+.pbi-exercise-title i {
+  font-size: 1.1rem;
+}
+
+.pbi-exercise ol,
+.pbi-exercise ul {
+  margin-bottom: 0.75rem;
+}
+
+.pbi-exercise-toggle {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pbi-exercise-toggle:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.pbi-exercise-solution {
+  display: none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.pbi-exercise-solution.visible {
+  display: block;
+}
+
+.pbi-exercise-solution p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Output / Result Block ── */
+.pbi-output {
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.pbi-output-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.pbi-output pre {
+  margin: 0;
+  font-family: "Fira Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Progress Tracker (topic-level) ── */
+.pbi-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.pbi-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dark-surface);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.pbi-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(135deg, #ffd000 0%, #f2a100 100%);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.pbi-progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ── Key Takeaway / Tip Callout ── */
+.pbi-callout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(242, 200, 17, 0.04);
+  border: 1px solid rgba(242, 200, 17, 0.18);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.pbi-callout-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.pbi-callout p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Table ── */
+.pbi-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.pbi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.pbi-table th {
+  background: rgba(242, 200, 17, 0.12);
+  color: #ffd000;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.pbi-table td {
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.pbi-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Visual Media Elements ── */
+.pbi-media-card {
+  margin: 1.5rem 0;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--dark-surface);
+}
+
+.pbi-media-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.pbi-media-card img:hover {
+  transform: scale(1.02);
+}
+
+.pbi-media-caption {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .pbi-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .pbi-lesson {
+    padding: 1.5rem;
+  }
+
+  .pbi-lesson-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .pbi-code-block pre {
+    padding: 1rem;
+  }
+
+  .pbi-code-block code {
+    font-size: 0.78rem;
+  }
+
+  .pbi-progress-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .pbi-progress-text {
+    text-align: center;
+  }
+
+  .pbi-callout {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pbi-lesson {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .pbi-lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .pbi-exercise {
+    padding: 1rem;
+  }
+}
+
+/* ── Accessibility: focus-visible ── */
+.pbi-sidebar-nav li a:focus-visible,
+.pbi-code-copy:focus-visible,
+.pbi-exercise-toggle:focus-visible {
+  outline: 2px solid #ffd000;
+  outline-offset: 2px;
+}
+
+/* ── Print styles ── */
+@media print {
+  .pbi-sidebar,
+  .pbi-progress-bar,
+  .pbi-exercise-toggle,
+  .pbi-code-copy,
+  .navbar,
+  .footer {
+    display: none !important;
+  }
+
+  .pbi-lesson {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  .pbi-code-block pre {
+    background: #f5f5f5;
+    color: #333;
+  }
+}

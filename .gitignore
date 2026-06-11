@@ -25,3 +25,8 @@ script.js.backup
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local auth data
+data/
+
+node_modules/

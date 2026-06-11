@@ -1,0 +1,21 @@
+{
+  "name": "algo-infinity-verse",
+  "version": "1.0.0",
+  "description": "Interactive DSA learning platform with secure local authentication.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": [
+    "dsa",
+    "algorithms",
+    "authentication"
+  ],
+  "license": "MIT",
+  "dependencies": {
+   "firebase-admin": "^12.0.0"
+  }
+}

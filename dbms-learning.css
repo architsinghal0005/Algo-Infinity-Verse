@@ -1,0 +1,583 @@
+/* ─────────────────────────────────────────────
+   DBMS Learning Page – Reusable Component Styles
+   ───────────────────────────────────────────── */
+
+/* Hero typing text */
+.typing-text_dbms {
+  color: var(--primary-light);
+  font-weight: 600;
+}
+
+/* ── Topic Navigation Sidebar ── */
+.dbms-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.dbms-sidebar {
+  position: sticky;
+  top: 100px;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.dbms-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.dbms-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dbms-sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.dbms-sidebar-nav li a:hover,
+.dbms-sidebar-nav li a.active {
+  color: var(--primary-light);
+  background: rgba(139, 92, 246, 0.08);
+  border-left-color: var(--primary);
+}
+
+.dbms-sidebar-nav li a .nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.dbms-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Lesson Section Card ── */
+.dbms-lesson {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease;
+}
+
+.dbms-lesson:target {
+  border-color: var(--primary);
+}
+
+.dbms-lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dbms-lesson-number {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.dbms-lesson-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dbms-lesson p,
+.dbms-lesson li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+
+.dbms-lesson ul,
+.dbms-lesson ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dbms-lesson li {
+  margin-bottom: 0.4rem;
+}
+
+.dbms-lesson strong {
+  color: var(--text-primary);
+}
+
+/* ── Concept Card (inline sub-card) ── */
+.dbms-concept-card {
+  background: var(--dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.dbms-concept-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.dbms-concept-card p {
+  margin-bottom: 0;
+}
+
+/* ── Syntax-highlighted Code Block ── */
+.dbms-code-block {
+  position: relative;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.dbms-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.dbms-code-lang {
+  font-family: "Fira Code", monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dbms-code-copy {
+  background: none;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.dbms-code-copy:hover {
+  color: var(--text-primary);
+  border-color: var(--primary-light);
+}
+
+.dbms-code-copy.copied {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.dbms-code-block pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  background: #0d1117;
+  overflow-x: auto;
+}
+
+.dbms-code-block code {
+  font-family: "Fira Code", Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #e6edf3;
+}
+
+/* Token colors for SQL syntax highlighting */
+.dbms-code-block .tok-kw { color: #c792ea; font-weight: bold; } /* KEYWORDS: SELECT, CREATE, INSERT */
+.dbms-code-block .tok-fn { color: #82aaff; } /* FUNCTIONS: COUNT, SUM */
+.dbms-code-block .tok-str { color: #c3e88d; } /* STRINGS */
+.dbms-code-block .tok-num { color: #f78c6c; } /* NUMBERS */
+.dbms-code-block .tok-cmt { color: #546e7a; font-style: italic; } /* COMMENTS */
+.dbms-code-block .tok-op { color: #89ddff; } /* OPERATORS: =, >, < */
+.dbms-code-block .tok-bi { color: #ffcb6b; } /* DATA TYPES: INT, VARCHAR */
+.dbms-code-block .tok-var { color: #f07178; } /* TABLE & COLUMN NAMES */
+
+/* ── Exercise Box ── */
+.dbms-exercise {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.dbms-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-bottom: 0.75rem;
+}
+
+.dbms-exercise-title i {
+  font-size: 1.1rem;
+}
+
+.dbms-exercise ol,
+.dbms-exercise ul {
+  margin-bottom: 0.75rem;
+}
+
+.dbms-exercise-toggle {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dbms-exercise-toggle:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.dbms-exercise-solution {
+  display: none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.dbms-exercise-solution.visible {
+  display: block;
+}
+
+.dbms-exercise-solution p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Output / Result Block ── */
+.dbms-output {
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.dbms-output-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.dbms-output pre {
+  margin: 0;
+  font-family: "Fira Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Progress Tracker ── */
+.dbms-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.dbms-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dark-surface);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.dbms-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gradient-4);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.dbms-progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ── Key Takeaway / Tip Callout ── */
+.dbms-callout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.dbms-callout-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.dbms-callout p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Table Styling ── */
+.dbms-table-wrap {
+  overflow-x: auto;
+  margin: 1.25rem 0 1.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.dbms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.dbms-table th {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--primary-light);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.dbms-table td {
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.dbms-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── SVG Architecture and ER Diagrams ── */
+.dbms-svg-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.dbms-svg-diagram {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dbms-svg-text {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  fill: #ffffff;
+  text-anchor: middle;
+}
+
+.dbms-svg-text-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  fill: var(--primary-light);
+}
+
+.dbms-svg-node {
+  fill: rgba(139, 92, 246, 0.15);
+  stroke: var(--primary);
+  stroke-width: 2px;
+  rx: 8px;
+  ry: 8px;
+  transition: all 0.3s ease;
+}
+
+.dbms-svg-node:hover {
+  fill: rgba(139, 92, 246, 0.3);
+  stroke: var(--accent);
+}
+
+.dbms-svg-node-alt {
+  fill: rgba(236, 72, 153, 0.1);
+  stroke: var(--accent);
+  stroke-width: 2px;
+  rx: 8px;
+  ry: 8px;
+}
+
+.dbms-svg-node-alt:hover {
+  fill: rgba(236, 72, 153, 0.2);
+}
+
+.dbms-svg-node-green {
+  fill: rgba(34, 197, 94, 0.1);
+  stroke: #22c55e;
+  stroke-width: 2px;
+  rx: 8px;
+  ry: 8px;
+}
+
+.dbms-svg-line {
+  stroke: var(--glass-border);
+  stroke-width: 2px;
+  fill: none;
+}
+
+.dbms-svg-line-active {
+  stroke: var(--primary-light);
+  stroke-width: 2px;
+  stroke-dasharray: 4;
+  animation: svgDash 10s linear infinite;
+}
+
+@keyframes svgDash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .dbms-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .dbms-lesson {
+    padding: 1.5rem;
+  }
+
+  .dbms-lesson-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .dbms-code-block pre {
+    padding: 1rem;
+  }
+
+  .dbms-code-block code {
+    font-size: 0.78rem;
+  }
+
+  .dbms-progress-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .dbms-progress-text {
+    text-align: center;
+  }
+
+  .dbms-callout {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dbms-lesson {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .dbms-lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .dbms-exercise {
+    padding: 1rem;
+  }
+}
+
+/* ── Accessibility: focus-visible ── */
+.dbms-sidebar-nav li a:focus-visible,
+.dbms-code-copy:focus-visible,
+.dbms-exercise-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Print styles ── */
+@media print {
+  .dbms-sidebar,
+  .dbms-progress-bar,
+  .dbms-exercise-toggle,
+  .dbms-code-copy,
+  .navbar,
+  .footer {
+    display: none !important;
+  }
+
+  .dbms-lesson {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  .dbms-code-block pre {
+    background: #f5f5f5;
+    color: #333;
+  }
+}

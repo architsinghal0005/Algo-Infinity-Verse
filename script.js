@@ -1101,7 +1101,13 @@ function initNavbar() {
 // ===== HERO SECTION =====
 function initHeroSection() {
   // Typing animation
-  const typingElement = document.getElementById("typingText");
+  const typingElement =
+    document.getElementById("typingText") ||
+    document.getElementById("typingTextGraph");
+  if (!typingElement) {
+    console.error("typingText element not found");
+    return;
+  }
   const texts = [
     "Arrays",
     "Linked Lists",
@@ -1292,6 +1298,10 @@ document.addEventListener("click", (e) => {
 // ===== TOPICS SECTION =====
 function initTopicsSection() {
   const topicsGrid = document.querySelector(".topics-grid");
+  if (!topicsGrid) {
+    console.warn("topics-grid not found");
+    return;
+  }
 
   dsaTopics.forEach((topic, index) => {
     const card = document.createElement("div");
@@ -1800,6 +1810,7 @@ function toggleFavorite(problemId) {
 // ===== ROADMAP =====
 function initRoadmap() {
   const progressBar = document.getElementById("roadmapProgress");
+  if (!progressBar) return;
   const stages = document.querySelectorAll(".stage");
 
   // Calculate progress based on completed problems
@@ -1979,15 +1990,21 @@ function updateLevelProgress() {
 
 // ===== DASHBOARD =====
 function initDashboard() {
+  const completedProblems = document.getElementById("completedProblems");
+
+  if (!completedProblems) return;
   updateDashboard();
   updateProfile();
 }
 
 function updateDashboard() {
-  document.getElementById("completedProblems").textContent =
-    userProgress.completedProblems.length;
-  document.getElementById("currentStreak").textContent = userProgress.streak;
-  document.getElementById("totalXP").textContent = userProgress.xp;
+  const completedProblems = document.getElementById("completedProblems");
+  const currentStreak = document.getElementById("currentStreak");
+  const totalXP = document.getElementById("totalXP");
+  if (!completedProblems || !currentStreak || !totalXP) return;
+  completedProblems.textContent = userProgress.completedProblems.length;
+  currentStreak.textContent = userProgress.streak;
+  totalXP.textContent = userProgress.xp;
 
   updateActivityList();
   updateBadges();
@@ -2186,6 +2203,11 @@ function showNotification(message, type = "info") {
 }
 
 function updateXPBar() {
+  const xpBar = document.getElementById("xpBar");
+  const xpText = document.getElementById("xpText");
+
+  if (!xpBar || !xpText) return;
+
   const levels = [0, 1000, 2500, 5000, 10000, 20000, 50000, 100000];
   const currentLevel = userProgress.level;
   const currentLevelXP = levels[currentLevel - 1] || 0;
@@ -2195,14 +2217,10 @@ function updateXPBar() {
     ((userProgress.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
 
   setTimeout(() => {
-    document.getElementById("xpBar").style.width =
-      `${Math.min(xpProgress, 100)}%`;
-    document.getElementById("xpText").textContent =
-      `${userProgress.xp} / ${nextLevelXP} XP`;
+    xpBar.style.width = `${Math.min(xpProgress, 100)}%`;
+    xpText.textContent = `${userProgress.xp} / ${nextLevelXP} XP`;
   }, 300);
 }
-
-let lastQuestion = "";
 
 // ===== CHATBOT =====
 function initChatbot() {
@@ -2213,6 +2231,9 @@ function initChatbot() {
   const send = document.getElementById("chatbotSend");
   const quickQs = document.querySelectorAll(".quick-q");
 
+  if (!toggle || !windowEl || !close || !input || !send) {
+    return;
+  }
   toggle.addEventListener("click", () => {
     windowEl.classList.toggle("hidden");
     toggle.querySelector(".chatbot-badge").style.display = "none";
