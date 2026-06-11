@@ -1,3 +1,14 @@
+/**
+ * divide-and-conquer-learning.js
+ * Interactivity for the Prefix Sum Learning page:
+ *  - Hero typing animation
+ *  - Stats counter animation (uses global animateValue from script.js)
+ *  - Sidebar scroll-spy (active link tracking)
+ *  - Progress bar (tracks completed topics via localStorage)
+ *  - Exercise toggle (show/hide solutions)
+ *  - Copy code button
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
   initHeroTyping();
   initStatsAnimation();
@@ -7,21 +18,20 @@ document.addEventListener("DOMContentLoaded", () => {
   initProgressTracker();
 });
 
+/* ─────────────────────────────────────────────
+   Hero Typing Animation
+   ───────────────────────────────────────────── */
 function initHeroTyping() {
-  const el = document.getElementById("typingTextC");
+  const el = document.getElementById("typingTextDC");
   if (!el) return;
 
   const words = [
-    "Variables & Data Types",
-    "printf & scanf",
-    "Operators",
-    "Conditionals",
-    "Loops",
-    "Functions",
-    "Arrays & Strings",
-    "Pointers",
-    "Structures",
-  ];
+    "Merge Sort",
+    "Quick Sort",
+    "Binary Search",
+    "Master Theorem",
+    "Sub-problems"
+];
 
   let wordIdx = 0;
   let charIdx = 0;
@@ -64,6 +74,9 @@ function initHeroTyping() {
   tick();
 }
 
+/* ─────────────────────────────────────────────
+   Stats Counter Animation
+   ───────────────────────────────────────────── */
 function initStatsAnimation() {
   const statNumbers = document.querySelectorAll(".stat-number[data-target]");
   if (!statNumbers.length) return;
@@ -85,10 +98,13 @@ function initStatsAnimation() {
   statNumbers.forEach((s) => observer.observe(s));
 }
 
+/* ─────────────────────────────────────────────
+   Exercise Show/Hide Toggle
+   ───────────────────────────────────────────── */
 function initExerciseToggles() {
-  document.querySelectorAll(".c-exercise-toggle").forEach((btn) => {
+  document.querySelectorAll(".dc-exercise-toggle").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const targetId = btn.getAttribute("aria-controls");
+      const targetId = btn.getAttribute("aria-controls") || btn.getAttribute("data-target");
       const solution = document.getElementById(targetId);
       if (!solution) return;
 
@@ -99,10 +115,20 @@ function initExerciseToggles() {
   });
 }
 
+/* ─────────────────────────────────────────────
+   Copy Code Button
+   ───────────────────────────────────────────── */
 function initCopyButtons() {
-  document.querySelectorAll(".c-code-copy").forEach((btn) => {
+  document.querySelectorAll(".dc-code-copy").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const code = btn.getAttribute("data-code");
+      let code = btn.getAttribute("data-code");
+      if (!code) {
+        const targetId = btn.getAttribute("data-target");
+        if (targetId) {
+            const block = document.getElementById(targetId);
+            if (block) code = block.innerText;
+        }
+      }
       if (!code) return;
 
       try {
@@ -114,6 +140,7 @@ function initCopyButtons() {
           btn.classList.remove("copied");
         }, 2000);
       } catch {
+        // Fallback for older browsers
         const textarea = document.createElement("textarea");
         textarea.value = code;
         textarea.style.position = "fixed";
@@ -133,12 +160,15 @@ function initCopyButtons() {
   });
 }
 
+/* ─────────────────────────────────────────────
+   Sidebar Scroll-Spy
+   ───────────────────────────────────────────── */
 function initSidebarSpy() {
-  const links = document.querySelectorAll(".c-sidebar-nav a");
-  const lessons = document.querySelectorAll(".c-lesson");
+  const links = document.querySelectorAll(".dc-sidebar-nav a");
+  const lessons = document.querySelectorAll(".dc-lesson");
   if (!links.length || !lessons.length) return;
 
-  const NAV_HEIGHT = 80;
+  const NAV_HEIGHT = 100; // offset for fixed navbar
 
   function getActiveId() {
     let bestId = null;
@@ -167,7 +197,7 @@ function initSidebarSpy() {
       if (id) {
         links.forEach((l) => l.classList.remove("active"));
         const active = document.querySelector(
-          `.c-sidebar-nav a[href="#${id}"]`
+          `.dc-sidebar-nav a[href="#${id}"]`
         );
         if (active) active.classList.add("active");
       }
@@ -176,15 +206,18 @@ function initSidebarSpy() {
   }
 
   window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  onScroll(); // run once on load
 }
 
+/* ─────────────────────────────────────────────
+   Progress Tracker
+   ───────────────────────────────────────────── */
 function initProgressTracker() {
-  const STORAGE_KEY = "c-learning-progress";
-  const TOTAL_TOPICS = 11;
+  const STORAGE_KEY = "divide-and-conquer-learning-progress";
+  const TOTAL_TOPICS = 5; // Adjust this if you change the number of topics
   const fill = document.getElementById("progressFill");
   const count = document.getElementById("progressCount");
-  const bar = document.querySelector(".c-progress-bar");
+  const bar = document.querySelector(".dc-progress-bar");
 
   if (!fill || !count) return;
 
@@ -192,10 +225,8 @@ function initProgressTracker() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (Array.isArray(saved)) completed = new Set(saved);
-    else if (saved !== null) localStorage.removeItem(STORAGE_KEY);
-  } 
-  catch {
-     localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
   }
 
   function updateUI() {
@@ -207,7 +238,7 @@ function initProgressTracker() {
 
   updateUI();
 
-  const lessons = document.querySelectorAll(".c-lesson");
+  const lessons = document.querySelectorAll(".dc-lesson");
   const observer = new IntersectionObserver(
     (entries) => {
       let changed = false;
@@ -221,10 +252,14 @@ function initProgressTracker() {
         }
       });
       if (changed) {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify([...completed])
-        );
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify([...completed])
+          );
+        } catch {
+          /* ignore */
+        }
         updateUI();
       }
     },

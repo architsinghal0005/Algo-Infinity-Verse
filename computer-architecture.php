@@ -66,6 +66,8 @@
             <a href="tree-traversal.html" class="dropdown-item" role="menuitem">Tree Traversal</a>
             <a href="sorting-visualizer.html" class="dropdown-item" role="menuitem">Sorting Visualizer</a>
             <a href="graph-visualizer.html" class="dropdown-item" role="menuitem">Graph Visualizer</a>
+            
+           
           </div>
         </li>
         <li class="nav-item has-dropdown">

@@ -44,93 +44,14 @@
         <span class="logo-title">Algo Infinity Verse</span>
       </div>
       <ul class="nav-links" id="navLinks">
-        <li class="nav-item">
-          <a href="#home" class="nav-link">Home</a>
-        </li>
-        <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-            <span>Learn</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#topics" class="dropdown-item">DSA Topics</a>
-            <a href="#practice" class="dropdown-item">Practice Problems</a>
-            <a href="#quiz" class="dropdown-item">Quizzes</a>
-            <a href="#roadmap" class="dropdown-item">Learning Roadmap</a>
-            <a href="python-learning.html" class="dropdown-item">Learn Python</a>
-            <a href="javascript-learning.html" class="dropdown-item">Learn JavaScript</a>
-            <a href="java-learning.html" class="dropdown-item">Learn Java</a>
-            <a href="cplusplus-learning.html" class="dropdown-item">Learn C++</a>
-            <a href="c-learning.html" class="dropdown-item">Learn C</a>
-            <a href="dbms-learning.html" class="dropdown-item">Learn DBMS</a>
-            <a href="sliding-window-learning.html"  class="dropdown-item">Learn Sliding Window</a>
-            <a href="prefix-sum-learning.html"  class="dropdown-item">Learn Prefix Sum</a>
-            <a href="powerbi-learning.html" class="dropdown-item">Learn Power BI</a>
-            <a href="php-learning.html" class="dropdown-item">Learn PHP</a>
-            <a href="oop-learning.html" class="dropdown-item">Learn OOP</a>
-            <a href="sorting-visualizer.html" class="dropdown-item">Sorting Visualizer</a>
-            <a href="graph-visualizer.html" class="dropdown-item">Graph Visualizer</a>
-          </div>
-        </li>
-        <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-            <span>Interview</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#interview" class="dropdown-item">Interview Prep</a>
-            <a href="cheat-sheets.html" class="dropdown-item">DSA Cheat Sheets</a>
-            <a href="system-design.html" class="dropdown-item">System Design</a>
-            <a href="behavioral-questions.html" class="dropdown-item">Behavioral Questions</a>
-          </div>
-        </li>
-        <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-            <span>Community</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="community.html" class="dropdown-item">Discussions</a>
-            <a href="#dashboard" class="dropdown-item">Leaderboard</a>
-            <a href="support-page/index.html" class="dropdown-item">Support</a>
-            <a href="feedback.html" class="dropdown-item">Feedback</a>
-          </div>
-        </li>
-        <li class="nav-item has-dropdown nav-profile-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-            <span>Profile</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end">
-            <a href="#dashboard" class="dropdown-item">
-              <i class="fas fa-tachometer-alt"></i>
-              Dashboard
-            </a>
-            <a href="#profile" class="dropdown-item">
-              <i class="fas fa-user"></i>
-              My Profile
-            </a>
-            <a href="resume.html" class="dropdown-item">
-              <i class="fas fa-file-alt"></i>
-              Coding Resume
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="login.html" class="dropdown-item nav-auth-link" id="navLoginBtn">
-              <i class="fas fa-sign-in-alt"></i>
-              Sign In
-            </a>
-            <a href="signup.html" class="dropdown-item nav-auth-link" id="navSignupBtn">
-              <i class="fas fa-user-plus"></i>
-              Sign Up
-            </a>
-          </div>
-        </li>
-        <li class="nav-item nav-cta desktop-only">
-          <a href="#practice" class="btn btn-primary nav-cta-btn">
-            <i class="fas fa-rocket"></i>
-            Start Learning
-          </a>
-        </li>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#topics">DSA Topics</a></li>
+        <li><a href="#quiz">Quizzes</a></li>
+        <li><a href="#practice">Practice</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#interview">Interview Prep</a></li>
+        <li><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#profile">Profile</a></li>
       </ul>
       <div class="nav-buttons">
         <button id="darkModeToggle" class="dark-mode-btn" aria-label="Toggle dark mode">
@@ -521,26 +442,20 @@
           Your Dashboard
         </h2>
         <div class="dashboard-grid">
-          <div class="dashboard-card" id="dailyChallengeCard">
-            <h3>🔥 Daily Challenge</h3>
-            <p id="dailyChallengeText">Loading...</p>
-            <button
-              id="completeChallengeBtn"
-              class="btn btn-primary"
-              aria-label="Complete daily challenge"
-            >
-              <i class="fas fa-bolt"></i> Complete Challenge (+50 XP)
-            </button>
-          </div>
+          <!-- Profile Card -->
           <div class="dashboard-card profile-card">
             <div class="profile-header">
               <div class="profile-avatar">
                 <span class="avatar-icon">🚀</span>
               </div>
               <div class="profile-info">
-                <h3 id="profileDashboardName">Learner</h3>
-                <p id="profileDashboardLevel">Level 1 - Beginner</p>
-                <p>Joined: <span id="joinDateDashboard"></span></p>
+                <h3 id="profileName">Learner</h3>
+                <p class="profile-level" id="profileLevel">
+                  Level 1 - Beginner
+                </p>
+                <p class="profile-join">
+                  Joined: <span id="joinDate">Today</span>
+                </p>
               </div>
               <button
                 class="profile-edit-btn"
@@ -576,7 +491,7 @@
               <div class="progress-bar-container">
                 <div class="progress-label">
                   <span>Level Progress</span>
-                  <span id="profileLevelProgressSection">0%</span>
+                  <span id="profileLevelProgress">0%</span>
                 </div>
                 <div class="progress-bar">
                    <div class="progress-fill" id="profileProgressBarSection"></div>
@@ -968,10 +883,13 @@
             <span class="quiz-difficulty" id="topicQuizDifficulty">Medium</span>
           </div>
           <h3 id="topicQuizTitle">Topic Quiz</h3>
-          <button class="modal-close" id="topicQuizModalClose">&times;</button>
+          <button class="modal-close" id="topicQuizModalClose">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div class="quiz-modal-body">
           <div class="quiz-layout">
+            <!-- Quiz Panel -->
             <div class="quiz-problem-panel">
               <div class="quiz-container">
                 <div class="quiz-progress-bar-container">
@@ -981,29 +899,16 @@
                 <div class="quiz-question" id="topicQuizQuestionText">
                   Question will appear here
                 </div>
-                <div class="quiz-options" id="topicQuizOptions"></div>
+                <div class="quiz-options" id="topicQuizOptions">
+                  <!-- Options generated by JS -->
+                </div>
               </div>
             </div>
+
+            <!-- Right: Quiz Info Panel -->
             <div class="quiz-editor-panel">
               <div class="quiz-info-panel">
                 <h4>Quiz Instructions</h4>
-                <div class="quiz-timer-container">
-                  <div class="quiz-timer-box">
-                    <i class="fas fa-clock"></i>
-                    <div class="quiz-timer-content">
-                      <span class="timer-label">Current Time</span>
-                      <span class="timer-value" id="quizTimer">00:00</span>
-                    </div>
-                  </div>
-
-                  <div class="quiz-best-time-box">
-                    <i class="fas fa-trophy"></i>
-                    <div class="quiz-best-time-content">
-                      <span class="timer-label">Best Time</span>
-                      <span class="timer-value" id="bestQuizTime">--:--</span>
-                    </div>
-                  </div>
-                </div>
                 <ul>
                   <li>Select the correct answer for each question</li>
                   <li>You earn 10 XP per correct answer</li>
@@ -1071,14 +976,19 @@
           Profile
         </h2>
         <div class="profile-container">
+          <!-- Profile Header -->
           <div class="profile-header">
-            <div class="profile-avatar big-box">
+            <div class="profile-avatar">
               <span class="avatar-icon">🚀</span>
             </div>
             <div class="profile-info">
               <h3 id="profileSectionName">Learner</h3>
-              <p class="profile-level" id="profileLevel">Level 1 - Beginner</p>
-              <p class="profile-join">Joined: <span id="joinDate"></span></p>
+              <p class="profile-level" id="profileLevelSection">
+                Level 1 - Beginner
+              </p>
+              <p class="profile-join">
+                Joined: <span id="joinDateSection">Today</span>
+              </p>
             </div>
             <button
               class="profile-edit-btn"
@@ -1187,6 +1097,7 @@
             <h4>Quick Links</h4>
             <ul>
               <li><a href="#topics">DSA Topics</a></li>
+              <li><a href="binary-search.html">Learn Binary Search</a></li>
               <li><a href="#practice">Practice Problems</a></li>
               <li><a href="#roadmap">Learning Roadmap</a></li>
               <li><a href="#interview">Interview Prep</a></li>
@@ -1198,19 +1109,6 @@
               <li><a href="#">Documentation</a></li>
               <li><a href="#">Blog</a></li>
               <li><a href="community.html">Community</a></li>
-              <li><a href="cheat-sheets.html">DSA Cheat Sheets</a></li>
-              <li><a href="python-learning.html">Learn Python</a></li>
-              <li><a href="javascript-learning.html">Learn JavaScript</a></li>
-              <li><a href="java-learning.html">Learn Java</a></li>
-              <li><a href="cplusplus-learning.html">Learn C++</a></li>
-              <li><a href="c-learning.html">Learn C</a></li>
-              <li><a href="dbms-learning.html">Learn DBMS</a></li>
-              <li>
-            <a href="oop-learning.html">Learn OOP</a></li>
-              <li><a href="sliding-window-learning.html">Learn Sliding Window</a></li>
-              <li><a href="prefix-sum-learning.html">Learn Prefix Sum</a></li>
-              <li><a href="php-learning.html">Learn PHP</a></li>
-              <li><a href="resume.html">Coding Resume</a></li>
               <li><a href="support-page/index.html">Support</a></li>
               <li><a href="feedback.html">Feedback</a></li>
               <li><a href="about-us.html">About us</a></li>
