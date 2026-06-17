@@ -4,12 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Algorithm Timeline | Algo Infinity Verse</title>
+  <title>Learn Cache Systems: LRU & LFU | Algo Infinity Verse</title>
   <meta name="description"
-    content="Explore the historical evolution of algorithms, famous computer scientists, and milestones in DSA development through an interactive timeline." />
+    content="Learn LRU and LFU cache design from doubly linked lists to HashMap optimizations and O(1) performance." />
 
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="algorithm-timeline.css" />
+  <link rel="stylesheet" href="api-design-learning.css" />
+  <link rel="stylesheet" href="cache-learning.css" />
 
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
@@ -60,8 +61,10 @@
           <a href="index.html#practice" class="dropdown-item" role="menuitem">Practice Problems</a>
           <a href="index.html#quiz" class="dropdown-item" role="menuitem">Quizzes</a>
           <a href="index.html#roadmap" class="dropdown-item" role="menuitem">Learning Roadmap</a>
-          <a href="array-learning.html" class="dropdown-item" role="menuitem">Learn Arrays</a>
-          <a href="linkedlist-learning.html" class="dropdown-item" role="menuitem">Learn Linked Lists</a>
+          <a href="algorithm-timeline.html" class="dropdown-item" role="menuitem">Algorithm Timeline</a>
+          <a href="concept-bridge.html" class="dropdown-item" role="menuitem">Concept Bridge Trainer</a>
+          <a href="array-learning.html" class="dropdown-item active" role="menuitem">Learn Arrays</a>
+          <a href="linkedlist-learning.html" class="dropdown-item active" role="menuitem">Learn Linked Lists</a>
           <a href="stack-learning.html"            class="dropdown-item active" role="menuitem">Learn Stacks</a>
           <a href="python-learning.html" class="dropdown-item" role="menuitem">Learn Python</a>
           <a href="javascript-learning.html" class="dropdown-item" role="menuitem">Learn JavaScript</a>
@@ -81,10 +84,8 @@
           <a href="sorting-visualizer.html" class="dropdown-item" role="menuitem">Sorting Visualizer</a>
           <a href="graph-visualizer.html" class="dropdown-item" role="menuitem">Graph Visualizer</a>
           <a href="pathfinding-visualizer.html" class="dropdown-item" role="menuitem">Pathfinding Visualizer</a>
-          <a href="recursion-tree-visualizer.html" class="dropdown-item" role="menuitem">Recursion Tree Visualizer</a>
-          <a href="complexity-calculator.html" class="dropdown-item" role="menuitem">Complexity Calculator</a>
-          <a href="algorithm-timeline.html" class="dropdown-item active" role="menuitem">Algorithm Timeline</a>
-          <a href="concept-bridge.html" class="dropdown-item" role="menuitem">Concept Bridge Trainer</a>
+            <a href="recursion-tree-visualizer.html" class="dropdown-item" role="menuitem">Recursion Tree Visualizer</a>
+            <a href="complexity-calculator.html" class="dropdown-item" role="menuitem">Complexity Calculator</a>
         </div>
       </li>
       <li class="nav-item has-dropdown">
@@ -97,7 +98,6 @@
           <a href="cheat-sheets.html" class="dropdown-item" role="menuitem">DSA Cheat Sheets</a>
           <a href="system-design.html" class="dropdown-item" role="menuitem">System Design</a>
           <a href="api-design-learning.html" class="dropdown-item" role="menuitem">API Design</a>
-
           <a href="cache-learning.html" class="dropdown-item" role="menuitem">Cache Systems (LRU/LFU)</a>
           <a href="behavioral-questions.html" class="dropdown-item" role="menuitem">Behavioral Questions</a>
           <a href="interview-experience.html" class="dropdown-item" role="menuitem">Interview Experiences</a>
@@ -156,7 +156,7 @@
   </nav>
 
   <!-- Hero Section -->
-  <section id="home" class="hero timeline-hero">
+  <section id="home" class="hero">
     <div class="hero-background">
       <div class="stars"></div>
       <div class="stars2"></div>
@@ -164,34 +164,31 @@
     </div>
     <div class="hero-content">
       <h1 class="hero-title">
-        <span class="title-line">Historical Evolution of</span>
-        <span class="main-title gradient-text">Algorithms</span>
-        <span class="subtitle">From Euclid to AI — A Journey Through DSA History</span>
+        <span class="title-line">Master Memory Systems With</span>
+        <span class="main-title gradient-text">LRU & LFU Cache</span>
+        <span class="subtitle">Efficient, O(1) Eviction Architectures</span>
       </h1>
       <div class="typing-container">
-        <span class="typing-text" id="typingTextTimeline"></span>
+        <span class="typing-text_cache" id="typingTextCache"></span>
         <span class="typing-cursor">|</span>
       </div>
       <div class="hero-buttons">
-        <a href="#timeline-section" class="btn btn-primary">
-          <i class="fas fa-timeline"></i> Explore Timeline
-        </a>
-        <a href="#scientists-section" class="btn btn-secondary">
-          <i class="fas fa-user-graduate"></i> Famous Scientists
-        </a>
+        <button class="btn btn-primary" onclick="document.getElementById('cache-learning').scrollIntoView({behavior: 'smooth'})">
+          <i class="fas fa-play"></i> Start Learning
+        </button>
       </div>
       <div class="hero-stats">
-        <div class="stat-box">
-          <span class="stat-number" data-target="50">0</span>
-          <span class="stat-label">Algorithms</span>
+        <div class="stat-box" id="statBoxTopics">
+          <span class="stat-number" data-target="7">0</span>
+          <span class="stat-label">Topics</span>
         </div>
-        <div class="stat-box">
+        <div class="stat-box" id="statBoxSims">
+          <span class="stat-number" data-target="2">0</span>
+          <span class="stat-label">Live Simulators</span>
+        </div>
+        <div class="stat-box" id="statBoxInterviews">
           <span class="stat-number" data-target="10">0</span>
-          <span class="stat-label">Pioneers</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number" data-target="2300">0</span>
-          <span class="stat-label">Years of History</span>
+          <span class="stat-label">Interview Scenarios</span>
         </div>
       </div>
     </div>
@@ -200,75 +197,55 @@
     </div>
   </section>
 
-  <!-- Timeline Section -->
-  <section id="timeline-section" class="section">
+  <!-- Cache Learning Section -->
+  <section id="cache-learning" class="section">
     <div class="container">
 
-      <h2 class="tl-section-title">
-        <i class="fas fa-timeline"></i> Algorithm Timeline
+      <h2 class="section-title">
+        <span class="title-icon">💾</span>
+        Learn Cache Eviction
       </h2>
-      <p class="tl-section-subtitle">
-        Trace the evolution of algorithms and data structures from ancient Greece to the age of AI. Click through eras, filter by category, and discover the people behind the breakthroughs.
+      <p class="section-subtitle">
+        Design high-performance eviction algorithms using HashMaps and Doubly Linked Lists.
       </p>
 
-      <!-- Tabs -->
-      <div class="tl-tabs">
-        <button class="tl-tab active" data-tab="timeline">
-          <i class="fas fa-clock-rotate-left"></i> Timeline
-        </button>
-        <button class="tl-tab" data-tab="scientists">
-          <i class="fas fa-user-graduate"></i> Scientists
-        </button>
-        <button class="tl-tab" data-tab="milestones">
-          <i class="fas fa-trophy"></i> Milestones
-        </button>
-      </div>
-
-      <!-- Tab: Timeline -->
-      <div class="tl-tab-content active" id="timelineTab">
-
-        <!-- Category Filter -->
-        <div class="tl-filters">
-          <button class="tl-filter-btn active" data-filter="all">
-            <i class="fas fa-layer-group"></i> All
-          </button>
-          <button class="tl-filter-btn" data-filter="algorithm">
-            <i class="fas fa-code"></i> Algorithms
-          </button>
-          <button class="tl-filter-btn" data-filter="datastructure">
-            <i class="fas fa-sitemap"></i> Data Structures
-          </button>
-          <button class="tl-filter-btn" data-filter="person">
-            <i class="fas fa-user"></i> People
-          </button>
-          <button class="tl-filter-btn" data-filter="computing">
-            <i class="fas fa-microchip"></i> Computing
-          </button>
+      <!-- Progress Bar -->
+      <div class="api-progress-bar" role="progressbar"
+           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+           aria-label="Learning progress">
+        <span class="api-progress-text">
+          <span id="progressCount">0</span> / 7 topics completed
+        </span>
+        <div class="api-progress-track">
+          <div class="api-progress-fill" id="progressFill"></div>
         </div>
-
-        <div class="tl-container" id="timelineContainer"></div>
+        <span class="api-progress-percent" id="progressPercent">0%</span>
       </div>
 
-      <!-- Tab: Scientists -->
-      <div class="tl-tab-content" id="scientistsTab">
-        <p class="tl-section-subtitle">
-          The brilliant minds who shaped the field of algorithms and data structures.
-        </p>
-        <div class="tl-scientists" id="scientistsContainer"></div>
-      </div>
+      <div class="api-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="api-sidebar" aria-label="Topic navigation">
+          <div class="api-sidebar-title">Topics</div>
+          <ul class="api-sidebar-nav" id="topicNav">
+            <li><a href="#" class="api-nav-link active" data-topic-id="hub"><span class="nav-icon">🏠</span> Hub Dashboard</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="1"><span class="nav-icon">📖</span> Introduction</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="2"><span class="nav-icon">🔄</span> LRU Cache Concept</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="3"><span class="nav-icon">⛓️</span> Doubly Linked List</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="4"><span class="nav-icon">💻</span> Implementing LRU</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="5"><span class="nav-icon">📊</span> LFU Cache Concept</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="6"><span class="nav-icon">🚀</span> Implementing LFU</a></li>
+            <li><a href="#" class="api-nav-link" data-topic-id="7"><span class="nav-icon">⭐</span> System Design Prep</a></li>
+          </ul>
+        </aside>
 
-      <!-- Tab: Milestones -->
-      <div class="tl-tab-content" id="milestonesTab">
-        <p class="tl-section-subtitle">
-          Key milestones in the development of data structures and algorithms.
-        </p>
-        <div class="tl-milestones" id="milestonesContainer"></div>
+        <!-- Dynamic Main Content -->
+        <main class="api-main-content" id="mainContent">
+          <!-- JS will inject Hub or Topic content here -->
+        </main>
       </div>
-
     </div>
   </section>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
@@ -315,7 +292,6 @@
             <li><a href="bit-manipulation-learning.html">Learn Bit Manipulation</a></li>
             <li><a href="system-design.html">System Design</a></li>
             <li><a href="api-design-learning.html">Learn API Design</a></li>
-
             <li><a href="cache-learning.html">Learn Cache (LRU/LFU)</a></li>
             <li><a href="behavioral-questions.html">Behavioral Questions</a></li>
             <li><a href="interview-experience.html">Interview Experiences</a></li>
@@ -328,7 +304,6 @@
             <li><a href="pathfinding-visualizer.html">Pathfinding Visualizer</a></li>
             <li><a href="recursion-tree-visualizer.html">Recursion Tree Visualizer</a></li>
             <li><a href="complexity-calculator.html">Complexity Calculator</a></li>
-            <li><a href="algorithm-timeline.html">Algorithm Timeline</a></li>
             <li><a href="resume.html">Coding Resume</a></li>
             <li><a href="support-page/index.html">Support</a></li>
             <li><a href="feedback.html">Feedback</a></li>
@@ -371,7 +346,7 @@
   <script src="./auth.js"></script>
   <script src="./script.js"></script>
   <script src="./theme.js"></script>
-  <script src="./algorithm-timeline.js"></script>
+  <script src="./cache-learning.js"></script>
 
 </body>
 </html>
