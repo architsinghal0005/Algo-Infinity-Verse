@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stack & Queue Visualizer | Algo Infinity Verse</title>
+  <meta name="description"
+    content="Interactive Stack and Queue Visualizer to learn LIFO and FIFO operations through real-time animations." />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="stack-queue-visualizer.css" />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css"
+    integrity="sha512-W/zrbCncQnky/EzL+/AYwTtosvrM+YG/V6piQLSe2HuKS6cmbw89kjYkp3tWFn1dkWV7L1ruvJyKbLz73Vlgfg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loader">
+      <div class="infinity-loader">∞</div>
+      <h2>Algo Infinity Verse</h2>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <span class="logo-text">∞</span>
+      <span class="logo-title">Algo Infinity Verse</span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li class="nav-item">
+        <a href="index.html#home" class="nav-link">Home</a>
+      </li>
+      <li class="nav-item has-dropdown">
+        <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <span>Learn</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </button>
+        <div class="dropdown-menu" role="menu">
+          <a href="index.html#topics"              class="dropdown-item" role="menuitem">DSA Topics</a>
+          <a href="index.html#practice"            class="dropdown-item" role="menuitem">Practice Problems</a>
+          <a href="index.html#quiz"                class="dropdown-item" role="menuitem">Quizzes</a>
+          <a href="index.html#roadmap"             class="dropdown-item" role="menuitem">Learning Roadmap</a>
+          <a href="array-learning.html"            class="dropdown-item" role="menuitem">Learn Arrays</a>
+          <a href="linkedlist-learning.html"       class="dropdown-item" role="menuitem">Learn Linked Lists</a>
+          <a href="python-learning.html"           class="dropdown-item" role="menuitem">Learn Python</a>
+          <a href="javascript-learning.html"       class="dropdown-item" role="menuitem">Learn JavaScript</a>
+          <a href="java-learning.html"             class="dropdown-item" role="menuitem">Learn Java</a>
+          <a href="cplusplus-learning.html"        class="dropdown-item" role="menuitem">Learn C++</a>
+          <a href="c-learning.html"                class="dropdown-item" role="menuitem">Learn C</a>
+          <a href="dbms-learning.html"             class="dropdown-item" role="menuitem">Learn DBMS</a>
+          <a href="php-learning.html"              class="dropdown-item" role="menuitem">Learn PHP</a>
+          <a href="oop-learning.html"              class="dropdown-item" role="menuitem">Learn OOP</a>
+          <a href="sliding-window-learning.html"   class="dropdown-item" role="menuitem">Learn Sliding Window</a>
+          <a href="prefix-sum-learning.html"       class="dropdown-item" role="menuitem">Learn Prefix Sum</a>
+          <a href="divide-and-conquer-learning.html" class="dropdown-item">Learn Divide &amp; Conquer</a>
+          <a href="bit-manipulation-learning.html" class="dropdown-item">Learn Bit Manipulation</a>
+          <a href="recursion-learning.html"        class="dropdown-item" role="menuitem">Learn Recursion</a>
+          <a href="computer-architecture.html"     class="dropdown-item" role="menuitem">Learn Architecture</a>
+          <a href="tree-traversal.html"            class="dropdown-item" role="menuitem">Tree Traversal</a>
+          <a href="sorting-visualizer.html"        class="dropdown-item" role="menuitem">Sorting Visualizer</a>
+          <a href="graph-visualizer.html"          class="dropdown-item" role="menuitem">Graph Visualizer</a>
+          <a href="pathfinding-visualizer.html"    class="dropdown-item" role="menuitem">Pathfinding Visualizer</a>
+        </div>
+      </li>
+      <li class="nav-item has-dropdown">
+        <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <span>Interview</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </button>
+        <div class="dropdown-menu" role="menu">
+          <a href="index.html#interview"       class="dropdown-item" role="menuitem">Interview Prep</a>
+          <a href="cheat-sheets.html"          class="dropdown-item" role="menuitem">DSA Cheat Sheets</a>
+          <a href="system-design.html"         class="dropdown-item" role="menuitem">System Design</a>
+          <a href="behavioral-questions.html"  class="dropdown-item" role="menuitem">Behavioral Questions</a>
+          <a href="interview-experience.html" class="dropdown-item" role="menuitem">Interview Experiences</a>
+        </div>
+      </li>
+      <li class="nav-item has-dropdown">
+        <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <span>Community</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </button>
+        <div class="dropdown-menu" role="menu">
+          <a href="community.html"           class="dropdown-item" role="menuitem">Discussions</a>
+          <a href="index.html#dashboard"     class="dropdown-item" role="menuitem">Leaderboard</a>
+          <a href="support-page/index.html"  class="dropdown-item" role="menuitem">Support</a>
+          <a href="feedback.html"            class="dropdown-item" role="menuitem">Feedback</a>
+        </div>
+      </li>
+      <li class="nav-item has-dropdown nav-profile-dropdown">
+        <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <span>Profile</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end" role="menu">
+          <a href="index.html#dashboard" class="dropdown-item" role="menuitem">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+          <a href="index.html#profile" class="dropdown-item" role="menuitem">
+            <i class="fas fa-user"></i> My Profile
+          </a>
+          <a href="resume.html" class="dropdown-item" role="menuitem">
+            <i class="fas fa-file-alt"></i> Coding Resume
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="login.html"  class="dropdown-item nav-auth-link" role="menuitem" id="navLoginBtn">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </a>
+          <a href="signup.html" class="dropdown-item nav-auth-link" role="menuitem" id="navSignupBtn">
+            <i class="fas fa-user-plus"></i> Sign Up
+          </a>
+        </div>
+      </li>
+      <li class="nav-item nav-cta desktop-only">
+        <a href="index.html#practice" class="btn btn-primary nav-cta-btn">
+          <i class="fas fa-rocket"></i> Start Learning
+        </a>
+      </li>
+    </ul>
+    <div class="nav-buttons">
+      <button id="darkModeToggle" class="dark-mode-btn" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button id="menuToggle" class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1>Stack & Queue Visualizer</h1>
+      <p>
+        Learn LIFO and FIFO operations through interactive visualizations.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#stack-section" class="btn btn-primary">Explore Stack</a>
+        <a href="#queue-section" class="btn btn-secondary">Explore Queue</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sqv-section">
+  <div class="container sqv-container">
+
+    <!-- Stack Visualizer -->
+    <div class="sqv-card" id="stack-section">
+      <h2>Stack Visualizer</h2>
+
+      <div class="sqv-controls">
+        <input
+    type="number"
+    id="stackInput"
+    class="sqv-input"
+    placeholder="Enter value"
+/>
+
+<button id="pushBtn" class="sqv-btn">Push</button>
+<button id="popBtn" class="sqv-btn">Pop</button>
+<button id="peekBtn" class="sqv-btn">Peek</button>
+<button id="resetStackBtn" class="sqv-btn">Reset</button>
+      </div>
+
+      <h3 class="sqv-label">TOP</h3>
+
+<div id="stackContainer" class="stack-column"></div>
+<p id="stackMessage"></p>
+    </div>
+
+    <!-- Queue Visualizer -->
+    <div class="sqv-card" id="queue-section">
+      <h2>Queue Visualizer</h2>
+
+      <div class="sqv-controls">
+        <input
+    type="number"
+    id="queueInput"
+    class="sqv-input"
+    placeholder="Enter value"
+/>
+
+<button id="enqueueBtn" class="sqv-btn">Enqueue</button>
+<button id="dequeueBtn" class="sqv-btn">Dequeue</button>
+<button id="frontBtn" class="sqv-btn">Front</button>
+<button id="resetQueueBtn" class="sqv-btn">Reset</button>
+      </div>
+
+      <div class="queue-labels">
+  <span>Front</span>
+  <span>Rear</span>
+</div>
+
+<div id="queueContainer" class="queue-row"></div>
+<p id="queueMessage"></p>
+    </div>
+
+    <!-- History -->
+    <div class="sqv-card" id="history-section">
+    <h2>Operation History</h2>
+      <ul id="historyList"></ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>∞ Algo Infinity Verse</h3>
+          <p>
+            Your ultimate destination for mastering Data Structures &amp;
+            Algorithms and acing technical interviews.
+          </p>
+          <div class="social-links">
+            <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html#topics">DSA Topics</a></li>
+            <li><a href="index.html#practice">Practice Problems</a></li>
+            <li><a href="index.html#roadmap">Learning Roadmap</a></li>
+            <li><a href="index.html#interview">Interview Prep</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="array-learning.html">Learn Arrays</a></li>
+            <li><a href="linkedlist-learning.html">Learn Linked Lists</a></li>
+            <li><a href="stack-learning.html">Learn Stacks</a></li>
+            <li><a href="python-learning.html">Learn Python</a></li>
+            <li><a href="javascript-learning.html">Learn JavaScript</a></li>
+            <li><a href="sorting-visualizer.html">Sorting Visualizer</a></li>
+            <li><a href="graph-visualizer.html">Graph Visualizer</a></li>
+            <li><a href="cheat-sheets.html">DSA Cheat Sheets</a></li>
+            <li><a href="system-design.html">System Design</a></li>
+            <li><a href="api-design-learning.html">Learn API Design</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="about-us.html">About Us</a></li>
+            <li><a href="privacy-policy.html">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Questions</h4>
+          <div class="footer-questions">
+            <button class="footer-question" type="button"
+              data-question="What is the time complexity of this problem?">Time Complexity</button>
+            <button class="footer-question" type="button"
+              data-question="Can you give me a hint for this problem?">Hint</button>
+            <button class="footer-question" type="button"
+              data-question="What approach should I use?">Approach</button>
+            <button class="footer-question" type="button"
+              data-question="Are there any edge cases I should consider?">Edge Cases</button>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Newsletter</h4>
+          <p>Subscribe to get weekly problem sets and tips</p>
+          <form class="newsletter-form" id="newsletterForm" novalidate>
+            <label for="newsletterEmail" class="visually-hidden">Your email address</label>
+            <input type="email" id="newsletterEmail" name="email"
+              placeholder="Your email" autocomplete="email" required />
+            <button type="submit" aria-label="Subscribe">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Algo Infinity Verse. Crafted with 💜 for learners worldwide.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // FIX: script.js's DOMContentLoaded handler calls initDarkMode(), but that
+    // function is never defined anywhere in script.js. Since it's undefined,
+    // calling it throws a ReferenceError that can halt the rest of that handler
+    // (navbar/hero/etc. init calls that follow it never run). Defining it here,
+    // before script.js loads, makes that call succeed harmlessly everywhere,
+    // and gives this page working dark/light mode without touching script.js.
+    if (typeof window.initDarkMode !== "function") {
+      window.initDarkMode = function () {
+        const toggleBtn = document.getElementById("darkModeToggle");
+        if (!toggleBtn || toggleBtn.dataset.darkModeBound === "true") return;
+        toggleBtn.dataset.darkModeBound = "true";
+
+        const STORAGE_KEY = "algoInfinityVerse-theme"; // 'light' | 'dark'
+        const icon = toggleBtn.querySelector("i");
+
+        function applyTheme(theme) {
+          const isLight = theme === "light";
+          document.body.classList.toggle("light-mode", isLight);
+          if (icon) {
+            icon.classList.toggle("fa-sun", isLight);
+            icon.classList.toggle("fa-moon", !isLight);
+          }
+          toggleBtn.setAttribute(
+            "aria-label",
+            isLight ? "Switch to dark mode" : "Switch to light mode"
+          );
+        }
+
+        let savedTheme = null;
+        try {
+          savedTheme = localStorage.getItem(STORAGE_KEY);
+        } catch (e) {}
+
+        let initialTheme = savedTheme;
+        if (!initialTheme) {
+          const prefersLight =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches;
+          initialTheme = prefersLight ? "light" : "dark";
+        }
+        applyTheme(initialTheme);
+
+        toggleBtn.addEventListener("click", () => {
+          const isCurrentlyLight = document.body.classList.contains("light-mode");
+          const nextTheme = isCurrentlyLight ? "dark" : "light";
+          applyTheme(nextTheme);
+          try {
+            localStorage.setItem(STORAGE_KEY, nextTheme);
+          } catch (e) {
+            console.warn("Could not persist theme preference:", e);
+          }
+        });
+      };
+    }
+
+    // BACKUP: in case script.js's init sequence errors out before reaching
+    // initDarkMode() at all (e.g. an unrelated earlier failure), bind it
+    // directly here too. The dataset guard above prevents double-binding.
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof window.initDarkMode === "function") {
+        window.initDarkMode();
+      }
+    });
+  </script>
+  <script src="./auth.js"></script>
+  <script src="./script.js"></script>
+  <script src="stack-queue-visualizer.js"></script>
+
+</body>
+</html>

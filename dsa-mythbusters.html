@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSA Mythbusters | Algo Infinity Verse</title>
+    <meta name="description" content="Debunking the most common DSA misconceptions with counterexamples, interactive demos, and quizzes." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="javascript-learning.css" />
+    <link rel="stylesheet" href="dsa-mythbusters.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" integrity="sha512-W/zrbCncQnky/EzL+/AYwTtosvrM+YG/V6piQLSe2HuKS6cmbw89kjYkp3tWFn1dkWV7L1ruvJyKbLz73Vlgfg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="loader">
+        <div class="infinity-loader">∞</div>
+        <h2>Algo Infinity Verse</h2>
+        <div class="loading-bar"><div class="loading-progress"></div></div>
+      </div>
+    </div>
+
+    <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+      <i class="fas fa-circle-chevron-up"></i>
+    </button>
+
+    <nav class="navbar">
+      <div class="nav-logo">
+        <span class="logo-text">∞</span>
+        <span class="logo-title">Algo Infinity Verse</span>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li class="nav-item"><a href="index.html#home" class="nav-link">Home</a></li>
+        <li class="nav-item has-dropdown">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+            <span>Learn</span><i class="fas fa-chevron-down dropdown-icon"></i>
+          </button>
+          <div class="dropdown-menu" role="menu">
+            <a href="index.html#topics" class="dropdown-item" role="menuitem">DSA Topics</a>
+            <a href="index.html#practice" class="dropdown-item" role="menuitem">Practice Problems</a>
+            <a href="index.html#quiz" class="dropdown-item" role="menuitem">Quizzes</a>
+            <a href="index.html#roadmap" class="dropdown-item" role="menuitem">Learning Roadmap</a>
+            <a href="pattern-trainer.html" class="dropdown-item" role="menuitem">Pattern Trainer</a>
+            <a href="problem-solving-framework.html" class="dropdown-item" role="menuitem">Problem Solving Framework</a>
+            <a href="dry-run-simulator.html" class="dropdown-item" role="menuitem">Dry Run Simulator</a>
+            <a href="solution-evolution.html" class="dropdown-item" role="menuitem">Solution Evolution</a>
+            <a href="heaps-learning.html" class="dropdown-item" role="menuitem">Learn Heaps</a>
+            <a href="fenwick-tree-learning.html" class="dropdown-item" role="menuitem">Learn Fenwick Tree</a>
+            <a href="dsa-mythbusters.html" class="dropdown-item active" role="menuitem">DSA Mythbusters</a>
+          </div>
+        </li>
+        <li class="nav-item has-dropdown">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+            <span>Interview</span><i class="fas fa-chevron-down dropdown-icon"></i>
+          </button>
+          <div class="dropdown-menu" role="menu">
+            <a href="cheat-sheets.html" class="dropdown-item" role="menuitem">DSA Cheat Sheets</a>
+            <a href="system-design.html" class="dropdown-item" role="menuitem">System Design</a>
+            <a href="behavioral-questions.html" class="dropdown-item" role="menuitem">Behavioral Questions</a>
+            <a href="company-interview.html" class="dropdown-item" role="menuitem">Company Question Bank</a>
+            <a href="interview-mistakes.html" class="dropdown-item" role="menuitem">Mistakes Library</a>
+          </div>
+        </li>
+        <li class="nav-item has-dropdown">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+            <span>Community</span><i class="fas fa-chevron-down dropdown-icon"></i>
+          </button>
+          <div class="dropdown-menu" role="menu">
+            <a href="community.html" class="dropdown-item" role="menuitem">Discussions</a>
+            <a href="support-page/index.html" class="dropdown-item" role="menuitem">Support</a>
+            <a href="feedback.html" class="dropdown-item" role="menuitem">Feedback</a>
+          </div>
+        </li>
+        <li class="nav-item has-dropdown nav-profile-dropdown">
+          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+            <span>Profile</span><i class="fas fa-chevron-down dropdown-icon"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end" role="menu">
+            <a href="index.html#dashboard" class="dropdown-item" role="menuitem"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="resume.html" class="dropdown-item" role="menuitem"><i class="fas fa-file-alt"></i> Coding Resume</a>
+            <div class="dropdown-divider"></div>
+            <a href="login.html" class="dropdown-item nav-auth-link" id="navLoginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+            <a href="signup.html" class="dropdown-item nav-auth-link" id="navSignupBtn"><i class="fas fa-user-plus"></i> Sign Up</a>
+          </div>
+        </li>
+        <li class="nav-item nav-cta desktop-only">
+          <a href="index.html#practice" class="btn btn-primary nav-cta-btn"><i class="fas fa-rocket"></i> Start Learning</a>
+        </li>
+      </ul>
+      <div class="nav-buttons">
+        <button id="darkModeToggle" class="dark-mode-btn" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+        <button id="menuToggle" class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero mb-hero">
+      <div class="hero-background">
+        <div class="stars"></div><div class="stars2"></div><div class="stars3"></div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="title-line">Stop Believing These</span>
+          <span class="main-title mb-gradient">DSA Mythbusters 💥</span>
+          <span class="subtitle">5 Common Misconceptions. Debunked.</span>
+        </h1>
+        <p class="section-subtitle">The myths beginners believe that hold them back — busted with code, counterexamples, and interactive demos.</p>
+        <div class="hero-buttons">
+          <a href="#myths" class="btn btn-primary mb-btn-primary"><i class="fas fa-bomb"></i> Bust the Myths</a>
+          <a href="#quiz" class="btn btn-secondary"><i class="fas fa-question-circle"></i> Take the Quiz</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="section" style="padding: 1.5rem 2rem;">
+      <div class="container">
+        <div class="hero-stats">
+          <div class="stat-box"><span class="stat-number">5</span><span class="stat-label">Myths Busted</span></div>
+          <div class="stat-box"><span class="stat-number">5</span><span class="stat-label">Counterexamples</span></div>
+          <div class="stat-box"><span class="stat-number">5</span><span class="stat-label">Live Demos</span></div>
+          <div class="stat-box"><span class="stat-number">10</span><span class="stat-label">Quiz Questions</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Myths Section -->
+    <section id="myths" class="section">
+      <div class="container">
+        <h2 class="section-title"><span class="title-icon">💥</span> The Myths</h2>
+        <p class="section-subtitle">Click any myth card to expand the full breakdown.</p>
+        <div class="mb-myths-grid" id="mbMythsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz" class="section">
+      <div class="container">
+        <h2 class="section-title"><span class="title-icon">🧠</span> Try It Yourself</h2>
+        <p class="section-subtitle">Test what you've learned. Is it a myth or the truth?</p>
+        <div class="mb-quiz-card">
+          <div class="mb-quiz-progress-bar">
+            <div class="mb-quiz-progress-fill" id="mbQuizFill"></div>
+          </div>
+          <div class="mb-quiz-counter" id="mbQuizCounter">Question 1 / 10</div>
+          <div class="mb-quiz-question" id="mbQuizQuestion"></div>
+          <div class="mb-quiz-options" id="mbQuizOptions"></div>
+          <div class="mb-quiz-feedback hidden" id="mbQuizFeedback"></div>
+          <button class="btn btn-primary mb-quiz-next hidden" id="mbQuizNext">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+        <div class="mb-quiz-result hidden" id="mbQuizResult"></div>
+      </div>
+    </section>
+
+    <!-- Learning Outcomes -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title"><span class="title-icon">🎓</span> Learning Outcomes</h2>
+        <div class="tips-grid">
+          <div class="tip-card"><h3>✅ Think in Contexts</h3><p>Every algorithm has a context where it shines. There is no universal "best".</p></div>
+          <div class="tip-card"><h3>✅ Test Edge Cases</h3><p>Myths persist because people only test the happy path. Always think about worst cases.</p></div>
+          <div class="tip-card"><h3>✅ Understand Trade-offs</h3><p>O(1) average vs O(n) worst case. Trade-offs define the real world.</p></div>
+          <div class="tip-card"><h3>✅ Read the Problem</h3><p>Choosing BFS vs DFS, recursion vs iteration — it depends on what the problem asks.</p></div>
+          <div class="tip-card"><h3>✅ Build Intuition</h3><p>Counterexamples are the fastest way to shatter wrong mental models.</p></div>
+          <div class="tip-card"><h3>✅ Never Assume</h3><p>The most dangerous words in engineering: "It should work" and "It always does".</p></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>∞ Algo Infinity Verse</h3>
+            <p>Your ultimate destination for mastering DSA and acing technical interviews.</p>
+            <div class="social-links">
+              <a href="#"><i class="fa-brands fa-github"></i></a>
+              <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+              <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Tools</h4>
+            <ul>
+              <li><a href="dsa-mythbusters.html">DSA Mythbusters</a></li>
+              <li><a href="pattern-trainer.html">Pattern Trainer</a></li>
+              <li><a href="dry-run-simulator.html">Dry Run Simulator</a></li>
+              <li><a href="interview-mistakes.html">Mistakes Library</a></li>
+              <li><a href="solution-evolution.html">Solution Evolution</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2026 Algo Infinity Verse. Crafted with 💜 for learners worldwide.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./auth.js"></script>
+    <script src="./script.js"></script>
+    <script src="./dsa-mythbusters.js"></script>
+  </body>
+</html>

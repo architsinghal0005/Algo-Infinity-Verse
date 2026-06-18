@@ -354,7 +354,7 @@ function initCEditor() {
   }
 
   function updateLines() {
-    const count = editor.value.split("\\n").length;
-    lineNumbers.textContent = Array.from({ length: Math.max(count, 1) }, (_, i) => i + 1).join("\\n");
+    const count = editor.value.split("\n").length;
+    lineNumbers.textContent = Array.from({ length: Math.max(count, 1) }, (_, i) => i + 1).join("\n");
   }
 }

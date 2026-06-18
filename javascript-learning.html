@@ -61,6 +61,7 @@
             <a href="index.html#roadmap" class="dropdown-item" role="menuitem">Learning Roadmap</a>
             <a href="algorithm-timeline.html" class="dropdown-item" role="menuitem">Algorithm Timeline</a>
             <a href="concept-bridge.html" class="dropdown-item" role="menuitem">Concept Bridge Trainer</a>
+          <a href="problem-solving-framework.html" class="dropdown-item" role="menuitem">Problem Solving Framework</a>
             <a href="array-learning.html" class="dropdown-item active" role="menuitem">Learn Arrays</a>
             <a href="linkedlist-learning.html" class="dropdown-item active" role="menuitem">Learn Linked Lists</a>
             <a href="stack-learning.html"            class="dropdown-item active" role="menuitem">Learn Stacks</a>
@@ -93,6 +94,7 @@
             <a href="scala-editor.html" class="dropdown-item" role="menuitem">Scala Editor</a>
             <a href="ruby-editor.html" class="dropdown-item" role="menuitem">Ruby Editor</a>
             <a href="cpp-editor.html" class="dropdown-item" role="menuitem">C++ Editor</a>
+            <a href="ds-selection-assistant.html" class="dropdown-item" role="menuitem">DS Selection Assistant</a>
           </div>
         </li>
         <li class="nav-item has-dropdown">
@@ -105,6 +107,8 @@
             <a href="cheat-sheets.html" class="dropdown-item" role="menuitem">DSA Cheat Sheets</a>
             <a href="system-design.html" class="dropdown-item" role="menuitem">System Design</a>
           <a href="api-design-learning.html" class="dropdown-item" role="menuitem">API Design</a>
+
+          <a href="cache-learning.html" class="dropdown-item" role="menuitem">Cache Systems (LRU/LFU)</a>
             <a href="behavioral-questions.html" class="dropdown-item" role="menuitem">Behavioral Questions</a>
             <a href="interview-experience.html" class="dropdown-item" role="menuitem">Interview Experiences</a>
           </div>
@@ -248,6 +252,7 @@
               <li><a href="#arrays-objects"><span class="nav-icon">📋</span> Arrays &amp; Objects</a></li>
               <li><a href="#dom"><span class="nav-icon">🎨</span> DOM Manipulation</a></li>
               <li><a href="#events"><span class="nav-icon">🖱️</span> Event Handling</a></li>
+              <li><a href="#quiz-section"><span class="nav-icon">🧠</span> Knowledge Check</a></li>
             </ul>
           </aside>
 
@@ -936,6 +941,19 @@ btn.<span class="tok-fn">addEventListener</span>(<span class="tok-str">'click'</
               </div>
             </article>
 
+            <!-- 13. Knowledge Check Quiz -->
+            <article class="js-lesson" id="quiz-section" data-topic="13">
+              <div class="js-lesson-header">
+                <span class="js-lesson-number">13</span>
+                <h3>Knowledge Check</h3>
+              </div>
+              <p>
+                Test your understanding of the concepts covered in this JavaScript tutorial. Good luck!
+              </p>
+              
+              <div id="js-quiz-container"></div>
+            </article>
+
           </main>
         </div><!-- /.js-layout -->
       </div>
@@ -974,6 +992,7 @@ btn.<span class="tok-fn">addEventListener</span>(<span class="tok-str">'click'</
               <li><a href="#">Blog</a></li>
               <li><a href="community.html">Community</a></li>
               <li><a href="cheat-sheets.html">DSA Cheat Sheets</a></li>
+            <li><a href="problem-solving-framework.html">Problem Solving Framework</a></li>
               <li><a href="array-learning.html">Learn Arrays</a></li>
               <li><a href="python-learning.html">Learn Python</a></li>
               <li><a href="javascript-learning.html">Learn JavaScript</a></li>
@@ -993,14 +1012,16 @@ btn.<span class="tok-fn">addEventListener</span>(<span class="tok-str">'click'</
               <li><a href="os-learning.html">Learn OS</a></li>
               <li><a href="system-design.html">System Design</a></li>
             <li><a href="api-design-learning.html">Learn API Design</a></li>
+
+            <li><a href="cache-learning.html">Learn Cache (LRU/LFU)</a></li>
               <li><a href="behavioral-questions.html">Behavioral Questions</a></li>
               <li><a href="interview-experience.html">Interview Experiences</a></li>
               <li><a href="tree-traversal.html">Tree Traversal</a></li>
               <li><a href="sorting-visualizer.html">Sorting Visualizer</a></li>
-              <li><a href="graph-visualizer.html">Graph Visualizer</a>
-            <a href="pathfinding-visualizer.html">Pathfinding Visualizer</a>
-              <a href="recursion-tree-visualizer.html">Recursion Tree Visualizer</a>
-            <a href="complexity-calculator.html" class="dropdown-item" role="menuitem">Complexity Calculator</a></li>
+              <li><a href="graph-visualizer.html">Graph Visualizer</a></li>
+              <li><a href="pathfinding-visualizer.html">Pathfinding Visualizer</a></li>
+              <li><a href="recursion-tree-visualizer.html">Recursion Tree Visualizer</a></li>
+              <li><a href="complexity-calculator.html" class="dropdown-item" role="menuitem">Complexity Calculator</a></li>
               <li><a href="resume.html">Coding Resume</a></li>
               <li><a href="support-page/index.html">Support</a></li>
               <li><a href="feedback.html">Feedback</a></li>
@@ -1035,6 +1056,6 @@ btn.<span class="tok-fn">addEventListener</span>(<span class="tok-str">'click'</
     <script src="./auth.js"></script>
     <script src="./script.js"></script>
     <script src="./theme.js"></script>
-    <script src="./javascript-learning.js"></script>
+    <script type="module" src="./javascript-learning.js"></script>
   </body>
 </html>

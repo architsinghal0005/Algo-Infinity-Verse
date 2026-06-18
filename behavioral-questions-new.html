@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Behavioral Interview Prep | Algo Infinity Verse</title>
+    <meta name="description" content="Ace your behavioral interviews using the STAR method. Optimized paginated list of common culture-fit questions." />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="behavioral-questions.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <span class="logo-text">∞</span>
+            <span class="logo-title">Algo Infinity Verse</span>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="#" class="nav-link active" style="color: var(--beh-primary);">Behavioral</a></li>
+            <li class="nav-item"><a href="index.html#interview" class="nav-link">Interview Prep</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero beh-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-line">Master the Soft Skills</span>
+                <span class="main-title gradient-text-beh">Behavioral Interviews</span>
+                <span class="subtitle">
+                    Craft perfect responses using the S.T.A.R. Method (Situation, Task, Action, Result). Over 100+ questions optimized for fast browsing.
+                </span>
+            </h1>
+        </div>
+    </section>
+
+    <!-- Main Content Section -->
+    <section class="section">
+        <div class="container">
+            
+            <div class="beh-controls">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search questions or keywords..." aria-label="Search questions" />
+                </div>
+                
+                <div class="filter-group" id="categoryFilters">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <button class="filter-btn" data-category="Leadership">Leadership</button>
+                    <button class="filter-btn" data-category="Conflict">Conflict</button>
+                    <button class="filter-btn" data-category="Failure">Failure</button>
+                    <button class="filter-btn" data-category="Teamwork">Teamwork</button>
+                </div>
+            </div>
+
+            <!-- Virtualized/Paginated Container -->
+            <div class="questions-wrapper">
+                <div class="loading-state" id="loadingState" style="display: none;">
+                    <i class="fas fa-circle-notch fa-spin"></i> Loading Questions...
+                </div>
+                
+                <div class="questions-list" id="questionsList">
+                    <!-- DOM Nodes injected here by JS based on current page -->
+                </div>
+
+                <div class="no-results" id="noResults" style="display: none;">
+                    <i class="fas fa-search-minus"></i>
+                    <p>No questions found matching your criteria.</p>
+                </div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls" id="paginationControls">
+                <!-- Pagination buttons injected by JS -->
+            </div>
+
+        </div>
+    </section>
+    
+    <!-- External Scripts -->
+    <script src="script.js"></script>
+    <script src="behavioral-questions.js"></script>
+</body>
+</html>

@@ -319,6 +319,118 @@ async function initResumeAnalyzer(){
 
 }
 
+function initJsonUpload() {
+  const dropZone = document.getElementById("jsonDropZone");
+  const fileInput = document.getElementById("jsonUploadInput");
+  const browseBtn = document.getElementById("browseJsonBtn");
+  const messageEl = document.getElementById("jsonUploadMessage");
+
+  if (!dropZone || !fileInput || !browseBtn) return;
+
+  // Browse button click
+  browseBtn.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  // Highlight drop zone on drag events
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add("drag-active");
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove("drag-active");
+    }, false);
+  });
+
+  // Handle drop
+  dropZone.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files && files.length > 0) {
+      processFile(files[0]);
+    }
+  });
+
+  // Handle file input change
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFile(e.target.files[0]);
+    }
+  });
+
+  function showMessage(msg, isError = false) {
+    if(!messageEl) return;
+    messageEl.innerHTML = isError ? `<i class="fas fa-exclamation-circle"></i> ${msg}` : `<i class="fas fa-check-circle"></i> ${msg}`;
+    messageEl.style.display = "block";
+    messageEl.className = "upload-message " + (isError ? "error" : "success");
+    setTimeout(() => {
+      messageEl.style.display = "none";
+    }, 5000);
+  }
+
+  function processFile(file) {
+    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+      showMessage("Invalid file type. Please upload a JSON file.", true);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        
+        // Basic validation
+        if (!json || typeof json !== 'object') {
+          throw new Error("Invalid JSON structure");
+        }
+        
+        // Update userProgress
+        userProgress = { ...userProgress, ...json };
+        
+        // Safety check completedProblems array
+        if (!userProgress.completedProblems) {
+          userProgress.completedProblems = [];
+        }
+
+        // Determine solved count
+        solvedCount = userProgress.solved !== undefined && typeof userProgress.solved === 'number'
+          ? userProgress.solved
+          : userProgress.completedProblems.length;
+
+        // Save to localStorage
+        localStorage.setItem("userProgress", JSON.stringify(userProgress));
+        
+        // Update UI
+        populateProfileInfo();
+        populateStats();
+        renderDSAMastery();
+        renderBadges();
+        
+        showMessage("Resume data imported successfully!");
+        
+        // Reset input
+        fileInput.value = "";
+      } catch (err) {
+        console.error("JSON Parsing Error:", err);
+        showMessage("Failed to parse JSON file. Ensure it is correctly formatted.", true);
+      }
+    };
+    reader.onerror = () => {
+      showMessage("Error reading the file.", true);
+    };
+    
+    reader.readAsText(file);
+  }
+}
+
+
 // Page Initialization
 document.addEventListener("DOMContentLoaded", () => {
   
@@ -328,6 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initNavbar();
   initScrollTop();
   initResumeAnalyzer();
+  initJsonUpload();
 
   // Load and render user journey data
   loadUserData();
