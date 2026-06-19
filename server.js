@@ -20,6 +20,10 @@ const PASSWORD_KEY_LENGTH = 32;
 const SIGNUP_RATE_LIMIT = 5;
 const SIGNUP_WINDOW_MS = 15 * 60 * 1000;
 const signupAttempts = new Map();
+const DELETION_LOG_FILE = path.join(
+  DATA_DIR,
+  "account-deletions.json"
+);
 
 // Periodic sweeper — runs every SIGNUP_WINDOW_MS and deletes any identifier
 // whose timestamps have all aged out of the window.  This bounds the Map to
@@ -628,6 +632,92 @@ async function handleApi(req, res, pathname) {
     {
       "Set-Cookie": clearSessionCookie(),
     },
+  );
+}
+
+if (
+  pathname === "/api/delete-account" &&
+  req.method === "POST"
+) {
+  const session = getSession(req);
+
+  if (!session) {
+    return sendJson(res, 401, {
+      error: "Login required.",
+    });
+  }
+
+  const payload = await readJsonBody(req);
+
+  const password = String(
+    payload.password || ""
+  );
+
+  const users = await readUsers();
+
+  const userIndex = users.findIndex(
+    (u) => u.id === session.sub
+  );
+
+  if (userIndex === -1) {
+    return sendJson(res, 404, {
+      error: "User not found.",
+    });
+  }
+
+  const user = users[userIndex];
+
+  if (
+    !passwordMatches(
+      password,
+      user.password
+    )
+  ) {
+    return sendJson(res, 401, {
+      error: "Incorrect password.",
+    });
+  }
+
+  // Log deletion event
+  const deletionEvent = {
+    userId: user.id,
+    email: user.email,
+    deletedAt: new Date().toISOString(),
+  };
+
+  let logs = [];
+
+  try {
+    const raw = await fs.readFile(
+      DELETION_LOG_FILE,
+      "utf8"
+    );
+
+    logs = JSON.parse(raw || "[]");
+  } catch {}
+
+  logs.push(deletionEvent);
+
+  await fs.writeFile(
+    DELETION_LOG_FILE,
+    JSON.stringify(logs, null, 2)
+  );
+
+  // Remove user
+  users.splice(userIndex, 1);
+
+  await writeUsers(users);
+
+  return sendJson(
+    res,
+    200,
+    {
+      success: true,
+    },
+    {
+      "Set-Cookie":
+        clearSessionCookie(),
+    }
   );
 }
 
