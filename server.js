@@ -601,6 +601,96 @@ async function handleApi(req, res, pathname) {
     );
   }
 
+  if (pathname === "/api/change-password" && req.method === "POST") {
+  const session = getSession(req);
+
+  if (!session) {
+    return sendJson(res, 401, {
+      error: "Login required.",
+    });
+  }
+
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  } = await readJsonBody(req);
+
+  if (
+    !currentPassword ||
+    !newPassword ||
+    !confirmPassword
+  ) {
+    return sendJson(res, 400, {
+      error: "All fields are required.",
+    });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return sendJson(res, 400, {
+      error: "Passwords do not match.",
+    });
+  }
+
+  if (newPassword.length < 8) {
+    return sendJson(res, 400, {
+      error:
+        "Password must be at least 8 characters.",
+    });
+  }
+
+  if (
+    !/[A-Z]/.test(newPassword) ||
+    !/[a-z]/.test(newPassword) ||
+    !/\d/.test(newPassword)
+  ) {
+    return sendJson(res, 400, {
+      error:
+        "Password must contain uppercase, lowercase and number.",
+    });
+  }
+
+  const users = await readUsers();
+
+  const user = users.find(
+    (u) => u.id === session.sub
+  );
+
+  if (!user) {
+    return sendJson(res, 404, {
+      error: "User not found.",
+    });
+  }
+
+  if (
+    !passwordMatches(
+      currentPassword,
+      user.password
+    )
+  ) {
+    return sendJson(res, 400, {
+      error: "Current password is incorrect.",
+    });
+  }
+
+  user.password = hashPassword(newPassword);
+
+  await writeUsers(users);
+
+  return sendJson(
+    res,
+    200,
+    {
+      success: true,
+      message:
+        "Password updated successfully.",
+    },
+    {
+      "Set-Cookie": clearSessionCookie(),
+    }
+  );
+}
+
   if (pathname === "/api/deactivate-account" && req.method === "POST") {
   const session = getSession(req);
 

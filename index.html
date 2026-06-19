@@ -1327,6 +1327,10 @@
               </div>
             </div>
             <div class="account-actions">
+              <button id="changePasswordBtn" class="btn btn-secondary">
+  <i class="fas fa-key"></i>
+  Change Password
+</button>
               <button id="deactivateAccountBtn" class="btn btn-danger">
                 <i class="fas fa-user-slash"></i>
                 Deactivate Account
@@ -1382,6 +1386,75 @@
         </div>
       </div>
     </div>
+
+    <div class="modal" id="changePasswordModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Change Password</h3>
+      <button
+        class="modal-close"
+        id="changePasswordClose"
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="profile-edit-form">
+
+        <label for="currentPassword">
+          Current Password
+        </label>
+
+        <input
+          type="password"
+          id="currentPassword"
+          placeholder="Enter current password"
+        />
+
+        <label for="newPassword">
+          New Password
+        </label>
+
+        <input
+          type="password"
+          id="newPassword"
+          placeholder="Enter new password"
+        />
+
+        <label for="confirmNewPassword">
+          Confirm New Password
+        </label>
+
+        <input
+          type="password"
+          id="confirmNewPassword"
+          placeholder="Confirm new password"
+        />
+
+        <p id="changePasswordMessage"></p>
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        class="btn btn-secondary"
+        id="cancelPasswordChange"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="btn btn-primary"
+        id="savePasswordBtn"
+      >
+        Change Password
+      </button>
+    </div>
+  </div>
+</div>
 
     <!-- Footer -->
     <div id="footer-placeholder"></div>

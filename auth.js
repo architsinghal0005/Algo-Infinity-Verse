@@ -369,6 +369,7 @@
       wireLogout();
       wireAuthForm();
       wireDeactivateAccount();
+      wireChangePassword();
       wireDeleteAccount();
       updateProfileNames(currentSession.user);
       guardPrivateHash();
@@ -390,6 +391,7 @@
     wireLogout();
     wireAuthForm();
     wireDeactivateAccount();
+    wireChangePassword();
     wireDeleteAccount();
     updateProfileNames(currentSession.user);
 
@@ -493,4 +495,116 @@ function wireDeleteAccount() {
       alert(error.message);
     }
   });
+}
+
+function wireChangePassword() {
+  const modal =
+    document.getElementById(
+      "changePasswordModal"
+    );
+
+  const openBtn =
+    document.getElementById(
+      "changePasswordBtn"
+    );
+
+  if (!modal || !openBtn) return;
+
+  const closeBtn =
+    document.getElementById(
+      "changePasswordClose"
+    );
+
+  const cancelBtn =
+    document.getElementById(
+      "cancelPasswordChange"
+    );
+
+  const saveBtn =
+    document.getElementById(
+      "savePasswordBtn"
+    );
+
+  const message =
+    document.getElementById(
+      "changePasswordMessage"
+    );
+
+  function closeModal() {
+    modal.classList.remove("active");
+  }
+
+  openBtn.addEventListener("click", () => {
+    modal.classList.add("active");
+  });
+
+  closeBtn?.addEventListener(
+    "click",
+    closeModal
+  );
+
+  cancelBtn?.addEventListener(
+    "click",
+    closeModal
+  );
+
+  saveBtn?.addEventListener(
+    "click",
+    async () => {
+      const currentPassword =
+        document.getElementById(
+          "currentPassword"
+        ).value;
+
+      const newPassword =
+        document.getElementById(
+          "newPassword"
+        ).value;
+
+      const confirmPassword =
+        document.getElementById(
+          "confirmNewPassword"
+        ).value;
+
+      message.textContent = "";
+
+      try {
+        const response = await fetch(
+          "/api/change-password",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              currentPassword,
+              newPassword,
+              confirmPassword,
+            }),
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error
+          );
+        }
+
+        alert(
+          "Password changed successfully. Please login again."
+        );
+
+        window.location.href =
+          "/login";
+      } catch (error) {
+        message.textContent =
+          error.message;
+      }
+    }
+  );
 }
