@@ -7116,3 +7116,17 @@ body.light-mode .nav-auth-link:hover {
   margin-bottom: 1.5rem;
 }
 
+.account-actions {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
+}
