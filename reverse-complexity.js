@@ -322,7 +322,12 @@ function endGame() {
     }
 
     // Save to localStorage using project conventions
-    const progress = JSON.parse(localStorage.getItem('algoInfinityVerse')) || {};
+    let progress = {};
+    try {
+        progress = JSON.parse(localStorage.getItem('algoInfinityVerse')) || {};
+    } catch {
+        progress = {};
+    }
     if (!progress.stats) progress.stats = {};
     
     const bestScore = progress.stats.reverseComplexityBest || 0;
@@ -353,10 +358,15 @@ function updateUI() {
 }
 
 // Global Notification Helper (to be safe if script.js didn't load it)
+const globalNotifier = window.showNotification;
+
 function showNotification(msg, type = 'info') {
-    if (window.showNotification) {
-        window.showNotification(msg, type);
+    if (typeof globalNotifier === 'function') {
+        globalNotifier(msg, type);
     } else {
+        console.log(`[Notification] ${type}: ${msg}`);
+    }
+}
         console.log(`[Notification] ${type}: ${msg}`);
     }
 }
