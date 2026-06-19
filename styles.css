@@ -6729,6 +6729,7 @@ body.light-mode .nav-auth-link:hover {
 .game-modal-header h3 {
   font-size: 1.5rem;
   background: var(--gradient-3);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -6892,6 +6893,7 @@ body.light-mode .nav-auth-link:hover {
   font-size: 2.5rem;
   font-weight: 700;
   background: var(--gradient-3);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
