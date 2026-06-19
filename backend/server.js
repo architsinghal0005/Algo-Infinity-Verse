@@ -94,6 +94,56 @@ function recordSignupAttempt(identifier) {
 async function normalizeAuthDelay() {
   return new Promise((resolve) => setTimeout(resolve, 500));
 }
+// ── Login Rate Limiting (failed attempts only) ──────────────────────────────
+const LOGIN_RATE_LIMIT = 5;          // max failed attempts before lockout
+const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15-minute sliding window
+const loginFailures = new Map();     // identifier → [timestamp, ...]
+
+// Periodic sweeper — mirrors the signup sweeper to prevent unbounded growth.
+const _loginSweeper = setInterval(() => {
+  const now = Date.now();
+  for (const [identifier, timestamps] of loginFailures) {
+    const fresh = timestamps.filter((t) => now - t < LOGIN_WINDOW_MS);
+    if (fresh.length === 0) {
+      loginFailures.delete(identifier);
+    } else {
+      loginFailures.set(identifier, fresh);
+    }
+  }
+}, LOGIN_WINDOW_MS);
+if (_loginSweeper.unref) _loginSweeper.unref();
+
+/**
+ * Returns true when the given identifier has reached the failed-login limit
+ * within the current sliding window.
+ */
+function isLoginRateLimited(identifier) {
+  const now = Date.now();
+  const attempts = loginFailures.get(identifier) || [];
+  const recent = attempts.filter((t) => now - t < LOGIN_WINDOW_MS);
+  loginFailures.set(identifier, recent); // keep array trimmed
+  return recent.length >= LOGIN_RATE_LIMIT;
+}
+
+/**
+ * Records a single failed login attempt for the given identifier.
+ * Only call this after confirming the credentials were wrong.
+ */
+function recordLoginFailure(identifier) {
+  const now = Date.now();
+  const attempts = loginFailures.get(identifier) || [];
+  const recent = attempts.filter((t) => now - t < LOGIN_WINDOW_MS);
+  recent.push(now);
+  loginFailures.set(identifier, recent);
+}
+
+/**
+ * Clears the failure counter for the given identifier on successful login
+ * so a legitimate user is never locked out after a prior mistake.
+ */
+function clearLoginFailures(identifier) {
+  loginFailures.delete(identifier);
+}
 // ────────────────────────────────────────────────────────────────────────────
 
 const protectedPaths = new Set([
@@ -592,6 +642,30 @@ async function handleApi(req, res, pathname) {
   }
 
   if (pathname === "/api/login" && req.method === "POST") {
+    // ── Rate-limit check (failed attempts only) ───────────────────────────────
+    const clientId = getClientIdentifier(req);
+
+    if (isLoginRateLimited(clientId)) {
+      console.warn("[login] rate limited", {
+        ip: clientId,
+        at: new Date().toISOString(),
+      });
+      await normalizeAuthDelay();
+      return sendJson(
+        res,
+        429,
+        {
+          error:
+            "Too many failed login attempts. " +
+            "Please wait 15 minutes before trying again.",
+          retryAfterSeconds: Math.ceil(LOGIN_WINDOW_MS / 1000),
+        },
+        // Inform standards-compliant clients how long to back off.
+        { "Retry-After": String(Math.ceil(LOGIN_WINDOW_MS / 1000)) },
+      );
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const payload = await readJsonBody(req);
     const email = String(payload.email || "")
       .trim()
@@ -600,7 +674,11 @@ async function handleApi(req, res, pathname) {
     const user = useFirestore
       ? await getUserByEmail(email)
       : (await readUsers()).find((candidate) => candidate.email === email);
+
     if (!user || !passwordMatches(password, user.password)) {
+      // Record the failure ONLY when credentials are wrong, not for every request.
+      recordLoginFailure(clientId);
+      await normalizeAuthDelay();
       return sendJson(res, 401, { error: "Invalid email or password." });
     }
     if (user.isDeactivated) {
@@ -617,6 +695,10 @@ async function handleApi(req, res, pathname) {
         await writeUsers(users);
       }
     }
+
+    // Successful login — clear any accumulated failure count so a legitimate
+    // user who mistyped their password earlier is not locked out.
+    clearLoginFailures(clientId);
 
     const token = createSessionToken(user);
     return sendJson(
