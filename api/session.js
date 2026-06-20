@@ -66,6 +66,14 @@ function createSessionToken(user) {
   return `${header}.${payload}.${sign(`${header}.${payload}`)}`;
 }
 
+function timingSafeEqStr(a, b) {
+  // Compare base64url strings in a timing-safe way (both normalized to utf8 bytes)
+  const ab = Buffer.from(a || "", "utf8");
+  const bb = Buffer.from(b || "", "utf8");
+  if (ab.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ab, bb);
+}
+
 function verifySessionToken(token) {
   if (!token) return null;
   const parts = token.split(".");
@@ -73,12 +81,17 @@ function verifySessionToken(token) {
   const [header, payload, signature] = parts;
   const body = `${header}.${payload}`;
   const expected = sign(body);
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+
+  // signature/expected are base64url strings; compare strings (timing-safe)
+  if (!timingSafeEqStr(signature, expected)) return null;
+
   try {
     const session = JSON.parse(fromBase64Url(payload));
     if (!session.exp || session.exp < Math.floor(Date.now() / 1000)) return null;
     return session;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function parseCookies(h = "") {

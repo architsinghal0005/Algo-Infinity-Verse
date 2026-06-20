@@ -7,11 +7,11 @@
   "rewrites": [
     {
       "source": "/login",
-      "destination": "/login.html"
+      "destination": "/pages/auth/login.html"
     },
     {
       "source": "/signup",
-      "destination": "/signup.html"
+      "destination": "/pages/auth/signup.html"
     },
     {
       "source": "/community",
