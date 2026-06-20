@@ -812,14 +812,24 @@ function showQuizResults(score, total, percentage, xpEarned, completionTime) {
 function showQuizReview() {
   if (!lastQuizReview || !lastQuizReview.questions || !lastQuizReview.answers) { showNotification("No review data found", "error"); return; }
   const resultEl = document.getElementById("topicQuizResult");
-  let html = `<div class="quiz-review"><h2>📖 Quiz Review</h2>`;
+  // Ensure layout doesn't cut off items: keep scrollable container, and avoid nested flex issues.
+  let html = `<div class="quiz-review"><h2>📖 Quiz Review</h2><div class="quiz-review-container"><div class="quiz-review-items">`;
   lastQuizReview.questions.forEach((q, index) => {
     const answer = lastQuizReview.answers[index] || {};
-    html += `<div class="review-item"><h4>Q${index + 1}. ${q.question}</h4><p><strong>Your Answer:</strong> ${answer.selected !== undefined ? q.options[answer.selected] : "Not Answered"} ${answer.isCorrect ? "✅" : "❌"}</p><p class="correct-answer"><strong>Correct Answer:</strong> ${q.options[q.correct]}</p><p><strong>Explanation:</strong> ${q.explanation}</p></div>`;
+    const yourAnswerText = answer.selected !== undefined ? q.options[answer.selected] : "Not Answered";
+    const correctnessIcon = answer.isCorrect ? "✅" : "❌";
+    html += `<div class="review-item"><h4>Q${index + 1}. ${q.question}</h4><p><strong>Your Answer:</strong> ${yourAnswerText} ${correctnessIcon}</p><p class="correct-answer"><strong>Correct Answer:</strong> ${q.options[q.correct]}</p><p><strong>Explanation:</strong> ${q.explanation}</p></div>`;
   });
-  html += `<button class="btn btn-primary" onclick="restoreQuizResults()">Back</button><button class="btn btn-secondary" onclick="closeQuizModal()">Close</button></div>`;
+  html += `</div></div><div class="quiz-actions" style="border-top:none; justify-content:space-between; padding-top:1.25rem; background:transparent;">
+    <button class="btn btn-primary" onclick="restoreQuizResults()">Back</button>
+    <button class="btn btn-secondary" onclick="closeQuizModal()">Close</button>
+  </div></div>`;
   resultEl.innerHTML = html;
+  // If the user re-opens review, scroll to the top of the review list.
+  const container = resultEl.querySelector('.quiz-review-container');
+  if (container) container.scrollTop = 0;
 }
+
 
 function restoreQuizResults() {
   if (!lastQuizResultData) return;
