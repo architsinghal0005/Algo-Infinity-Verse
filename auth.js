@@ -192,16 +192,6 @@
     }); // ✅ closes addEventListener
   } // ✅ closes wireLogout
 
-  function passwordStrength(password) {
-    let score = 0;
-    if (password.length >= 8) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/\d/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    return score;
-  }
-
   function setFormMessage(form, message, type) {
     const messageBox = form.querySelector("[data-auth-message]");
     if (!messageBox) return;
@@ -322,17 +312,17 @@
         );
         return;
       }
-      
+
       // Loading state ON
-const submitButton = form.querySelector("button[type='submit']");
-if (!submitButton) return; // Guard add karo
-submitButton.disabled = true;
-submitButton.dataset.loading = "true";
-submitButton.innerHTML = `
+      const submitButton = form.querySelector("button[type='submit']");
+      if (!submitButton) return; // Guard add karo
+      submitButton.disabled = true;
+      submitButton.dataset.loading = "true";
+      submitButton.innerHTML = `
   <span class="btn-spinner"></span>
   <span>${mode === "login" ? "Logging in..." : "Signing up..."}</span>
 `;
-setFormMessage(form, "Working...", "info");
+      setFormMessage(form, "Working...", "info");
 
       try {
         const response = await fetch(`/api/${mode}`, {
@@ -351,13 +341,14 @@ setFormMessage(form, "Working...", "info");
       } catch (error) {
         setFormMessage(form, error.message, "error");
       } finally {
-    submitButton.disabled = false;
-    delete submitButton.dataset.loading;
-    // Restore button text
-    submitButton.innerHTML = mode === "login"
-        ? `<i class="fas fa-right-to-bracket"></i><span>Log In</span>`
-        : `<i class="fas fa-user-plus"></i><span>Sign Up</span>`;
-}
+        submitButton.disabled = false;
+        delete submitButton.dataset.loading;
+        // Restore button text
+        submitButton.innerHTML =
+          mode === "login"
+            ? `<i class="fas fa-right-to-bracket"></i><span>Log In</span>`
+            : `<i class="fas fa-user-plus"></i><span>Sign Up</span>`;
+      }
     });
   }
 
@@ -442,35 +433,27 @@ setFormMessage(form, "Working...", "info");
 })();
 
 function wireDeactivateAccount() {
-  const btn = document.getElementById(
-    "deactivateAccountBtn"
-  );
+  const btn = document.getElementById("deactivateAccountBtn");
 
   if (!btn) return;
 
   btn.addEventListener("click", async () => {
     const confirmed = confirm(
-      "Are you sure you want to deactivate your account?"
+      "Are you sure you want to deactivate your account?",
     );
 
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
-        "/api/deactivate-account",
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const response = await fetch("/api/deactivate-account", {
+        method: "POST",
+        credentials: "include",
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error ||
-          "Failed to deactivate account."
-        );
+        throw new Error(data.error || "Failed to deactivate account.");
       }
 
       alert("Account deactivated successfully.");
@@ -483,53 +466,38 @@ function wireDeactivateAccount() {
 }
 
 function wireDeleteAccount() {
-  const btn = document.getElementById(
-    "deleteAccountBtn"
-  );
+  const btn = document.getElementById("deleteAccountBtn");
 
   if (!btn) return;
 
   btn.addEventListener("click", async () => {
-    const confirmed = confirm(
-      "This action is permanent. Delete account?"
-    );
+    const confirmed = confirm("This action is permanent. Delete account?");
 
     if (!confirmed) return;
 
-    const password = prompt(
-      "Enter your password to continue:"
-    );
+    const password = prompt("Enter your password to continue:");
 
     if (!password) return;
 
     try {
-      const response = await fetch(
-        "/api/delete-account",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            password,
-          }),
-        }
-      );
+      const response = await fetch("/api/delete-account", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error ||
-            "Failed to delete account."
-        );
+        throw new Error(data.error || "Failed to delete account.");
       }
 
-      alert(
-        "Account deleted successfully."
-      );
+      alert("Account deleted successfully.");
 
       window.location.href = "/login";
     } catch (error) {
@@ -538,38 +506,92 @@ function wireDeleteAccount() {
   });
 }
 
-function wireChangePassword() {
-  const modal =
-    document.getElementById(
-      "changePasswordModal"
-    );
+function passwordStrength(password) {
+  let score = 0;
 
-  const openBtn =
-    document.getElementById(
-      "changePasswordBtn"
-    );
+  if (password.length >= 8) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/\d/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  return score;
+}
+
+function wireChangePassword() {
+  document.querySelectorAll(".password-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = document.getElementById(btn.dataset.target);
+
+      input.type = input.type === "password" ? "text" : "password";
+
+      btn.innerHTML =
+        input.type === "password"
+          ? '<i class="fas fa-eye"></i>'
+          : '<i class="fas fa-eye-slash"></i>';
+    });
+  });
+  const passwordInput = document.getElementById("newPassword");
+
+  const strengthBar = document.getElementById("passwordStrengthBar");
+
+  const strengthText = document.getElementById("passwordStrengthText");
+
+  if (passwordInput && strengthBar && strengthText) {
+    passwordInput.addEventListener("input", () => {
+      const score = passwordStrength(passwordInput.value);
+
+      strengthBar.style.width = `${score * 20}%`;
+
+      const labels = [
+        "Very Weak",
+        "Weak",
+        "Fair",
+        "Good",
+        "Strong",
+        "Excellent",
+      ];
+
+      strengthText.textContent = labels[score];
+
+      if (score <= 1) {
+        strengthBar.style.background = "#ef4444";
+      } else if (score <= 3) {
+        strengthBar.style.background = "#f59e0b";
+      } else {
+        strengthBar.style.background = "#22c55e";
+      }
+    });
+  }
+  const confirmPassword = document.getElementById("confirmNewPassword");
+
+  if (confirmPassword) {
+    confirmPassword.addEventListener("input", () => {
+      const error = document.getElementById("confirmPasswordError");
+
+      if (
+        confirmPassword.value &&
+        confirmPassword.value !== passwordInput.value
+      ) {
+        error.textContent = "Passwords do not match";
+      } else {
+        error.textContent = "";
+      }
+    });
+  }
+  const modal = document.getElementById("changePasswordModal");
+
+  const openBtn = document.getElementById("changePasswordBtn");
 
   if (!modal || !openBtn) return;
 
-  const closeBtn =
-    document.getElementById(
-      "changePasswordClose"
-    );
+  const closeBtn = document.getElementById("changePasswordClose");
 
-  const cancelBtn =
-    document.getElementById(
-      "cancelPasswordChange"
-    );
+  const cancelBtn = document.getElementById("cancelPasswordChange");
 
-  const saveBtn =
-    document.getElementById(
-      "savePasswordBtn"
-    );
+  const saveBtn = document.getElementById("savePasswordBtn");
 
-  const message =
-    document.getElementById(
-      "changePasswordMessage"
-    );
+  const message = document.getElementById("changePasswordMessage");
 
   function closeModal() {
     modal.classList.remove("active");
@@ -579,73 +601,50 @@ function wireChangePassword() {
     modal.classList.add("active");
   });
 
-  closeBtn?.addEventListener(
-    "click",
-    closeModal
-  );
+  closeBtn?.addEventListener("click", closeModal);
 
-  cancelBtn?.addEventListener(
-    "click",
-    closeModal
-  );
+  cancelBtn?.addEventListener("click", closeModal);
 
-  saveBtn?.addEventListener(
-    "click",
-    async () => {
-      const currentPassword =
-        document.getElementById(
-          "currentPassword"
-        ).value;
+  saveBtn?.addEventListener("click", async () => {
+    const currentPassword = document.getElementById("currentPassword").value;
 
-      const newPassword =
-        document.getElementById(
-          "newPassword"
-        ).value;
+    const newPassword = document.getElementById("newPassword").value;
 
-      const confirmPassword =
-        document.getElementById(
-          "confirmNewPassword"
-        ).value;
+    const confirmPassword = document.getElementById("confirmNewPassword").value;
 
-      message.textContent = "";
+    message.textContent = "";
 
-      try {
-        const response = await fetch(
-          "/api/change-password",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              currentPassword,
-              newPassword,
-              confirmPassword,
-            }),
-          }
-        );
+    try {
+      const response = await fetch("/api/change-password", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
 
-        const data =
-          await response.json();
+      const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(
-            data.error
-          );
-        }
-
-        alert(
-          "Password changed successfully. Please login again."
-        );
-
-        window.location.href =
-          "/login";
-      } catch (error) {
-        message.textContent =
-          error.message;
+      if (!response.ok) {
+        throw new Error(data.error);
       }
+
+      message.className = "password-message success";
+
+      message.textContent = "Password changed successfully. Redirecting...";
+
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
+    } catch (error) {
+      message.className = "password-message error";
+
+      message.textContent = error.message;
     }
-  );
+  });
 }
