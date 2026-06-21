@@ -812,14 +812,32 @@ function showQuizResults(score, total, percentage, xpEarned, completionTime) {
 function showQuizReview() {
   if (!lastQuizReview || !lastQuizReview.questions || !lastQuizReview.answers) { showNotification("No review data found", "error"); return; }
   const resultEl = document.getElementById("topicQuizResult");
-  let html = `<div class="quiz-review"><h2>📖 Quiz Review</h2>`;
+  const escapeHtml = (value = "") =>
+    String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&`#39`;");
+
+  // Ensure layout doesn't cut off items: keep scrollable container, and avoid nested flex issues.
+  let html = `<div class="quiz-review"><h2>📖 Quiz Review</h2><div class="quiz-review-container"><div class="quiz-review-items">`;
   lastQuizReview.questions.forEach((q, index) => {
     const answer = lastQuizReview.answers[index] || {};
-    html += `<div class="review-item"><h4>Q${index + 1}. ${q.question}</h4><p><strong>Your Answer:</strong> ${answer.selected !== undefined ? q.options[answer.selected] : "Not Answered"} ${answer.isCorrect ? "✅" : "❌"}</p><p class="correct-answer"><strong>Correct Answer:</strong> ${q.options[q.correct]}</p><p><strong>Explanation:</strong> ${q.explanation}</p></div>`;
+    const yourAnswerText = answer.selected !== undefined ? q.options[answer.selected] : "Not Answered";
+    const correctnessIcon = answer.isCorrect ? "✅" : "❌";
+    html += `<div class="review-item"><h4>Q${index + 1}. ${escapeHtml(q.question)}</h4><p><strong>Your Answer:</strong> ${escapeHtml(yourAnswerText)} ${correctnessIcon}</p><p class="correct-answer"><strong>Correct Answer:</strong> ${escapeHtml(q.options[q.correct])}</p><p><strong>Explanation:</strong> ${escapeHtml(q.explanation)}</p></div>`;
   });
-  html += `<button class="btn btn-primary" onclick="restoreQuizResults()">Back</button><button class="btn btn-secondary" onclick="closeQuizModal()">Close</button></div>`;
+  html += `</div></div><div class="quiz-actions" style="border-top:none; justify-content:space-between; padding-top:1.25rem; background:transparent;">
+    <button class="btn btn-primary" onclick="restoreQuizResults()">Back</button>
+    <button class="btn btn-secondary" onclick="closeQuizModal()">Close</button>
+  </div></div>`;
   resultEl.innerHTML = html;
+  // If the user re-opens review, scroll to the top of the review list.
+  const container = resultEl.querySelector('.quiz-review-container');
+  if (container) container.scrollTop = 0;
 }
+
 
 function restoreQuizResults() {
   if (!lastQuizResultData) return;
@@ -1091,16 +1109,26 @@ const advancedRoadmapSteps = [
 let roadmapTabsInitialized = false;
 let currentQuizAnswers = {};
 
+/* Temporarily disabled because roadmapAdvancedTab is not present in the current HTML structure.*/
 function initRoadmap() {
   if (!roadmapTabsInitialized) {
     const basicTab = document.getElementById("roadmapBasicTab");
-    const advancedTab = document.getElementById("roadmapAdvancedTab");
+    //const advancedTab = document.getElementById("roadmapAdvancedTab");
     const overviewTab = document.getElementById("roadmapOverviewTab");
-    if (basicTab && advancedTab && overviewTab) {
-      basicTab.addEventListener("click", () => { basicTab.classList.add("active"); advancedTab.classList.remove("active"); overviewTab.classList.remove("active"); document.getElementById("basicRoadmapContainer").classList.add("active"); document.getElementById("advancedRoadmapContainer").classList.remove("active"); document.getElementById("overviewRoadmapContainer").classList.remove("active"); });
-      advancedTab.addEventListener("click", () => { advancedTab.classList.add("active"); basicTab.classList.remove("active"); overviewTab.classList.remove("active"); document.getElementById("advancedRoadmapContainer").classList.add("active"); document.getElementById("basicRoadmapContainer").classList.remove("active"); document.getElementById("overviewRoadmapContainer").classList.remove("active"); });
-      overviewTab.addEventListener("click", () => { overviewTab.classList.add("active"); basicTab.classList.remove("active"); advancedTab.classList.remove("active"); document.getElementById("overviewRoadmapContainer").classList.add("active"); document.getElementById("basicRoadmapContainer").classList.remove("active"); document.getElementById("advancedRoadmapContainer").classList.remove("active"); });
-    }
+    //if (basicTab && advancedTab && overviewTab) {
+    if (basicTab && overviewTab) {
+      basicTab.addEventListener("click", () => { basicTab.classList.add("active"); 
+        //advancedTab.classList.remove("active"); 
+        overviewTab.classList.remove("active"); 
+        document.getElementById("basicRoadmapContainer").classList.add("active"); 
+        //document.getElementById("advancedRoadmapContainer").classList.remove("active"); 
+        document.getElementById("overviewRoadmapContainer").classList.remove("active"); });
+      /*advancedTab.addEventListener("click", () => { advancedTab.classList.add("active"); basicTab.classList.remove("active"); overviewTab.classList.remove("active"); document.getElementById("advancedRoadmapContainer").classList.add("active"); document.getElementById("basicRoadmapContainer").classList.remove("active"); document.getElementById("overviewRoadmapContainer").classList.remove("active"); });*/
+      overviewTab.addEventListener("click", () => { overviewTab.classList.add("active"); basicTab.classList.remove("active"); 
+        //advancedTab.classList.remove("active"); 
+        document.getElementById("overviewRoadmapContainer").classList.add("active"); document.getElementById("basicRoadmapContainer").classList.remove("active"); 
+        //document.getElementById("advancedRoadmapContainer").classList.remove("active"); });
+    });
     const closeBtn = document.getElementById("roadmapStepModalClose");
     const closeBtn2 = document.getElementById("roadmapStepModalCloseBtn");
     const modal = document.getElementById("roadmapStepModal");
@@ -1110,7 +1138,7 @@ function initRoadmap() {
     roadmapTabsInitialized = true;
   }
   renderBasicRoadmap();
-  renderAdvancedRoadmap();
+  //renderAdvancedRoadmap();
   const progressBar = document.getElementById("roadmapProgress");
   const stages = document.querySelectorAll(".stage");
   if (progressBar && stages.length >= 3) {
@@ -1122,6 +1150,7 @@ function initRoadmap() {
       if (progress === 100) stages[2].classList.add("active");
     }, 500);
   }
+}
 }
 
 function isRoadmapStepCompleted(step) {
@@ -1635,7 +1664,7 @@ function loadUserData() {
     else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
   } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
   updateProfile();
-  getAuthenticatedSession().then(session => { if (session?.user?.name) { userProgress.name = session.user.name; updateProfile(); saveUserData(); } initProfile(); });
+  getAuthenticatedSession().then(session => { if (session?.user?.name) { userProgress.name = session.user.name; updateProfile(); saveUserData(); } else { userProgress.name = "Learner"; updateProfile(); saveUserData(); } initProfile(); });
 }
 
 // ============================================

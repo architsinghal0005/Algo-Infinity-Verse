@@ -547,6 +547,10 @@ body {
   color: var(--text-secondary);
 }
 
+.dropdown-item.nav-auth-link:not(:last-child) {
+  margin-bottom: 7.5px;
+}
+
 .dropdown-item.nav-auth-link:hover {
   background: var(--primary);
   color: var(--text-primary);
@@ -2140,6 +2144,61 @@ section[id] {
 
 #roadmapStepSubmitQuizBtn {
   margin-bottom: 1.5rem;
+}
+/* ===== OVERALL STAGES ===== */
+.overall-roadmap {
+  max-width: 900px;
+  margin: auto;
+}
+
+.overall-stage {
+  background: var(--card-bg);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: all .3s ease;
+}
+
+.overall-stage:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(139,92,246,.25);
+}
+
+.stage-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.topic-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.topic-list span {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(139,92,246,.2);
+}
+
+.road-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    font-size: 2rem;
+    color: #8b5cf6;
+    text-shadow: 0 0 12px rgba(139,92,246,0.7);
+}
+
+.road-arrow i {
+    transition: transform 0.3s ease;
+}
+
+.road-arrow:hover i {
+    transform: translateY(4px);
 }
 
 /* ===== INTERVIEW SECTION ===== */
@@ -4484,10 +4543,29 @@ section[id] {
 }
 
 .quiz-review-container {
-  max-height: 70vh;
+  max-height: calc(90vh - 140px);
   overflow-y: auto;
   padding: 20px;
+  overscroll-behavior: contain;
 }
+
+.quiz-review {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure the review list always expands and can scroll */
+.quiz-review-items {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Each item should not be positioned/hidden by layout */
+.review-item {
+  position: relative;
+  z-index: 1;
+}
+
 
 .review-item {
   margin-bottom: 25px;
@@ -7271,3 +7349,15 @@ body.light-mode .nav-auth-link:hover {
     font-size: 0.8rem;
   }
 }
+
+/* ===== AUTH VISIBILITY AND GATING ===== */
+html.auth-unverified #dashboard,
+html.auth-unverified #gamification,
+html.auth-unverified [data-auth-required] {
+  display: none !important;
+}
+
+html.auth-verified [data-guest-only] {
+  display: none !important;
+}
+

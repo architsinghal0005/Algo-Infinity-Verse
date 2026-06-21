@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P2P Decentralized Workspace | Algo Infinity Verse</title>
+    <meta name="description" content="Serverless, Peer-to-Peer collaborative coding using WebRTC Data Channels." />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- CodeMirror Core and Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-ocean.min.css">
+    
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="../../styles.css" />
+    <link rel="stylesheet" href="p2p-workspace.css" />
+</head>
+<body class="p2p-body">
+
+    <nav class="navbar p2p-nav">
+        <div class="nav-logo">
+            <span class="logo-text">∞</span>
+            <span class="logo-title">Algo Infinity Verse</span>
+        </div>
+        <div class="network-badge" id="networkBadge">
+            <i class="fas fa-wifi"></i> P2P Network: Offline
+        </div>
+    </nav>
+
+    <!-- Workspace Toolbar -->
+    <div class="p2p-toolbar">
+        <div class="toolbar-left">
+            <button class="btn btn-primary" id="btnOpenHandshake"><i class="fas fa-satellite-dish"></i> Connect to Peer</button>
+            <div class="status-indicator">
+                <span class="dot" id="statusDot"></span>
+                <span id="statusText">Disconnected</span>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <div class="latency-meter hidden" id="latencyMeter">
+                <i class="fas fa-tachometer-alt"></i> Ping: <span id="pingValue">--</span> ms
+            </div>
+            <button class="btn btn-danger hidden" id="btnDisconnect"><i class="fas fa-times"></i> Disconnect</button>
+        </div>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <main class="p2p-workspace">
+        
+        <!-- Left Panel: Chat / P2P Logs -->
+        <div class="panel-left">
+            <div class="panel-header">
+                <h3><i class="fas fa-terminal"></i> Data Channel Logs</h3>
+            </div>
+            
+            <div class="system-logs" id="systemLogs">
+                <div class="log-entry sys">>> P2P Engine initialized. Awaiting WebRTC Handshake...</div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Send P2P message..." disabled>
+                    <button id="btnSendChat" disabled><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Code Editor -->
+        <div class="panel-right">
+            <div class="editor-header">
+                <div class="editor-tabs">
+                    <button class="editor-tab active"><i class="fab fa-js" style="color: #f1fa8c;"></i> p2p_sync.js</button>
+                </div>
+                <div class="editor-controls">
+                    <span class="sync-badge" id="syncBadge"><i class="fas fa-lock"></i> End-to-End Encrypted</span>
+                </div>
+            </div>
+            
+            <div class="editor-wrapper" id="editorContainer">
+                <!-- CodeMirror injects here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- WebRTC Manual Handshake Modal -->
+    <div class="modal-overlay hidden" id="handshakeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-handshake"></i> WebRTC P2P Handshake</h2>
+                <button class="btn-icon" id="btnCloseModal"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <p class="modal-desc">Because this is a true serverless connection, you must exchange connection tokens manually to establish the peer-to-peer data channel.</p>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="host">1. Host a Room</button>
+                <button class="tab-btn" data-tab="join">2. Join a Room</button>
+            </div>
+
+            <!-- Host Flow -->
+            <div class="tab-content active" id="tab-host">
+                <div class="step-card">
+                    <h4>Step 1: Generate Invite Token</h4>
+                    <button class="btn btn-primary w-100" id="btnGenerateOffer">Generate Token</button>
+                    <textarea class="token-box" id="hostOfferToken" readonly placeholder="Your token will appear here..."></textarea>
+                    <button class="btn btn-secondary w-100 hidden" id="btnCopyOffer"><i class="fas fa-copy"></i> Copy & Send to Friend</button>
+                </div>
+                
+                <div class="step-card">
+                    <h4>Step 2: Paste Friend's Reply Token</h4>
+                    <textarea class="token-box" id="hostAnswerToken" placeholder="Paste the token your friend sends back..."></textarea>
+                    <button class="btn btn-success w-100" id="btnConnectHost">Connect</button>
+                </div>
+            </div>
+
+            <!-- Join Flow -->
+            <div class="tab-content hidden" id="tab-join">
+                <div class="step-card">
+                    <h4>Step 1: Paste Invite Token</h4>
+                    <textarea class="token-box" id="guestOfferToken" placeholder="Paste the token from the Host here..."></textarea>
+                    <button class="btn btn-primary w-100" id="btnAcceptOffer">Accept & Generate Reply</button>
+                </div>
+                
+                <div class="step-card hidden" id="guestReplySection">
+                    <h4>Step 2: Send Reply Token</h4>
+                    <textarea class="token-box" id="guestAnswerToken" readonly></textarea>
+                    <button class="btn btn-secondary w-100" id="btnCopyAnswer"><i class="fas fa-copy"></i> Copy & Send to Host</button>
+                    <p class="wait-text"><i class="fas fa-spinner fa-spin"></i> Waiting for Host to finalize connection...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <!-- Main Logic -->
+    <script src="p2p-workspace.js"></script>
+</body>
+</html>

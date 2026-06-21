@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Code Execution Trace Visualizer</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">🚀 Algo-Infinity-Verse</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="index.html" class="active">Code Visualizer</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>🔍 Code Execution Trace Visualizer</h1>
+        <p class="subtitle">Watch your code execute line-by-line with variable tracking</p>
+
+        <div class="main-layout">
+            <!-- Left: Code Editor -->
+            <div class="panel editor-panel">
+                <div class="panel-header">
+                    <span>📝 Code Editor</span>
+                    <div class="panel-actions">
+                        <button id="runBtn" class="btn btn-run">▶ Run</button>
+                        <button id="stepBtn" class="btn btn-step">⏭ Step</button>
+                        <button id="resetBtn" class="btn btn-reset">🔄 Reset</button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <div id="lineNumbers" class="line-numbers"></div>
+                    <textarea id="codeEditor" spellcheck="false"></textarea>
+                </div>
+                <div id="highlightLine" class="highlight-line"></div>
+            </div>
+
+            <!-- Right: Variable Watch -->
+            <div class="panel watch-panel">
+                <div class="panel-header">
+                    <span>📊 Variable Watch</span>
+                </div>
+                <div id="variablesContainer" class="variables-container">
+                    <div class="empty-state">No variables yet. Run some code!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom: Output Console & Execution Trace -->
+        <div class="bottom-layout">
+            <div class="panel console-panel">
+                <div class="panel-header">
+                    <span>🖥️ Output Console</span>
+                </div>
+                <div id="outputConsole" class="console-output">
+                    <div class="empty-state">Output will appear here...</div>
+                </div>
+            </div>
+
+            <div class="panel trace-panel">
+                <div class="panel-header">
+                    <span>📜 Execution Trace</span>
+                </div>
+                <div id="traceContainer" class="trace-container">
+                    <div class="empty-state">Trace will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span id="statusText">⏹️ Ready</span>
+            <span id="lineStatus">Line: 0</span>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
