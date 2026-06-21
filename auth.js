@@ -315,7 +315,7 @@
 
       // Loading state ON
       const submitButton = form.querySelector("button[type='submit']");
-      if (!submitButton) return; // Guard add karo
+      if (!submitButton) return; // Guard: ensure submit button exists
       submitButton.disabled = true;
       submitButton.dataset.loading = "true";
       submitButton.innerHTML = `
