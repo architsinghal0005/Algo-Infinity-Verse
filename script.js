@@ -342,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initChatbot();
   initProfile();
   initScrollEffects();
-  initDarkMode();
   console.log('App initialization complete');
 });
 
@@ -1586,17 +1585,6 @@ function initScrollEffects() {
 function initializeAnimations() {
   const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.opacity = "1"; entry.target.style.transform = "translateY(0)"; } }); }, { threshold: 0.1 });
   document.querySelectorAll(".animate-in").forEach(el => { el.style.opacity = "0"; el.style.transform = "translateY(30px)"; el.style.transition = "opacity 0.6s ease, transform 0.6s ease"; observer.observe(el); });
-}
-
-function initDarkMode() {
-  const darkModeBtn = document.getElementById("darkModeBtn");
-  if (!darkModeBtn) return;
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "light") document.body.classList.add("light-mode");
-  darkModeBtn.addEventListener("click", () => {
-    document.body.classList.toggle("light-mode");
-    localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
-  });
 }
 
 // ============================================

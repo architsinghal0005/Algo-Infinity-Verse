@@ -112,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set flag so if user navigates to index.html, it skips the intro animation
     sessionStorage.setItem('algoInfinityVerse_appLoaded', 'true');
     initNavbar();
-    initDarkMode();
     initCommunityFeed();
 });
 
@@ -210,29 +209,6 @@ function initNavbar() {
     });
 }
 
-function initDarkMode() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        const isLightMode = localStorage.getItem('algoInfinityVerse_lightMode') === 'true';
-        if (isLightMode) {
-            document.body.classList.add('light-mode');
-            darkModeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-        }
-
-        darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            const icon = darkModeToggle.querySelector('i');
-            
-            if (document.body.classList.contains('light-mode')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('algoInfinityVerse_lightMode', 'true');
-            } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('algoInfinityVerse_lightMode', 'false');
-            }
-        });
-    }
-}
 
 // ===== COMMUNITY LOGIC =====
 let currentSearchQuery = '';

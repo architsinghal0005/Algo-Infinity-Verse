@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Dark mode
   const darkModeToggle = document.getElementById("darkModeToggle");
   if (darkModeToggle) {
-    const savedMode = localStorage.getItem("darkMode");
+    const savedMode = localStorage.getItem("theme");
     const isLightMode = savedMode === "light";
     if (isLightMode) {
       document.body.classList.add("light-mode");
@@ -55,10 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const icon = darkModeToggle.querySelector("i");
       if (document.body.classList.contains("light-mode")) {
         icon.classList.replace("fa-moon", "fa-sun");
-        localStorage.setItem("darkMode", "light");
+        localStorage.setItem("theme", "light");
       } else {
         icon.classList.replace("fa-sun", "fa-moon");
-        localStorage.setItem("darkMode", "dark");
+        localStorage.setItem("theme", "dark");
       }
     });
   }

@@ -848,7 +848,7 @@ function syncTheme() {
   const icon = toggle.querySelector("i");
 
   // Check saved preference
-  const savedMode = localStorage.getItem("darkMode");
+  const savedMode = localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   if (savedMode === "light") {
     document.body.classList.add("light-mode");
     if (icon) {
@@ -864,7 +864,7 @@ function syncTheme() {
       icon.classList.toggle("fa-moon");
       icon.classList.toggle("fa-sun");
     }
-    localStorage.setItem("darkMode", isLight ? "light" : "dark");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
   });
 }
 

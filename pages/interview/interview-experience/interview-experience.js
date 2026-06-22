@@ -105,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
   sessionStorage.setItem('algoInfinityVerse_appLoaded', 'true');
   initLoadingScreen();
   initNavbar();
-  initDarkMode();
   initIEP();
 });
 
@@ -200,16 +199,6 @@ function initNavbar() {
     }
   });
 }
-
-function initDarkMode() {
-  // theme.js is the single source of truth for theme toggling + persistence.
-  const toggle = document.getElementById('darkModeToggle');
-  if (!toggle) return;
-  const isLight = localStorage.getItem('darkMode') === 'light';
-  document.body.classList.toggle('light-mode', isLight);
-}
-
-
 // ===== MAIN IEP LOGIC =====
 function initIEP() {
   renderList();

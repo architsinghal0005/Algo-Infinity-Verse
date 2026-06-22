@@ -4,7 +4,7 @@ export function initTheme() {
 
   const icon = toggle.querySelector("i");
 
-  const savedMode = localStorage.getItem("darkMode");
+  const savedMode = localStorage.getItem("theme");
 
   if (savedMode === "light") {
     document.body.classList.add("light-mode");
@@ -25,6 +25,7 @@ export function initTheme() {
       icon.classList.toggle("fa-sun");
     }
 
-    localStorage.setItem("darkMode", isLight ? "light" : "dark");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
   });
 }
+
