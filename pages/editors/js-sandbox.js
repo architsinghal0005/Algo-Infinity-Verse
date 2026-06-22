@@ -1,4 +1,4 @@
-import { executeJavaScriptSandbox } from "./backend/jsSandboxRunner.js";
+import { executeJavaScriptSandbox } from "/backend/jsSandboxRunner.js";
 
 const SAMPLE_TESTS = [
   { name: "reverse-1", input: [[1, 2, 3]], expected: [3, 2, 1] },

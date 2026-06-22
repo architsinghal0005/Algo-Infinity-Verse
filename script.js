@@ -324,47 +324,34 @@ function injectRevisionSchedulerUI(topicId) {
 // ============================================
 let currentProblem = null;
 
-// ============================================
-// INITIALIZATION
-// ============================================
+// ==========================================
+// 1. SINGLE CENTRALIZED INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOMContentLoaded fired, initializing app...');
-  loadUserData();
-  initLoadingScreen();
-  initNavbar();
-  initHeroSection();
-  initTopicsSection();
-  initQuizSection();
-  initPracticeSection();
-  initRoadmap();
-  initDashboard();
-  initGamification();
-  initChatbot();
-  initProfile();
-  initScrollEffects();
-  initDarkMode();
-  console.log('App initialization complete');
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadUserData();
-  initLoadingScreen();
-  initNavbar();
-  initHeroSection();
-  initTopicOfTheDay();
-  initTopicsSection();
-  initQuizSection();
-  initPracticeSection();
-  initRoadmap();
-  initDashboard();
-  initGamification();
-  initDailyChallenge();
-  initChatbot();
-  initProfile();
-  initNewsletterValidation();
-  initScrollEffects();
-  initFooterCurrentDate();
-  updateProfile();
+    console.log('Algo Infinity Verse: Initializing App...');
+    
+    // Core Initializations - Executed strictly ONCE in order
+    loadUserData();
+    initLoadingScreen();
+    initNavbar();
+    initHeroSection();
+    initTopicOfTheDay();
+    initTopicsSection();
+    initQuizSection();
+    initPracticeSection();
+    initRoadmap();
+    initDashboard();
+    initGamification();
+    initDailyChallenge();
+    initChatbot();
+    initProfile();
+    initNewsletterValidation();
+    initScrollEffects();
+    initDarkMode();
+    initFooterCurrentDate();
+    updateProfile();
+    
+    console.log('App initialization complete');
 });
 
 // ============================================
