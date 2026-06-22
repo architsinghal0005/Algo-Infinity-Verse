@@ -236,6 +236,8 @@ let userProgress = {
   completedRoadmapSteps: [],
   lastActive: null,
   quizScores: {},
+  dailyGoals: {},
+
   bestQuizTimes: {},
   activityData: {},
   xpHistory: [],
@@ -249,8 +251,10 @@ let userProgress = {
 if (localStorage.getItem("algoInfinityVerse")) {
   try {
     const loaded = JSON.parse(localStorage.getItem("algoInfinityVerse"));
-    if (loaded && typeof loaded === "object") {
-      Object.assign(userProgress, loaded);
+  if (loaded && typeof loaded === "object") {
+    Object.assign(userProgress, loaded);
+    if (!userProgress.dailyGoals) userProgress.dailyGoals = {};
+
       if (loaded.quizScores) userProgress.quizScores = { ...(userProgress.quizScores || {}), ...loaded.quizScores };
       if (!userProgress.revisionSchedule) userProgress.revisionSchedule = {};
       ["arrays", "strings", "linkedlist", "trees", "graphs", "dp"].forEach(topic => {
@@ -324,46 +328,35 @@ function injectRevisionSchedulerUI(topicId) {
 // ============================================
 let currentProblem = null;
 
-// ============================================
-// INITIALIZATION
-// ============================================
+// ==========================================
+// 1. SINGLE CENTRALIZED INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOMContentLoaded fired, initializing app...');
-  loadUserData();
-  initLoadingScreen();
-  initNavbar();
-  initHeroSection();
-  initTopicsSection();
-  initQuizSection();
-  initPracticeSection();
-  initRoadmap();
-  initDashboard();
-  initGamification();
-  initChatbot();
-  initProfile();
-  initScrollEffects();
-  console.log('App initialization complete');
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadUserData();
-  initLoadingScreen();
-  initNavbar();
-  initHeroSection();
-  initTopicOfTheDay();
-  initTopicsSection();
-  initQuizSection();
-  initPracticeSection();
-  initRoadmap();
-  initDashboard();
-  initGamification();
-  initDailyChallenge();
-  initChatbot();
-  initProfile();
-  initNewsletterValidation();
-  initScrollEffects();
-  initFooterCurrentDate();
-  updateProfile();
+    console.log('Algo Infinity Verse: Initializing App...');
+    
+    // Core Initializations - Executed strictly ONCE in order
+    loadUserData();
+    initLoadingScreen();
+    initNavbar();
+    initHeroSection();
+    initTopicOfTheDay();
+    initTopicsSection();
+    initQuizSection();
+    initPracticeSection();
+    initRoadmap();
+    initDashboard();
+    initGamification();
+    initDailyChallenge();
+    initChatbot();
+    initProfile();
+    initNewsletterValidation();
+    initScrollEffects();
+    initDarkMode();
+    initFooterCurrentDate();
+    updateProfile();
+    initPerlEditor();
+    
+    console.log('App initialization complete');
 });
 
 // ============================================
@@ -371,7 +364,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================
 function initLoadingScreen() {
   setTimeout(() => {
-    document.getElementById("loading-screen").classList.add("hidden");
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) loadingScreen.classList.add("hidden");
     initializeAnimations();
   }, 2000);
 }
@@ -379,6 +373,28 @@ function initLoadingScreen() {
 // ============================================
 // NAVBAR
 // ============================================
+let scrollPosition = 0;
+
+function lockBodyScroll() {
+  scrollPosition = window.scrollY;
+
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollPosition}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+
+function unlockBodyScroll() {
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+
+  window.scrollTo(0, scrollPosition);
+}
+
 let navbarInitialized = false;
 
 function initNavbar() {
@@ -393,7 +409,11 @@ function initNavbar() {
     navLinks.classList.toggle("active", isOpen);
     menuToggle.setAttribute("aria-expanded", isOpen);
     if (overlay) overlay.classList.toggle("active", isOpen);
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      lockBodyScroll();
+    } else {
+      unlockBodyScroll();
+    }
     const icon = menuToggle.querySelector("i");
     if (icon) { icon.classList.toggle("fa-bars", !isOpen); icon.classList.toggle("fa-times", isOpen); }
   };
@@ -1106,6 +1126,7 @@ const advancedRoadmapSteps = [
 ];
 
 let roadmapTabsInitialized = false;
+let roadmapStagesInitialized = false;
 let currentQuizAnswers = {};
 
 /* Temporarily disabled because roadmapAdvancedTab is not present in the current HTML structure.*/
@@ -1140,6 +1161,27 @@ function initRoadmap() {
   //renderAdvancedRoadmap();
   const progressBar = document.getElementById("roadmapProgress");
   const stages = document.querySelectorAll(".stage");
+  if (!roadmapStagesInitialized) {
+    stages.forEach((stage) => {
+      stage.style.cursor = "pointer";
+
+      stage.addEventListener("click", () => {
+        const level = stage.dataset.level;
+
+        if (level === "beginner") {
+          document.getElementById("roadmapBasicTab")?.click();
+        } else if (level === "intermediate") {
+          document.getElementById("roadmapOverviewTab")?.click();
+        } else if (level === "advanced") {
+          document
+            .querySelector(".roadmap-container")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+
+    roadmapStagesInitialized = true;
+  }
   if (progressBar && stages.length >= 3) {
     const progress = Math.min((userProgress.completedProblems.length / practiceProblems.length) * 100, 100);
     setTimeout(() => {
@@ -1465,7 +1507,12 @@ function updateXPBar() {
   const currentLevelXP = levels[currentLevel - 1] || 0;
   const nextLevelXP = levels[currentLevel] || 100000;
   const xpProgress = ((userProgress.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-  setTimeout(() => { document.getElementById("xpBar").style.width = `${Math.min(xpProgress, 100)}%`; document.getElementById("xpText").textContent = `${userProgress.xp} / ${nextLevelXP} XP`; }, 300);
+  setTimeout(() => { 
+    const xpBar = document.getElementById("xpBar");
+    const xpText = document.getElementById("xpText");
+    if (xpBar) xpBar.style.width = `${Math.min(xpProgress, 100)}%`; 
+    if (xpText) xpText.textContent = `${userProgress.xp} / ${nextLevelXP} XP`; 
+  }, 300);
 }
 
 // ============================================
@@ -1648,9 +1695,9 @@ async function getAuthenticatedSession() {
 function loadUserData() {
   try {
     const saved = localStorage.getItem("algoInfinityVerse");
-    if (saved) { const data = JSON.parse(saved); Object.assign(userProgress, data); if (!userProgress.quizScores) userProgress.quizScores = {}; if (!userProgress.completedRoadmapSteps) userProgress.completedRoadmapSteps = []; if (!userProgress.activityData) userProgress.activityData = {}; if (!userProgress.xpHistory) userProgress.xpHistory = []; if (!userProgress.quizAttempts) userProgress.quizAttempts = []; if (!userProgress.practiceEvents) userProgress.practiceEvents = []; if (!userProgress.codingPersonality) userProgress.codingPersonality = { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }; if (!userProgress.mistakeDna) userProgress.mistakeDna = { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }; backfillActivityData(); }
-    else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
-  } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
+    if (saved) { const data = JSON.parse(saved); Object.assign(userProgress, data); if (!userProgress.quizScores) userProgress.quizScores = {}; if (!userProgress.completedRoadmapSteps) userProgress.completedRoadmapSteps = []; if (!userProgress.activityData) userProgress.activityData = {}; if (!userProgress.xpHistory) userProgress.xpHistory = []; if (!userProgress.quizAttempts) userProgress.quizAttempts = []; if (!userProgress.practiceEvents) userProgress.practiceEvents = []; if (!userProgress.codingPersonality) userProgress.codingPersonality = { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }; if (!userProgress.mistakeDna) userProgress.mistakeDna = { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }; if (!userProgress.dailyGoals) userProgress.dailyGoals = {}; backfillActivityData(); }
+    else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, dailyGoals: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
+  } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, dailyGoals: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
   updateProfile();
   getAuthenticatedSession().then(session => { if (session?.user?.name) { userProgress.name = session.user.name; updateProfile(); saveUserData(); } else { userProgress.name = "Learner"; updateProfile(); saveUserData(); } initProfile(); });
 }
@@ -2197,7 +2244,7 @@ window.addEventListener('hashchange', () => {
 // RUN PERL
 // ============================================
 let isRunning = false;
-document.addEventListener("DOMContentLoaded", () => {
+function initPerlEditor() {
   const codeEl = document.getElementById("perlEditor");
   const outputEl = document.getElementById("perlOutput");
   const runBtn = document.getElementById("runBtn");
@@ -2206,7 +2253,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (runBtn) runBtn.addEventListener("click", runPerl);
   if (resetBtn) resetBtn.addEventListener("click", () => { if (codeEl) codeEl.value = ""; if (outputEl) outputEl.textContent = "Run code to see output..."; });
   if (sampleBtn) sampleBtn.addEventListener("click", () => { if (codeEl) codeEl.value = `print "Hello World\\n";\n\nmy $name = "DSA Learner";\nprint "Welcome $name\\n";`; });
-});
+}
 
 async function runPerl() {
   if (isRunning) return;
@@ -2223,3 +2270,4 @@ async function runPerl() {
   } catch (err) { if (output) output.textContent = "Error: " + err.message; }
   isRunning = false;
 }
+

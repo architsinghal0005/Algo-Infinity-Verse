@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Concurrency & Deadlock Simulator | Algo Infinity Verse</title>
+    <meta name="description" content="Visualize multi-threading, race conditions, and deadlocks using Web Workers and SharedArrayBuffer." />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="concurrency-simulator.css" />
+</head>
+<body class="conc-body">
+
+    <nav class="navbar">
+        <div class="nav-logo">
+            <span class="logo-text">∞</span>
+            <span class="logo-title">Algo Infinity Verse</span>
+        </div>
+        <div class="engine-badge" id="engineBadge">
+            <i class="fas fa-microchip"></i> Multiprocessor Engine
+        </div>
+    </nav>
+
+    <!-- SAB Warning Overlay (If Cross-Origin Isolation is missing) -->
+    <div class="sab-warning hidden" id="sabWarning">
+        <div class="warning-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>SharedArrayBuffer Blocked</h2>
+            <p>Your browser has blocked shared memory allocation due to missing Cross-Origin Isolation headers. This is a standard security measure to prevent Spectre attacks.</p>
+            <div class="fix-instructions">
+                <strong>How to fix for local testing:</strong>
+                <ul>
+                    <li>Run your local server with these headers:</li>
+                    <code>Cross-Origin-Opener-Policy: same-origin<br>Cross-Origin-Embedder-Policy: require-corp</code>
+                    <li>Or, test in Chrome by enabling this flag: <br><code>chrome://flags/#enable-sharedarraybuffer-credentialless</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <main class="conc-workspace" id="mainWorkspace">
+        
+        <!-- Left Panel: Controls & Scenarios -->
+        <div class="panel-left">
+            <div class="panel-header">
+                <h3><i class="fas fa-cogs"></i> Thread Controller</h3>
+            </div>
+            
+            <div class="control-section">
+                <p class="desc-text">
+                    <strong>The Setup:</strong> Two independent Web Workers share a single block of memory (a Bank Balance). Thread 1 deposits money, Thread 2 withdraws money simultaneously.
+                </p>
+
+                <div class="scenario-card">
+                    <h4>1. Race Condition (No Locks)</h4>
+                    <p>Both threads read and write memory blindly. Context switching causes them to overwrite each other's data, corrupting the balance.</p>
+                    <button class="btn btn-warning w-100" id="btnRace">
+                        <i class="fas fa-running"></i> Run Race Condition
+                    </button>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>2. Thread-Safe (Mutex Locks)</h4>
+                    <p>Threads use <code>Atomics.wait()</code> to acquire a Mutex lock before touching the memory, ensuring operations happen sequentially.</p>
+                    <button class="btn btn-success w-100" id="btnSafe">
+                        <i class="fas fa-lock"></i> Run Safe Execution
+                    </button>
+                </div>
+
+                <div class="scenario-card">
+                    <h4>3. Mutual Deadlock</h4>
+                    <p>Thread 1 locks Mutex A and waits for B. Thread 2 locks Mutex B and waits for A. Both freeze infinitely.</p>
+                    <button class="btn btn-danger w-100" id="btnDeadlock">
+                        <i class="fas fa-skull-crossbones"></i> Force Deadlock
+                    </button>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn btn-outline w-100" id="btnReset">
+                        <i class="fas fa-redo"></i> Reset Memory & Kill Threads
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Visualization Arena -->
+        <div class="panel-center">
+            <div class="arena-header">
+                <div class="header-title">
+                    <i class="fas fa-memory"></i> SharedArrayBuffer Visualizer
+                </div>
+                <div class="hardware-indicator">
+                    Dual-Core Execution
+                </div>
+            </div>
+
+            <div class="visualization-arena">
+                <!-- Thread 1 -->
+                <div class="thread-node" id="uiThread1">
+                    <div class="thread-icon"><i class="fas fa-microchip"></i></div>
+                    <h5>Thread 1 (Deposit)</h5>
+                    <span class="thread-status idle" id="statusT1">IDLE</span>
+                </div>
+
+                <!-- Shared State (Middle) -->
+                <div class="shared-resources">
+                    <div class="mutex-container">
+                        <div class="mutex-lock unlocked" id="uiMutex1">
+                            <i class="fas fa-lock-open" id="iconMutex1"></i>
+                            <span>Mutex A</span>
+                        </div>
+                        <div class="mutex-lock unlocked" id="uiMutex2">
+                            <i class="fas fa-lock-open" id="iconMutex2"></i>
+                            <span>Mutex B</span>
+                        </div>
+                    </div>
+
+                    <div class="memory-vault">
+                        <i class="fas fa-database"></i>
+                        <span>Shared Balance</span>
+                        <strong class="balance-display" id="uiBalance">$1000</strong>
+                    </div>
+                </div>
+
+                <!-- Thread 2 -->
+                <div class="thread-node" id="uiThread2">
+                    <div class="thread-icon"><i class="fas fa-microchip"></i></div>
+                    <h5>Thread 2 (Withdraw)</h5>
+                    <span class="thread-status idle" id="statusT2">IDLE</span>
+                </div>
+            </div>
+            
+            <div class="expected-box" id="expectedBox">
+                Expected final balance: <strong>$1000</strong> (if thread-safe).
+            </div>
+        </div>
+
+        <!-- Right Panel: Thread Logs -->
+        <div class="panel-right">
+            <div class="panel-header">
+                <h3><i class="fas fa-terminal"></i> Thread Output</h3>
+            </div>
+            <div class="logs-container" id="logContainer">
+                <div class="log-entry sys">> System booted. SharedArrayBuffer allocated.</div>
+                <div class="log-entry sys">> Memory size: 20 bytes (5 Int32 slots).</div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="concurrency-simulator.js"></script>
+</body>
+</html>

@@ -1,9 +1,9 @@
-import { initLoader } from "./modules/loader.js";
-import { initTheme } from "./modules/theme.js";
-import { initNavbar } from "./modules/navbar.js";
-import { initPrint } from "./modules/print.js";
-import { initScrollTop } from "./modules/scrollTop.js";
-import { initPagination } from "./modules/pagination.js";
+import { initLoader } from "/modules/loader.js";
+import { initTheme } from "/modules/theme.js";
+import { initNavbar } from "/modules/navbar.js";
+import { initPrint } from "/modules/print.js";
+import { initScrollTop } from "/modules/scrollTop.js";
+import { initPagination } from "/modules/pagination.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 

@@ -1,4 +1,4 @@
-import vm from "vm";
+import ivm from "isolated-vm";
 
 function truncate(str, max) {
   const s = String(str ?? "");
@@ -64,13 +64,9 @@ const consoleProxy = {
   warn: (...args) => { __captured.logs.push(args.map(String).join(' ')); },
 };
 
-// Provide a minimal console and a few safe globals.
+// Provide a minimal console.
 const sandboxGlobal = {
   console: consoleProxy,
-  setTimeout,
-  setInterval,
-  clearTimeout,
-  clearInterval,
 };
 
 // Evaluate user code in the VM.
@@ -100,6 +96,97 @@ module.exports = { runOne, __captured };
   return harness;
 }
 
+async function runWithPiston({ language, sourceCode, tests, timeoutMs, maxOutputChars, showMySteps }) {
+  const versionMap = { python: "3.10.0", cpp: "10.2.0" };
+  const langIdMap = { python: "python", cpp: "c++" };
+  const langId = langIdMap[language] || language;
+  
+  const results = [];
+  
+  for (let i = 0; i < tests.length; i++) {
+    const t = tests[i];
+    const start = Date.now();
+    
+    const stdinStr = typeof t.input === "string" ? t.input : JSON.stringify(t.input);
+    const expected = t.expectedOutput;
+    
+    let actualOutput = null;
+    let passed = false;
+    let runtimeError = null;
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+    
+    try {
+      const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          language: langId,
+          version: versionMap[language] || "*",
+          files: [{ content: sourceCode }],
+          stdin: stdinStr || "",
+          compile_timeout: timeoutMs,
+          run_timeout: timeoutMs,
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.compile && data.compile.code !== 0) {
+        runtimeError = { message: "Compilation Error:\n" + data.compile.stderr };
+      } else if (data.run) {
+        stdout = data.run.stdout || "";
+        stderr = data.run.stderr || "";
+        
+        if (data.run.signal === "SIGKILL") {
+          timedOut = true;
+          runtimeError = { message: "Execution timed out" };
+        } else if (data.run.code !== 0) {
+          runtimeError = { message: stderr || `Process exited with code ${data.run.code}` };
+        } else {
+          actualOutput = stdout.trim();
+          if (typeof expected === "string") {
+            passed = actualOutput === String(expected).trim();
+          } else {
+            try {
+              const parsedActual = JSON.parse(actualOutput);
+              passed = JSON.stringify(parsedActual) === JSON.stringify(expected);
+            } catch {
+              passed = actualOutput === String(expected).trim();
+            }
+          }
+        }
+      } else {
+         runtimeError = { message: data.message || "Unknown error" };
+      }
+    } catch (e) {
+      runtimeError = { message: e.message };
+    }
+    
+    results.push({
+      testName: t.name ?? `test_${i + 1}`,
+      input: t.input,
+      expectedOutput: expected,
+      actualOutput: timedOut ? null : actualOutput,
+      passed,
+      durationMs: Date.now() - start,
+      timedOut,
+      runtimeError,
+      transcript: showMySteps ? {
+        stdout: truncate(stdout, maxOutputChars),
+        stderr: truncate(stderr, maxOutputChars),
+      } : undefined,
+    });
+  }
+  
+  return {
+    ok: true,
+    results,
+    runtimeMeta: { timeoutMs, maxOutputChars, showMySteps }
+  };
+}
+
 export async function runUserCode({
   language,
   sourceCode,
@@ -108,6 +195,19 @@ export async function runUserCode({
   maxOutputChars = 20000,
   showMySteps = false,
 }) {
+  const normalizedTests = Array.isArray(tests) ? tests.map(normalizeTestCase) : [];
+
+  if (language === "python" || language === "cpp") {
+    return await runWithPiston({
+      language,
+      sourceCode,
+      tests: normalizedTests,
+      timeoutMs,
+      maxOutputChars,
+      showMySteps,
+    });
+  }
+
   if (language && language !== "javascript") {
     return {
       ok: false,
@@ -115,156 +215,154 @@ export async function runUserCode({
     };
   }
 
-  const normalizedTests = Array.isArray(tests) ? tests.map(normalizeTestCase) : [];
-
   const stdoutAll = [];
   const stderrAll = [];
 
   const results = [];
 
-  // Create a single VM instance per run.
-  // Use a fresh context so each run is isolated.
   const outputBuffer = { logs: [], errors: [] };
 
-  // module shim for harness.
-  const module = { exports: {} };
-
-  const context = vm.createContext({
-    console: {
-      log: (...args) => {
-        outputBuffer.logs.push(args.map(String).join(" "));
-      },
-      error: (...args) => {
-        outputBuffer.errors.push(args.map(String).join(" "));
-      },
-      warn: (...args) => {
-        outputBuffer.logs.push(args.map(String).join(" "));
-      },
-    },
-    setTimeout,
-    setInterval,
-    clearTimeout,
-    clearInterval,
-    module,
-    globalThis: {},
-  });
-
-  const harness = buildHarness({ sourceCode, showMySteps });
-
-  let compiled;
+  let isolate;
   try {
-    compiled = new vm.Script(harness, { filename: "user_harness.js" });
-  } catch (e) {
-    return {
-      ok: false,
-      error: "Failed to compile user code",
-      runtimeError: {
-        message: e?.message || String(e),
-        stack: e?.stack || null,
-      },
-    };
-  }
+    isolate = new ivm.Isolate({ memoryLimit: 128 });
+    const context = isolate.createContextSync();
+    const jail = context.global;
 
-  // Execute user code once to define solve/runOne.
-  try {
-    compiled.runInContext(context, { timeout: timeoutMs });
-  } catch (e) {
-    return {
-      ok: false,
-      error: "Runtime error while loading user code",
-      runtimeError: {
-        message: e?.message || String(e),
-        stack: e?.stack || null,
-      },
-      transcript: {
-        stdout: truncate(outputBuffer.logs.join("\n"), maxOutputChars),
-        stderr: truncate(outputBuffer.errors.join("\n"), maxOutputChars),
-        showMySteps,
-      },
-    };
-  }
+    jail.setSync('global', jail.derefInto());
 
-  const exported = module.exports || {};
-  const runOne = exported.runOne;
+    jail.setSync('_consoleLog', new ivm.Reference((...args) => {
+      outputBuffer.logs.push(args.map(String).join(" "));
+    }));
+    jail.setSync('_consoleError', new ivm.Reference((...args) => {
+      outputBuffer.errors.push(args.map(String).join(" "));
+    }));
 
-  // Execute each test.
-  for (let i = 0; i < normalizedTests.length; i++) {
-    const t = normalizedTests[i];
+    isolate.compileScriptSync(`
+      global.console = {
+        log: (...args) => _consoleLog.applyIgnored(null, args),
+        warn: (...args) => _consoleLog.applyIgnored(null, args),
+        error: (...args) => _consoleError.applyIgnored(null, args)
+      };
+      global.module = { exports: {} };
+      global.globalThis = global;
+    `).runSync(context);
 
-    const start = Date.now();
+    const harness = buildHarness({ sourceCode, showMySteps });
 
-    let actual;
-    let runtimeError = null;
-    let timedOut = false;
-
-    // Run each test with timeout.
+    let compiled;
     try {
-      actual = vm.runInContext(
-        `runOne(${JSON.stringify(t.input)})`,
-        context,
-        { timeout: timeoutMs },
-      );
+      compiled = isolate.compileScriptSync(harness, { filename: "user_harness.js" });
     } catch (e) {
-      // vm timeout has a generic error message; best-effort detect.
-      const msg = e?.message || String(e);
-      if (/Script execution timed out|timed out/i.test(msg)) {
-        timedOut = true;
-      }
-      runtimeError = {
-        message: msg,
-        stack: e?.stack || null,
+      return {
+        ok: false,
+        error: "Failed to compile user code",
+        runtimeError: {
+          message: e?.message || String(e),
+          stack: e?.stack || null,
+        },
       };
     }
 
-    const stdout = truncate(outputBuffer.logs.join("\n"), maxOutputChars);
-    const stderr = truncate(outputBuffer.errors.join("\n"), maxOutputChars);
-
-    // Only keep per-test delta-ish output in MVP: for now, same captured stream.
-    stdoutAll.push(stdout);
-    stderrAll.push(stderr);
-
-    const expected = t.expectedOutput;
-
-    // Compare as strings if expected is a string; otherwise strict equality.
-    let passed = false;
-    if (timedOut || runtimeError) {
-      passed = false;
-    } else {
-      if (typeof expected === "string") {
-        passed = String(actual) === String(expected);
-      } else {
-        passed = actual === expected;
-      }
+    // Execute user code once to define solve/runOne.
+    try {
+      compiled.runSync(context, { timeout: timeoutMs });
+    } catch (e) {
+      return {
+        ok: false,
+        error: "Runtime error while loading user code",
+        runtimeError: {
+          message: e?.message || String(e),
+          stack: e?.stack || null,
+        },
+        transcript: {
+          stdout: truncate(outputBuffer.logs.join("\\n"), maxOutputChars),
+          stderr: truncate(outputBuffer.errors.join("\\n"), maxOutputChars),
+          showMySteps,
+        },
+      };
     }
 
-    const durationMs = Date.now() - start;
+    // Execute each test.
+    for (let i = 0; i < normalizedTests.length; i++) {
+      const t = normalizedTests[i];
 
-    results.push({
-      testName: t.name ?? `test_${i + 1}`,
-      input: t.input,
-      expectedOutput: expected,
-      actualOutput: timedOut ? null : actual,
-      passed,
-      durationMs,
-      timedOut,
-      runtimeError,
-      transcript: showMySteps
-        ? {
-            stdout,
-            stderr,
-          }
-        : undefined,
-    });
+      const start = Date.now();
+
+      let actual;
+      let runtimeError = null;
+      let timedOut = false;
+
+      // Run each test with timeout.
+      try {
+        actual = isolate.compileScriptSync(
+          \`runOne(\${JSON.stringify(t.input)})\`
+        ).runSync(context, { timeout: timeoutMs, copy: true });
+      } catch (e) {
+        // isolate timeout has a generic error message; best-effort detect.
+        const msg = e?.message || String(e);
+        if (/Script execution timed out|timed out/i.test(msg)) {
+          timedOut = true;
+        }
+        runtimeError = {
+          message: msg,
+          stack: e?.stack || null,
+        };
+      }
+
+      const stdout = truncate(outputBuffer.logs.join("\\n"), maxOutputChars);
+      const stderr = truncate(outputBuffer.errors.join("\\n"), maxOutputChars);
+
+      // Only keep per-test delta-ish output in MVP: for now, same captured stream.
+      stdoutAll.push(stdout);
+      stderrAll.push(stderr);
+
+      const expected = t.expectedOutput;
+
+      // Compare as strings if expected is a string; otherwise strict equality.
+      let passed = false;
+      if (timedOut || runtimeError) {
+        passed = false;
+      } else {
+        if (typeof expected === "string") {
+          passed = String(actual) === String(expected);
+        } else {
+          passed = actual === expected;
+        }
+      }
+
+      const durationMs = Date.now() - start;
+
+      results.push({
+        testName: t.name ?? \`test_\${i + 1}\`,
+        input: t.input,
+        expectedOutput: expected,
+        actualOutput: timedOut ? null : actual,
+        passed,
+        durationMs,
+        timedOut,
+        runtimeError,
+        transcript: showMySteps
+          ? {
+              stdout,
+              stderr,
+            }
+          : undefined,
+      });
+    }
+
+    return {
+      ok: true,
+      results,
+      runtimeMeta: {
+        timeoutMs,
+        maxOutputChars,
+        showMySteps,
+      },
+    };
+  } finally {
+    if (isolate) {
+      isolate.dispose();
+    }
   }
-
-  return {
-    ok: true,
-    results,
-    runtimeMeta: {
-      timeoutMs,
-      maxOutputChars,
-      showMySteps,
-    },
-  };
 }
 

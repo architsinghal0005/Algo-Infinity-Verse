@@ -9,6 +9,7 @@ const dsaTopics = [
         theory: "Arrays are contiguous memory locations that store elements of the same type. They provide O(1) access time but fixed size.",
         problems: ["Two Sum", "Maximum Subarray", "Merge Intervals", "Product Except Self", "Spiral Matrix"]
     },
+    
     {
         id: 2,
         name: "Strings",

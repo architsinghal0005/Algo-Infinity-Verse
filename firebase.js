@@ -81,4 +81,5 @@ export const COLLECTIONS = {
   USERS: "users",
   SESSIONS: "sessions",
   QUIZ_RESULTS: "quizResults",
+  AUDITS_HISTORY: "audits_history",
 };

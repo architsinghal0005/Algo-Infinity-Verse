@@ -134,6 +134,33 @@
                 />
               </div>
 
+              <!-- Sound Toggle -->
+              <div class="control-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                  <label for="soundToggle" style="margin-bottom: 0;">Sound Effects</label>
+                  <label class="switch-custom">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="slider-switch"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Volume Control -->
+              <div class="control-group" id="volumeControlGroup">
+                <label for="volumeRange"
+                  >Volume
+                  <span class="val-display" id="volumeDisplay">50%</span></label
+                >
+                <input
+                  type="range"
+                  id="volumeRange"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="slider-custom"
+                />
+              </div>
+
               <!-- Control Buttons -->
               <button
                 id="newArrayBtn"

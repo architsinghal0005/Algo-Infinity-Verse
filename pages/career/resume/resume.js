@@ -1,7 +1,8 @@
-import { initLoader } from "./modules/loader.js";
-import { initTheme } from "./modules/theme.js";
-import { initNavbar } from "./modules/navbar.js";
-import { initScrollTop } from "./modules/scrollTop.js";
+import { initLoader } from "/modules/loader.js";
+import { initTheme } from "/modules/theme.js";
+import { initNavbar } from "/modules/navbar.js";
+import { initScrollTop } from "/modules/scrollTop.js";
+import { escapeHtml } from "/modules/domSanitizer.js";
 
 // DSA Topics database for progress calculation
 const dsaTopics = [
@@ -144,14 +145,14 @@ function populateProfileInfo() {
   
   if (emailEl) {
     if (userProgress.email) {
-      emailEl.innerHTML = `<i class="fas fa-envelope"></i> ${userProgress.email}`;
+      emailEl.innerHTML = `<i class="fas fa-envelope"></i> ${escapeHtml(userProgress.email)}`;
     } else {
       emailEl.innerHTML = `<i class="fas fa-envelope"></i> Not Provided`;
     }
   }
   
   if (joinDateEl) {
-    joinDateEl.innerHTML = `<i class="fas fa-calendar-alt"></i> Joined: ${formatDate(userProgress.joinDate)}`;
+    joinDateEl.innerHTML = `<i class="fas fa-calendar-alt"></i> Joined: ${escapeHtml(formatDate(userProgress.joinDate))}`;
   }
 }
 
@@ -290,20 +291,37 @@ async function initResumeAnalyzer(){
 
       document.getElementById("missingSkills").innerHTML = 
         data.missingSkills && data.missingSkills.length > 0
-          ? data.missingSkills.map(skill => `<li>${skill}</li>`).join("")
+          ? data.missingSkills.map(skill => `<li>${escapeHtml(skill)}</li>`).join("")
           : `<li style="border-left-color: #9ca3af; color: #9ca3af; background: rgba(156, 163, 175, 0.1);">No missing skills found!</li>`;
 
 
 
       document.getElementById("resumeSuggestions").innerHTML = 
         data.suggestions && data.suggestions.length > 0
-          ? data.suggestions.map(item => `<li>${item}</li>`).join("")
+          ? data.suggestions.map(item => `<li>${escapeHtml(item)}</li>`).join("")
           : `<li style="border-left-color: #9ca3af; color: #9ca3af; background: rgba(156, 163, 175, 0.1);">Looking great! No suggestions.</li>`;
 
 
 
       button.innerHTML="Analyze Resume";
 
+      // Save to Audit History
+      try {
+        await fetch("/api/audit/history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            repoUrl: "Resume Upload",
+            overallScore: data.atsScore,
+            categoryScores: data.missingSkills || [],
+            issuesCount: (data.missingSkills || []).length,
+            recommendations: data.suggestions || []
+          })
+        });
+        initAuditHistory();
+      } catch (err) {
+        console.error("Failed to save audit history:", err);
+      }
 
     }
     catch(error){
@@ -369,7 +387,8 @@ function initJsonUpload() {
 
   function showMessage(msg, isError = false) {
     if(!messageEl) return;
-    messageEl.innerHTML = isError ? `<i class="fas fa-exclamation-circle"></i> ${msg}` : `<i class="fas fa-check-circle"></i> ${msg}`;
+    const iconClass = isError ? "fa-exclamation-circle" : "fa-check-circle";
+    messageEl.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(msg)}`;
     messageEl.style.display = "block";
     messageEl.className = "upload-message " + (isError ? "error" : "success");
     setTimeout(() => {
@@ -432,6 +451,88 @@ function initJsonUpload() {
   }
 }
 
+let trendsChartInstance = null;
+
+async function initAuditHistory() {
+  const card = document.getElementById("auditHistoryCard");
+  const tbody = document.getElementById("auditHistoryTableBody");
+  if (!card || !tbody) return;
+
+  try {
+    const historyRes = await fetch("/api/audit/history");
+    if (!historyRes.ok) return;
+    const historyData = await historyRes.json();
+    
+    if (!historyData || historyData.length === 0) {
+      card.style.display = "none";
+      return;
+    }
+
+    card.style.display = "block";
+
+    // Populate Table
+    tbody.innerHTML = historyData.map((audit, index) => {
+      const prevAudit = historyData[index + 1];
+      let deltaStr = "-";
+      if (prevAudit) {
+        const delta = audit.overallScore - prevAudit.overallScore;
+        if (delta > 0) deltaStr = `<span style="color: #4ade80;">+${delta}</span>`;
+        else if (delta < 0) deltaStr = `<span style="color: #f87171;">${delta}</span>`;
+        else deltaStr = `<span style="color: #9ca3af;">0</span>`;
+      }
+
+      return `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 10px;">${new Date(audit.timestamp).toLocaleDateString()}</td>
+          <td style="padding: 10px; font-weight: bold;" class="gradient-text">${audit.overallScore}%</td>
+          <td style="padding: 10px;">${audit.issuesCount}</td>
+          <td style="padding: 10px;">${deltaStr}</td>
+        </tr>
+      `;
+    }).join("");
+
+    // Render Chart
+    const trendsRes = await fetch("/api/audit/trends");
+    if (!trendsRes.ok) return;
+    const trendsData = await trendsRes.json();
+
+    const ctx = document.getElementById("trendsChart");
+    if (!ctx) return;
+
+    if (trendsChartInstance) {
+      trendsChartInstance.destroy();
+    }
+
+    const labels = trendsData.map(t => new Date(t.timestamp).toLocaleDateString());
+    const data = trendsData.map(t => t.overallScore);
+
+    trendsChartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "ATS Score",
+          data,
+          borderColor: "#60a5fa",
+          backgroundColor: "rgba(96, 165, 250, 0.1)",
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, max: 100 }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("Failed to load audit history:", err);
+  }
+}
+
 
 // Page Initialization
 document.addEventListener("DOMContentLoaded", () => {
@@ -443,6 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initScrollTop();
   initResumeAnalyzer();
   initJsonUpload();
+  initAuditHistory();
 
   // Load and render user journey data
   loadUserData();

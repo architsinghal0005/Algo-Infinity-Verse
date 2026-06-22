@@ -9,7 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
         if (data.authenticated && data.user) {
           sessionNotice.className = "session-notice authenticated";
-          sessionNotice.innerHTML = `<i class="fas fa-circle-check"></i> Submitting feedback as <strong>${data.user.name}</strong> (${data.user.email})`;
+          const safeName = window.DOMSanitizer ? window.DOMSanitizer.escapeHtml(data.user.name) : data.user.name;
+          const safeEmail = window.DOMSanitizer ? window.DOMSanitizer.escapeHtml(data.user.email) : data.user.email;
+          sessionNotice.innerHTML = `<i class="fas fa-circle-check"></i> Submitting feedback as <strong>${safeName}</strong> (${safeEmail})`;
           return;
         }
       }
