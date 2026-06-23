@@ -376,10 +376,10 @@ function buildRoadmap(goal) {
     step.setAttribute("data-index", i);
 
     step.innerHTML = `
-      <div class="step-dot" style="font-size: 1.2rem;">${isDone ? '<i class="fas fa-check" style="color: #fff;"></i>' : '<i class="fas fa-circle" style="color: var(--primary); font-size: 0.6rem;"></i>'}</div>
+      <div class="step-dot" style="font-size: 1.2rem;">${isDone ? '<i class="fas fa-check" style="color: #fff;" aria-hidden="true" focusable="false"></i>' : '<i class="fas fa-circle" style="color: var(--primary); font-size: 0.6rem;" aria-hidden="true" focusable="false"></i>'}</div>
       <div class="step-card">
         <label for="step-${i}" class="step-icon-label" style="cursor: pointer; font-size: 1.8rem; margin-right: 15px; display: flex; align-items: center; justify-content: center; width: 40px;">
-          ${isDone ? '<i class="fas fa-check-circle" style="color: #22c55e;"></i>' : topic.icon}
+          ${isDone ? '<i class="fas fa-check-circle" style="color: #22c55e;" aria-hidden="true" focusable="false"></i>' : topic.icon}
         </label>
         <input type="checkbox" class="step-checkbox" id="step-${i}" ${isDone ? "checked" : ""} aria-label="${topic.name}" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
         <div class="step-info">
@@ -452,9 +452,9 @@ function attachCheckboxListeners(goal) {
         step.classList.add("completed");
         step.classList.remove("active");
         const dot = step.querySelector(".step-dot");
-        if (dot) dot.innerHTML = '<i class="fas fa-check" style="color: #fff;"></i>';
+        if (dot) dot.innerHTML = '<i class="fas fa-check" style="color: #fff;" aria-hidden="true" focusable="false"></i>';
         const labelEl = step.querySelector(".step-icon-label");
-        if (labelEl) labelEl.innerHTML = '<i class="fas fa-check-circle" style="color: #22c55e;"></i>';
+        if (labelEl) labelEl.innerHTML = '<i class="fas fa-check-circle" style="color: #22c55e;" aria-hidden="true" focusable="false"></i>';
         const nameEl = step.querySelector(".step-name");
         if (nameEl) nameEl.classList.add("done");
         showToast(`"${PATHS[goal][index].name}" marked complete!`, "✅");
@@ -462,7 +462,7 @@ function attachCheckboxListeners(goal) {
         checked = checked.filter((i) => i !== index);
         step.classList.remove("completed");
         const dot = step.querySelector(".step-dot");
-        if (dot) dot.innerHTML = '<i class="fas fa-circle" style="color: var(--primary); font-size: 0.6rem;"></i>';
+        if (dot) dot.innerHTML = '<i class="fas fa-circle" style="color: var(--primary); font-size: 0.6rem;" aria-hidden="true" focusable="false"></i>';
         const labelEl = step.querySelector(".step-icon-label");
         if (labelEl) labelEl.innerHTML = PATHS[goal][index].icon;
         const nameEl = step.querySelector(".step-name");

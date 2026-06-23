@@ -49,7 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Row 9
     { id: "fenwick-tree", label: "Fenwick Tree", group: "advanced", col: -1, row: 9, icon: "fas fa-tree", link: "/pages/learning/fenwick-tree-learning/fenwick-tree-learning.html", desc: "Binary Indexed Tree.", outcome: "Implement simpler range sum queries." },
-    { id: "sparse-table", label: "Sparse Table", group: "advanced", col: 1, row: 9, icon: "fas fa-table", link: "/pages/learning/sparse-table-learning/sparse-table-learning.html", desc: "Precomputed table.", outcome: "Answer RMQ in O(1) time." }
+    { id: "sparse-table", label: "Sparse Table", group: "advanced", col: 1, row: 9, icon: "fas fa-table", link: "/pages/learning/sparse-table-learning/sparse-table-learning.html", desc: "Precomputed table.", outcome: "Answer RMQ in O(1) time." },
+
+    // Row 10
+    { id: "google-design", label: "System Design: Google", group: "advanced", col: 0, row: 10, icon: "fab fa-google", link: "/pages/learning/build-google-from-scratch/build-google-from-scratch.html", desc: "Build Google From Scratch.", outcome: "Understand architecture of billion-user apps." }
   ];
 
   const linksData = [
@@ -95,6 +98,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { source: "prefix-sum", target: "segment-tree" },
     { source: "segment-tree", target: "fenwick-tree" },
     { source: "segment-tree", target: "sparse-table" },
+
+    // System Design
+    { source: "graphs", target: "google-design" },
+    { source: "trie", target: "google-design" },
+    { source: "heaps", target: "google-design" }
   ];
 
   const CARD_WIDTH = 150;
@@ -204,6 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .on("end", dragended))
     .attr("tabindex", "0")
     .attr("role", "button")
+    .attr("aria-label", d => d.label)
     .on("keydown", (event, d) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();

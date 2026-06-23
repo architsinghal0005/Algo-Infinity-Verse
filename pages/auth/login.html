@@ -38,13 +38,25 @@
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-            />
+            <div class="auth-password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle auth-password-toggle"
+                data-target="password"
+                aria-label="Show password"
+                aria-pressed="false"
+                aria-controls="password"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
           </div>
           <p class="auth-message" data-auth-message aria-live="polite"></p>
           <button class="btn btn-primary auth-submit" type="submit">
@@ -68,5 +80,5 @@
       loadPartial('navbar-placeholder', '/partials/navbar.html');
       loadPartial('footer-placeholder', '/partials/footer.html');
     </script>
-</body>
+  </body>
 </html>

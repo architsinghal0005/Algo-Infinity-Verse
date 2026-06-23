@@ -236,6 +236,8 @@ let userProgress = {
   completedRoadmapSteps: [],
   lastActive: null,
   quizScores: {},
+  dailyGoals: {},
+
   bestQuizTimes: {},
   activityData: {},
   xpHistory: [],
@@ -249,8 +251,10 @@ let userProgress = {
 if (localStorage.getItem("algoInfinityVerse")) {
   try {
     const loaded = JSON.parse(localStorage.getItem("algoInfinityVerse"));
-    if (loaded && typeof loaded === "object") {
-      Object.assign(userProgress, loaded);
+  if (loaded && typeof loaded === "object") {
+    Object.assign(userProgress, loaded);
+    if (!userProgress.dailyGoals) userProgress.dailyGoals = {};
+
       if (loaded.quizScores) userProgress.quizScores = { ...(userProgress.quizScores || {}), ...loaded.quizScores };
       if (!userProgress.revisionSchedule) userProgress.revisionSchedule = {};
       ["arrays", "strings", "linkedlist", "trees", "graphs", "dp"].forEach(topic => {
@@ -324,9 +328,9 @@ function injectRevisionSchedulerUI(topicId) {
 // ============================================
 let currentProblem = null;
 
-// ============================================
-// INITIALIZATION
-// ============================================
+// ==========================================
+// 1. SINGLE CENTRALIZED INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded fired, initializing app...');
   loadUserData();
@@ -371,7 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================
 function initLoadingScreen() {
   setTimeout(() => {
-    document.getElementById("loading-screen").classList.add("hidden");
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) loadingScreen.classList.add("hidden");
     initializeAnimations();
   }, 2000);
 }
@@ -379,6 +384,28 @@ function initLoadingScreen() {
 // ============================================
 // NAVBAR
 // ============================================
+let scrollPosition = 0;
+
+function lockBodyScroll() {
+  scrollPosition = window.scrollY;
+
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollPosition}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+
+function unlockBodyScroll() {
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+
+  window.scrollTo(0, scrollPosition);
+}
+
 let navbarInitialized = false;
 
 function initNavbar() {
@@ -393,7 +420,11 @@ function initNavbar() {
     navLinks.classList.toggle("active", isOpen);
     menuToggle.setAttribute("aria-expanded", isOpen);
     if (overlay) overlay.classList.toggle("active", isOpen);
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      lockBodyScroll();
+    } else {
+      unlockBodyScroll();
+    }
     const icon = menuToggle.querySelector("i");
     if (icon) { icon.classList.toggle("fa-bars", !isOpen); icon.classList.toggle("fa-times", isOpen); }
   };
@@ -974,10 +1005,48 @@ function renderProblemCards(problems) {
     return `<div class="problem-card animate-in" data-id="${problem.id}"><div class="problem-header"><h3 class="problem-title">${recBadge}${problem.title}</h3><div class="problem-actions"><button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${problem.id}" aria-label="Favorite problem"><i class="fas fa-heart"></i></button><button class="notes-btn ${hasNotes ? 'has-notes' : ''}" data-id="${problem.id}" aria-label="Problem notes"><i class="fas fa-sticky-note"></i></button><span class="difficulty-badge ${problem.difficulty}">${problem.difficulty}</span></div></div><div class="problem-tags">${problem.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div><div class="problem-meta"><span class="acceptance-rate"><i class="fas fa-users"></i> ${problem.acceptance} acceptance</span>${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> Completed</span>' : ''}</div></div>`;
   }).join("");
   
-  addProblemCardEventListeners(problemsGrid);
+  // Use event delegation for problem cards (listeners are attached once).
+  if (!problemsGrid.dataset.listenersAttached) {
+    attachProblemGridEventDelegation(problemsGrid);
+    problemsGrid.dataset.listenersAttached = "true";
+  }
 }
 
-// Add event listeners to problem cards
+// Attach event listeners once using delegation
+function attachProblemGridEventDelegation(grid) {
+  if (!grid) return;
+
+  grid.addEventListener("click", (e) => {
+    const favoriteBtn = e.target.closest(".favorite-btn");
+    if (favoriteBtn && grid.contains(favoriteBtn)) {
+      e.stopPropagation();
+      e.preventDefault();
+      const problemId = parseInt(favoriteBtn.dataset.id);
+      toggleFavorite(problemId);
+      renderProblems();
+      return;
+    }
+
+    const notesBtn = e.target.closest(".notes-btn");
+    if (notesBtn && grid.contains(notesBtn)) {
+      e.stopPropagation();
+      e.preventDefault();
+      const problemId = parseInt(notesBtn.dataset.id);
+      currentNotesProblemId = problemId;
+      openNotesModal(problemId);
+      return;
+    }
+
+    const card = e.target.closest(".problem-card");
+    if (card && grid.contains(card)) {
+      const problemId = parseInt(card.dataset.id);
+      handleProblemClick(problemId);
+    }
+  });
+}
+
+
+// Legacy: addProblemCardEventListeners kept for compatibility, but no longer used
 function addProblemCardEventListeners(grid) {
   grid.querySelectorAll(".favorite-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -1106,6 +1175,7 @@ const advancedRoadmapSteps = [
 ];
 
 let roadmapTabsInitialized = false;
+let roadmapStagesInitialized = false;
 let currentQuizAnswers = {};
 
 /* Temporarily disabled because roadmapAdvancedTab is not present in the current HTML structure.*/
@@ -1140,6 +1210,27 @@ function initRoadmap() {
   //renderAdvancedRoadmap();
   const progressBar = document.getElementById("roadmapProgress");
   const stages = document.querySelectorAll(".stage");
+  if (!roadmapStagesInitialized) {
+    stages.forEach((stage) => {
+      stage.style.cursor = "pointer";
+
+      stage.addEventListener("click", () => {
+        const level = stage.dataset.level;
+
+        if (level === "beginner") {
+          document.getElementById("roadmapBasicTab")?.click();
+        } else if (level === "intermediate") {
+          document.getElementById("roadmapOverviewTab")?.click();
+        } else if (level === "advanced") {
+          document
+            .querySelector(".roadmap-container")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+
+    roadmapStagesInitialized = true;
+  }
   if (progressBar && stages.length >= 3) {
     const progress = Math.min((userProgress.completedProblems.length / practiceProblems.length) * 100, 100);
     setTimeout(() => {
@@ -1465,7 +1556,12 @@ function updateXPBar() {
   const currentLevelXP = levels[currentLevel - 1] || 0;
   const nextLevelXP = levels[currentLevel] || 100000;
   const xpProgress = ((userProgress.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-  setTimeout(() => { document.getElementById("xpBar").style.width = `${Math.min(xpProgress, 100)}%`; document.getElementById("xpText").textContent = `${userProgress.xp} / ${nextLevelXP} XP`; }, 300);
+  setTimeout(() => { 
+    const xpBar = document.getElementById("xpBar");
+    const xpText = document.getElementById("xpText");
+    if (xpBar) xpBar.style.width = `${Math.min(xpProgress, 100)}%`; 
+    if (xpText) xpText.textContent = `${userProgress.xp} / ${nextLevelXP} XP`; 
+  }, 300);
 }
 
 // ============================================
@@ -1528,11 +1624,22 @@ function addChatMessage(message, sender, { html = false } = {}) {
   const messagesContainer = document.getElementById("chatbotMessages");
   const messageEl = document.createElement("div");
   messageEl.className = `message ${sender}`;
-  if (html) messageEl.innerHTML = message;
-  else messageEl.textContent = message;
+
+  if (html) {
+    // Never trust user-influenced HTML. Sanitize before injecting.
+    if (typeof window !== 'undefined' && window.DOMSanitizer?.sanitizeHTML) {
+      messageEl.innerHTML = window.DOMSanitizer.sanitizeHTML(message);
+    } else {
+      messageEl.textContent = String(message ?? '');
+    }
+  } else {
+    messageEl.textContent = message;
+  }
+
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
 
 function getBotResponse(question) {
   const q = question.toLowerCase();
@@ -1648,9 +1755,9 @@ async function getAuthenticatedSession() {
 function loadUserData() {
   try {
     const saved = localStorage.getItem("algoInfinityVerse");
-    if (saved) { const data = JSON.parse(saved); Object.assign(userProgress, data); if (!userProgress.quizScores) userProgress.quizScores = {}; if (!userProgress.completedRoadmapSteps) userProgress.completedRoadmapSteps = []; if (!userProgress.activityData) userProgress.activityData = {}; if (!userProgress.xpHistory) userProgress.xpHistory = []; if (!userProgress.quizAttempts) userProgress.quizAttempts = []; if (!userProgress.practiceEvents) userProgress.practiceEvents = []; if (!userProgress.codingPersonality) userProgress.codingPersonality = { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }; if (!userProgress.mistakeDna) userProgress.mistakeDna = { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }; backfillActivityData(); }
-    else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
-  } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
+    if (saved) { const data = JSON.parse(saved); Object.assign(userProgress, data); if (!userProgress.quizScores) userProgress.quizScores = {}; if (!userProgress.completedRoadmapSteps) userProgress.completedRoadmapSteps = []; if (!userProgress.activityData) userProgress.activityData = {}; if (!userProgress.xpHistory) userProgress.xpHistory = []; if (!userProgress.quizAttempts) userProgress.quizAttempts = []; if (!userProgress.practiceEvents) userProgress.practiceEvents = []; if (!userProgress.codingPersonality) userProgress.codingPersonality = { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }; if (!userProgress.mistakeDna) userProgress.mistakeDna = { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }; if (!userProgress.dailyGoals) userProgress.dailyGoals = {}; backfillActivityData(); }
+    else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, dailyGoals: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
+  } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, dailyGoals: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
   updateProfile();
   getAuthenticatedSession().then(session => { if (session?.user?.name) { userProgress.name = session.user.name; updateProfile(); saveUserData(); } else { userProgress.name = "Learner"; updateProfile(); saveUserData(); } initProfile(); });
 }
@@ -2098,7 +2205,12 @@ function formatMistakeDate(dateStr) {
   try { const d = new Date(dateStr); const now = new Date(); const diffMs = now - d; const diffMins = Math.floor(diffMs / 60000); if (diffMins < 1) return "Just now"; if (diffMins < 60) return `${diffMins}m ago`; const diffHours = Math.floor(diffMins / 60); if (diffHours < 24) return `${diffHours}h ago`; return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { return "Recently"; }
 }
 
-function escapeHtml(text) { const div = document.createElement("div"); div.textContent = text; return div.innerHTML; }
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 
 // ============================================
 // NEWSLETTER
@@ -2197,7 +2309,7 @@ window.addEventListener('hashchange', () => {
 // RUN PERL
 // ============================================
 let isRunning = false;
-document.addEventListener("DOMContentLoaded", () => {
+function initPerlEditor() {
   const codeEl = document.getElementById("perlEditor");
   const outputEl = document.getElementById("perlOutput");
   const runBtn = document.getElementById("runBtn");
@@ -2206,7 +2318,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (runBtn) runBtn.addEventListener("click", runPerl);
   if (resetBtn) resetBtn.addEventListener("click", () => { if (codeEl) codeEl.value = ""; if (outputEl) outputEl.textContent = "Run code to see output..."; });
   if (sampleBtn) sampleBtn.addEventListener("click", () => { if (codeEl) codeEl.value = `print "Hello World\\n";\n\nmy $name = "DSA Learner";\nprint "Welcome $name\\n";`; });
-});
+}
 
 async function runPerl() {
   if (isRunning) return;
@@ -2223,3 +2335,4 @@ async function runPerl() {
   } catch (err) { if (output) output.textContent = "Error: " + err.message; }
   isRunning = false;
 }
+

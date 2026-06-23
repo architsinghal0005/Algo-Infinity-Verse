@@ -50,7 +50,7 @@
   font-size: 1.5rem;
   margin-bottom: 0.25rem;
   color: var(--primary);
-  font-family: "Orbitron", sans-serif;
+  font-family: Orbitron, sans-serif;
 }
 
 .universe-header p {
@@ -74,7 +74,7 @@
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(10px);
   color: var(--light-text);
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   outline: none;
   transition: all 0.3s ease;
 }
@@ -160,10 +160,13 @@
   transition: all 0.3s ease;
 }
 
-.universe-controls button:hover {
+.universe-controls button:hover,
+.universe-controls button:focus-visible {
   background: var(--primary);
   color: #fff;
   transform: scale(1.1);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .universe-legend {
@@ -230,7 +233,7 @@
 }
 
 .node text {
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 12px;
   pointer-events: none;
   text-shadow: 0 2px 4px rgba(0,0,0,0.8);
@@ -258,10 +261,18 @@
   stroke-width: 2px !important;
 }
 
-.node.highlighted circle {
+.node.highlighted circle,
+.node:focus-visible circle {
   stroke: #fff;
   stroke-width: 4px;
   filter: drop-shadow(0 0 15px currentcolor);
+}
+.node:focus-visible {
+  outline: none;
+}
+.node:focus-visible .topic-card {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Tooltip */
@@ -269,7 +280,7 @@
   position: absolute;
   text-align: center;
   padding: 10px;
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   font-size: 0.85rem;
   background: rgba(15, 23, 42, 0.95);
   color: #fff;
@@ -351,7 +362,7 @@
   font-size: 1.25rem;
   color: var(--primary);
   margin: 0;
-  font-family: "Orbitron", sans-serif;
+  font-family: Orbitron, sans-serif;
 }
 
 .panel-header button {
@@ -448,7 +459,7 @@
   align-items: center;
   justify-content: center;
   color: #f8fafc;
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   font-weight: 500;
   font-size: 13px;
   text-align: center;
