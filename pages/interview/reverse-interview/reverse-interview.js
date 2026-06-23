@@ -34,7 +34,7 @@ function initRIDarkMode() {
   const toggle = document.getElementById("darkModeToggle");
   if (!toggle) return;
   const icon = toggle.querySelector("i");
-  if (localStorage.getItem("darkMode") === "light") {
+  if (localStorage.getItem("theme") === "light") {
     document.body.classList.add("light-mode");
     if (icon) icon.classList.replace("fa-moon", "fa-sun");
   }
@@ -42,7 +42,7 @@ function initRIDarkMode() {
     document.body.classList.toggle("light-mode");
     const isLight = document.body.classList.contains("light-mode");
     if (icon) { icon.classList.toggle("fa-moon", !isLight); icon.classList.toggle("fa-sun", isLight); }
-    localStorage.setItem("darkMode", isLight ? "light" : "dark");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
   });
 }
 

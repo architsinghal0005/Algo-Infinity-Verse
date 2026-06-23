@@ -2,7 +2,7 @@
 (function () {
 
   // ── 1. Apply saved theme IMMEDIATELY (prevents flash on load) ──
-  if (localStorage.getItem("darkMode") === "light") {
+  if (localStorage.getItem("theme") === "light") {
     document.body.classList.add("light-mode");
   }
 
@@ -43,7 +43,7 @@
       toggle.addEventListener("click", function () {
         document.body.classList.toggle("light-mode");
         const isLight = document.body.classList.contains("light-mode");
-        localStorage.setItem("darkMode", isLight ? "light" : "dark");
+        localStorage.setItem("theme", isLight ? "light" : "dark");
         syncIcons();
         syncNavbar();
       });

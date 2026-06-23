@@ -1634,17 +1634,6 @@ function initializeAnimations() {
   document.querySelectorAll(".animate-in").forEach(el => { el.style.opacity = "0"; el.style.transform = "translateY(30px)"; el.style.transition = "opacity 0.6s ease, transform 0.6s ease"; observer.observe(el); });
 }
 
-function initDarkMode() {
-  const darkModeBtn = document.getElementById("darkModeBtn");
-  if (!darkModeBtn) return;
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "light") document.body.classList.add("light-mode");
-  darkModeBtn.addEventListener("click", () => {
-    document.body.classList.toggle("light-mode");
-    localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
-  });
-}
-
 // ============================================
 // LOCAL STORAGE
 // ============================================
