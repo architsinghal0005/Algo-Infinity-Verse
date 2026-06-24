@@ -20,7 +20,23 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-  </head>
+  
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
   <body data-page="complexity-calculator">
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -65,7 +81,9 @@
             <div class="cc-graph-title"><i class="fas fa-chart-area"></i> Big-O Growth Visualization</div>
           </div>
           <div class="cc-canvas-wrapper">
-            <canvas id="complexityChart"></canvas>
+            <canvas id="complexityChart" role="img" aria-label="Interactive line graph visualizing Big-O complexities">
+              <p class="sr-only">A dynamic chart showing the growth rates of selected Big-O functions based on the current input size.</p>
+            </canvas>
           </div>
         </div>
 
@@ -78,20 +96,20 @@
                 <span>Input Size (N)</span>
                 <span class="cc-val-badge" id="nValDisplay">50</span>
               </div>
-              <input type="range" id="nSlider" min="5" max="200" value="50" />
+              <input type="range" id="nSlider" min="5" max="200" value="50" aria-label="Input Size (N)" aria-valuenow="50" aria-valuemin="5" aria-valuemax="200" />
             </div>
           </div>
 
           <div class="cc-control-section">
             <div class="cc-control-title"><i class="fas fa-layer-group"></i> Complexities</div>
             <div class="cc-toggles">
-              <label class="cc-toggle-label t-o1"><input type="checkbox" id="chk_o1" checked><div class="cc-toggle-box"></div> O(1) Constant</label>
-              <label class="cc-toggle-label t-ologn"><input type="checkbox" id="chk_ologn" checked><div class="cc-toggle-box"></div> O(log N) Logarithmic</label>
-              <label class="cc-toggle-label t-on"><input type="checkbox" id="chk_on" checked><div class="cc-toggle-box"></div> O(N) Linear</label>
-              <label class="cc-toggle-label t-onlogn"><input type="checkbox" id="chk_onlogn" checked><div class="cc-toggle-box"></div> O(N log N) Linearithmic</label>
-              <label class="cc-toggle-label t-on2"><input type="checkbox" id="chk_on2" checked><div class="cc-toggle-box"></div> O(N²) Quadratic</label>
-              <label class="cc-toggle-label t-o2n"><input type="checkbox" id="chk_o2n"><div class="cc-toggle-box"></div> O(2^N) Exponential</label>
-              <label class="cc-toggle-label t-onfact"><input type="checkbox" id="chk_onfact"><div class="cc-toggle-box"></div> O(N!) Factorial</label>
+              <label class="cc-toggle-label t-o1" role="switch" tabindex="0" aria-checked="true"><input type="checkbox" id="chk_o1" checked tabindex="-1"><div class="cc-toggle-box"></div> O(1) Constant</label>
+              <label class="cc-toggle-label t-ologn" role="switch" tabindex="0" aria-checked="true"><input type="checkbox" id="chk_ologn" checked tabindex="-1"><div class="cc-toggle-box"></div> O(log N) Logarithmic</label>
+              <label class="cc-toggle-label t-on" role="switch" tabindex="0" aria-checked="true"><input type="checkbox" id="chk_on" checked tabindex="-1"><div class="cc-toggle-box"></div> O(N) Linear</label>
+              <label class="cc-toggle-label t-onlogn" role="switch" tabindex="0" aria-checked="true"><input type="checkbox" id="chk_onlogn" checked tabindex="-1"><div class="cc-toggle-box"></div> O(N log N) Linearithmic</label>
+              <label class="cc-toggle-label t-on2" role="switch" tabindex="0" aria-checked="true"><input type="checkbox" id="chk_on2" checked tabindex="-1"><div class="cc-toggle-box"></div> O(N²) Quadratic</label>
+              <label class="cc-toggle-label t-o2n" role="switch" tabindex="0" aria-checked="false"><input type="checkbox" id="chk_o2n" tabindex="-1"><div class="cc-toggle-box"></div> O(2^N) Exponential</label>
+              <label class="cc-toggle-label t-onfact" role="switch" tabindex="0" aria-checked="false"><input type="checkbox" id="chk_onfact" tabindex="-1"><div class="cc-toggle-box"></div> O(N!) Factorial</label>
             </div>
           </div>
 

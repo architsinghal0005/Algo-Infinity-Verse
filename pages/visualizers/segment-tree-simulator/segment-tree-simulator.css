@@ -269,7 +269,7 @@
 .st-dot-active  { background: rgba(168,85,247,0.4);  border: 1px solid #a855f7; }
 .st-dot-match   { background: rgba(34,197,94,0.4);   border: 1px solid #22c55e; }
 .st-dot-partial { background: rgba(245,158,11,0.4);  border: 1px solid #f59e0b; }
-.st-dot-none    { background: rgba(239,68,68,0.2);   border: 1px solid #ef4444; opacity: 0.5; }
+.st-dot-none    { background: rgba(100,116,139,0.25); border: 1px solid #64748b; opacity: 0.6; }
 .st-dot-updated { background: rgba(6,182,212,0.4);   border: 1px solid #06b6d4; }
 
 /* ── Result Panel ── */
@@ -292,6 +292,97 @@
   color: var(--text-primary);
 }
 
+/* ── Bottom Array Layout ── */
+.st-array-wrapper {
+  margin-bottom: 1.5rem;
+  background: rgba(10, 10, 26, 0.45);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  overflow-x: auto;
+}
+
+.st-array-container {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: max-content;
+  padding: 0.5rem 0;
+}
+
+.st-array-cell {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--glass-border);
+  border-radius: 12px;
+  width: 54px;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.st-array-cell:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(34, 197, 94, 0.5);
+  transform: translateY(-2px);
+}
+
+.st-array-cell:focus-visible {
+  outline: 2px solid `#22c55e`;
+  outline-offset: 2px;
+  border-color: `#22c55e`;
+}
+
+.st-cell-idx {
+  font-family: Orbitron, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.st-cell-val {
+  font-family: "Fira Code", monospace;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Cell Highlight States */
+.st-array-cell.highlight-match {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.st-array-cell.highlight-partial {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.st-array-cell.highlight-active {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: #a855f7;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+.st-array-cell.highlight-updated {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #06b6d4;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+.st-array-cell.highlight-none {
+  background: rgba(100, 116, 139, 0.05);
+  border-color: #64748b;
+  opacity: 0.6;
+}
+
 /* ── Learn Cards ── */
 .st-learn-grid {
   display: grid;
@@ -312,7 +403,7 @@
 
 .st-learn-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(34,197,94,0.3);
+  border-color: rgba(34, 197, 94, 0.3);
 }
 
 .st-learn-card::before {
@@ -350,9 +441,9 @@
   font-weight: 700;
   padding: 0.2rem 0.6rem;
   border-radius: 6px;
-  background: rgba(34,197,94,0.1);
+  background: rgba(34, 197, 94, 0.1);
   color: #22c55e;
-  border: 1px solid rgba(34,197,94,0.25);
+  border: 1px solid rgba(34, 197,94, 0.25);
 }
 
 .st-chip-green { background: rgba(6,182,212,0.1); color: #06b6d4; border-color: rgba(6,182,212,0.25); }

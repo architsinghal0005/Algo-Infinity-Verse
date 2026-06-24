@@ -1,3 +1,5 @@
+import { executeSandboxedCode } from '../modules/code-executor.js';
+
 const output = document.getElementById("output");
 const languageSelector = document.getElementById("language");
 
@@ -106,24 +108,15 @@ function runCode() {
     }
 }
 
-function runJavaScript(code) {
+async function runJavaScript(code) {
     clearOutput();
-    output.textContent = "Running...\n";
-    const capture = createConsoleCapture();
+    output.textContent = "Running (Sandboxed)...\n";
 
     try {
-        const execute = new Function(code);
-        const result = execute();
-
-        if (result !== undefined) {
-            capture.logs.push(formatValue(result));
-        }
-
-        output.textContent = capture.logs.join("\n") || "✅ Code executed successfully.";
+        const logs = await executeSandboxedCode(code, 3000);
+        output.textContent = logs.join("\n") || "✅ Code executed successfully.";
     } catch (error) {
-        output.textContent = `❌ ${error.name}: ${error.message}`;
-    } finally {
-        capture.restore();
+        output.textContent = `❌ ${error.message}`;
     }
 }
 

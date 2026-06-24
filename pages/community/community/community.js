@@ -272,9 +272,23 @@ function renderTrendingTags() {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
         
-    container.innerHTML = sortedTags.length > 0 
-        ? sortedTags.map(([tag]) => `<span class="tag" style="cursor:pointer;" onclick="setTagFilter('${tag}')">#${tag}</span>`).join('')
-        : '<p class="text-secondary" style="font-size:0.9rem;">No tags yet</p>';
+    container.innerHTML = '';
+    if (sortedTags.length > 0) {
+        sortedTags.forEach(([tag]) => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.style.cursor = 'pointer';
+            span.textContent = `#${tag}`;
+            span.addEventListener('click', () => setTagFilter(tag));
+            container.appendChild(span);
+        });
+    } else {
+        const p = document.createElement('p');
+        p.className = 'text-secondary';
+        p.style.fontSize = '0.9rem';
+        p.textContent = 'No tags yet';
+        container.appendChild(p);
+    }
 }
 
 function formatDate(isoString) {
@@ -303,7 +317,10 @@ function renderPosts() {
     container.innerHTML = '';
 
     if (posts.length === 0) {
-        container.innerHTML = '<p class="text-secondary text-center">No posts found.</p>';
+        const p = document.createElement('p');
+        p.className = 'text-secondary text-center';
+        p.textContent = 'No posts found.';
+        container.appendChild(p);
         return;
     }
 
@@ -314,58 +331,177 @@ function renderPosts() {
         const card = document.createElement('div');
         card.className = 'post-card glass-card animate-in';
         
-        let tagsHtml = '';
+        // Post Header
+        const postHeader = document.createElement('div');
+        postHeader.className = 'post-header';
+        
+        const postTitle = document.createElement('h4');
+        postTitle.className = 'post-title';
+        postTitle.textContent = post.title;
+        
+        const postMeta = document.createElement('span');
+        postMeta.className = 'post-meta';
+        postMeta.textContent = formatDate(post.timestamp);
+        
+        postHeader.appendChild(postTitle);
+        postHeader.appendChild(postMeta);
+        card.appendChild(postHeader);
+        
+        // Post Content
+        const postContent = document.createElement('div');
+        postContent.className = 'post-content markdown-body';
+        
+        let safePostHtml = '';
+        if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+            safePostHtml = DOMPurify.sanitize(marked.parse(post.content, { breaks: true }), {
+                ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr'],
+                ALLOWED_ATTR: ['href', 'target', 'rel']
+            });
+        } else {
+            safePostHtml = escapeHtml(post.content);
+        }
+        postContent.innerHTML = safePostHtml;
+        card.appendChild(postContent);
+        
+        // Post Tags
         if (post.tags && post.tags.length > 0) {
-            tagsHtml = '<div class="post-tags">' + 
-                post.tags.map(tag => `<span class="post-tag" style="cursor:pointer;" onclick="setTagFilter('${tag}')">#${tag.trim()}</span>`).join('') + 
-                '</div>';
+            const postTags = document.createElement('div');
+            postTags.className = 'post-tags';
+            post.tags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'post-tag';
+                tagSpan.style.cursor = 'pointer';
+                tagSpan.textContent = `#${tag.trim()}`;
+                tagSpan.addEventListener('click', () => setTagFilter(tag));
+                postTags.appendChild(tagSpan);
+            });
+            card.appendChild(postTags);
         }
 
-        let commentsHtml = '';
+        // Post Actions
+        const postActions = document.createElement('div');
+        postActions.className = 'post-actions';
+        postActions.style.display = 'flex';
+        postActions.style.gap = '15px';
+        
+        const voteActions = document.createElement('div');
+        voteActions.className = 'vote-actions';
+        voteActions.style.display = 'flex';
+        voteActions.style.alignItems = 'center';
+        voteActions.style.gap = '8px';
+        voteActions.style.background = 'rgba(255,255,255,0.05)';
+        voteActions.style.padding = '4px 10px';
+        voteActions.style.borderRadius = '20px';
+        
+        const upvoteBtn = document.createElement('button');
+        upvoteBtn.className = `post-action-btn ${post.userVote === 1 ? 'liked' : ''}`;
+        upvoteBtn.style.padding = '0';
+        upvoteBtn.style.minWidth = 'auto';
+        upvoteBtn.style.border = 'none';
+        upvoteBtn.style.background = 'transparent';
+        upvoteBtn.style.transform = 'scale(1.1)';
+        upvoteBtn.style.color = post.userVote === 1 ? '#22c55e' : 'inherit';
+        upvoteBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        upvoteBtn.addEventListener('click', () => handleVote(post.id, 1));
+        
+        const voteCount = document.createElement('span');
+        voteCount.style.fontWeight = '500';
+        voteCount.style.color = post.userVote === 1 ? '#22c55e' : post.userVote === -1 ? '#ef4444' : 'inherit';
+        voteCount.textContent = post.votes !== undefined ? post.votes : 0;
+        
+        const downvoteBtn = document.createElement('button');
+        downvoteBtn.className = `post-action-btn ${post.userVote === -1 ? 'liked' : ''}`;
+        downvoteBtn.style.padding = '0';
+        downvoteBtn.style.minWidth = 'auto';
+        downvoteBtn.style.border = 'none';
+        downvoteBtn.style.background = 'transparent';
+        downvoteBtn.style.transform = 'scale(1.1)';
+        downvoteBtn.style.color = post.userVote === -1 ? '#ef4444' : 'inherit';
+        downvoteBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+        downvoteBtn.addEventListener('click', () => handleVote(post.id, -1));
+        
+        voteActions.appendChild(upvoteBtn);
+        voteActions.appendChild(voteCount);
+        voteActions.appendChild(downvoteBtn);
+        
+        const commentBtn = document.createElement('button');
+        commentBtn.className = 'post-action-btn';
+        commentBtn.style.background = 'rgba(255,255,255,0.05)';
+        commentBtn.style.padding = '4px 15px';
+        commentBtn.style.borderRadius = '20px';
+        commentBtn.innerHTML = '<i class="far fa-comment"></i> ';
+        
+        const commentCount = document.createElement('span');
+        commentCount.textContent = post.comments ? post.comments.length : 0;
+        commentBtn.appendChild(commentCount);
+        commentBtn.addEventListener('click', () => toggleComments(post.id));
+        
+        postActions.appendChild(voteActions);
+        postActions.appendChild(commentBtn);
+        card.appendChild(postActions);
+
+        // Comments Section
+        const commentsSection = document.createElement('div');
+        commentsSection.className = 'comments-section';
+        commentsSection.id = `comments-${post.id}`;
+        
+        const commentsList = document.createElement('div');
+        commentsList.className = 'comments-list';
+        
         if (post.comments) {
             post.comments = sortCommentsByTimestamp(post.comments);
+            post.comments.forEach(c => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+                
+                const commentMeta = document.createElement('div');
+                commentMeta.className = 'comment-meta';
+                commentMeta.textContent = formatDate(c.timestamp);
+                
+                const commentText = document.createElement('div');
+                commentText.className = 'comment-text markdown-body';
+                
+                let safeCommentHtml = '';
+                if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                    safeCommentHtml = DOMPurify.sanitize(marked.parse(c.text, { breaks: true }), {
+                        ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr'],
+                        ALLOWED_ATTR: ['href', 'target', 'rel']
+                    });
+                } else {
+                    safeCommentHtml = escapeHtml(c.text);
+                }
+                commentText.innerHTML = safeCommentHtml;
+                
+                commentDiv.appendChild(commentMeta);
+                commentDiv.appendChild(commentText);
+                commentsList.appendChild(commentDiv);
+            });
         }
-        if (post.comments && post.comments.length > 0) {
-            commentsHtml = post.comments.map(c => `
-                <div class="comment">
-                    <div class="comment-meta">${formatDate(c.timestamp)}</div>
-                    <div class="comment-text">${escapeHtml(c.text)}</div>
-                </div>
-            `).join('');
-        }
+        commentsSection.appendChild(commentsList);
 
-        card.innerHTML = `
-            <div class="post-header">
-                <h4 class="post-title">${escapeHtml(post.title)}</h4>
-                <span class="post-meta">${formatDate(post.timestamp)}</span>
-            </div>
-            <div class="post-content">${escapeHtml(post.content)}</div>
-            ${tagsHtml}
-            <div class="post-actions" style="display: flex; gap: 15px;">
-                <div class="vote-actions" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px;">
-                    <button class="post-action-btn ${post.userVote === 1 ? 'liked' : ''}" onclick="handleVote(${post.id}, 1)" style="padding: 0; min-width: auto; border: none; background: transparent; transform: scale(1.1); color: ${post.userVote === 1 ? '#22c55e' : 'inherit'};">
-                        <i class="fas fa-arrow-up"></i>
-                    </button>
-                    <span style="font-weight: 500; color: ${post.userVote === 1 ? '#22c55e' : post.userVote === -1 ? '#ef4444' : 'inherit'};">${post.votes !== undefined ? post.votes : 0}</span>
-                    <button class="post-action-btn ${post.userVote === -1 ? 'liked' : ''}" onclick="handleVote(${post.id}, -1)" style="padding: 0; min-width: auto; border: none; background: transparent; transform: scale(1.1); color: ${post.userVote === -1 ? '#ef4444' : 'inherit'};">
-                        <i class="fas fa-arrow-down"></i>
-                    </button>
-                </div>
-                <button class="post-action-btn" onclick="toggleComments(${post.id})" style="background: rgba(255,255,255,0.05); padding: 4px 15px; border-radius: 20px;">
-                    <i class="far fa-comment"></i>
-                    <span>${post.comments ? post.comments.length : 0}</span>
-                </button>
-            </div>
-            <div class="comments-section" id="comments-${post.id}">
-                <div class="comments-list">
-                    ${commentsHtml}
-                </div>
-                <form class="add-comment-form" onsubmit="addComment(event, ${post.id})">
-                    <input type="text" placeholder="Write a comment..." required style="font-family: inherit;">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-reply"></i></button>
-                </form>
-            </div>
-        `;
+        // Add Comment Form
+        const addCommentForm = document.createElement('form');
+        addCommentForm.className = 'add-comment-form';
+        addCommentForm.addEventListener('submit', (e) => addComment(e, post.id));
+        
+        const commentInput = document.createElement('textarea');
+        commentInput.placeholder = 'Write a comment... (Markdown supported)';
+        commentInput.required = true;
+        commentInput.style.fontFamily = 'inherit';
+        commentInput.rows = 2;
+        commentInput.style.resize = 'vertical';
+        commentInput.style.flex = '1';
+        
+        const commentSubmitBtn = document.createElement('button');
+        commentSubmitBtn.type = 'submit';
+        commentSubmitBtn.className = 'btn btn-primary btn-sm';
+        commentSubmitBtn.innerHTML = '<i class="fas fa-reply"></i>';
+        
+        addCommentForm.appendChild(commentInput);
+        addCommentForm.appendChild(commentSubmitBtn);
+        commentsSection.appendChild(addCommentForm);
+        
+        card.appendChild(commentsSection);
         container.appendChild(card);
     });
 }
@@ -440,7 +576,7 @@ function toggleComments(postId) {
 function addComment(event, postId) {
     event.preventDefault();
     const form = event.target;
-    const input = form.querySelector('input');
+    const input = form.querySelector('textarea') || form.querySelector('input');
     const text = input.value.trim();
 
     if (!text) return;
@@ -466,9 +602,12 @@ function addComment(event, postId) {
     }
 }
 
-// Utility to prevent XSS in user input
+// Utility to prevent XSS in user input (delegating to centralized DOMSanitizer if available)
 function escapeHtml(unsafe) {
-    return unsafe
+    if (typeof window !== 'undefined' && window.DOMSanitizer) {
+        return window.DOMSanitizer.escapeHtml(unsafe);
+    }
+    return String(unsafe || '')
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")
          .replace(/>/g, "&gt;")

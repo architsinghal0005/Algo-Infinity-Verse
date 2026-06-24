@@ -21,7 +21,24 @@
       crossorigin="anonymous" 
       referrerpolicy="no-referrer" 
     />
-  </head>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
   <body data-page="resume">
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -168,6 +185,37 @@
   </div>
 
 </div>
+
+          <!-- Audit History & Trends Section -->
+          <div class="resume-card history-trends-card" id="auditHistoryCard" style="display: none;">
+            <h3>
+              <i class="fas fa-history"></i>
+              Audit History & Trends
+            </h3>
+     
+          <p id="auditHistorySummary">
+              Track your resume ATS score improvements over time.
+            </p>
+            <div class="trends-chart-container" style="position: relative; height: 300px; width: 100%; margin-bottom: 2rem;">
+              <canvas id="trendsChart"></canvas>
+            </div>
+            
+            <div class="history-table-container" style="overflow-x: auto;">
+              <table class="history-table" style="width: 100%; text-align: left; border-collapse: collapse;">
+                <thead>
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="padding: 10px;">Date</th>
+                    <th style="padding: 10px;">Score</th>
+                    <th style="padding: 10px;">Issues</th>
+                    <th style="padding: 10px;">Delta</th>
+                  </tr>
+                </thead>
+                <tbody id="auditHistoryTableBody">
+                  <!-- Generated dynamically in resume.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
 
           <div class="resume-body-grid">
             <!-- Left Side / Sidebar -->

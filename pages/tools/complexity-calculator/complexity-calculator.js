@@ -96,6 +96,7 @@ function initComplexityCalculator() {
 
   // Helper for factorial
   function fact(n) {
+    if (n < 0 || !Number.isInteger(n)) return 0;
     if (n > 170) return Infinity; // max safe float limit
     let res = 1;
     for (let i = 2; i <= n; i++) res *= i;
@@ -106,6 +107,7 @@ function initComplexityCalculator() {
   function updateChart() {
     const maxN = parseInt(nSlider.value, 10);
     nValDisplay.textContent = maxN;
+    nSlider.setAttribute("aria-valuenow", maxN);
 
     const labels = [];
     for (let i = 1; i <= maxN; i++) labels.push(i);
@@ -294,7 +296,23 @@ function initComplexityCalculator() {
 
   // Listeners
   nSlider.addEventListener("input", updateChart);
-  Object.values(toggles).forEach(chk => chk.addEventListener("change", updateChart));
+  Object.values(toggles).forEach(chk => {
+    chk.addEventListener("change", () => {
+      const label = chk.closest('label');
+      if (label) label.setAttribute('aria-checked', chk.checked);
+      updateChart();
+    });
+    const label = chk.closest('label');
+    if (label) {
+      label.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          chk.checked = !chk.checked;
+          chk.dispatchEvent(new Event("change"));
+        }
+      });
+    }
+  });
   algoA.addEventListener("change", updateChart);
   algoB.addEventListener("change", updateChart);
 

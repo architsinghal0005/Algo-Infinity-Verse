@@ -359,89 +359,89 @@
 }
 
 /* Light mode overrides */
-body.light-mode .resume-container {
+html.light-mode .resume-container {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(0, 0, 0, 0.06);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
 }
 
-body.light-mode .resume-header {
+html.light-mode .resume-header {
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
-body.light-mode .resume-info h2 {
+html.light-mode .resume-info h2 {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-body.light-mode .resume-title {
+html.light-mode .resume-title {
   color: var(--primary);
 }
 
-body.light-mode .resume-meta {
+html.light-mode .resume-meta {
   color: #4b5563;
 }
 
-body.light-mode .resume-card {
+html.light-mode .resume-card {
   background: rgba(0, 0, 0, 0.02);
   border-color: rgba(0, 0, 0, 0.05);
 }
 
-body.light-mode .resume-card:hover {
+html.light-mode .resume-card:hover {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(124, 58, 237, 0.15);
 }
 
-body.light-mode .resume-card h3 {
+html.light-mode .resume-card h3 {
   color: #1f2937;
 }
 
-body.light-mode .resume-stat-item {
+html.light-mode .resume-stat-item {
   background: rgba(0, 0, 0, 0.02);
   border-color: rgba(0, 0, 0, 0.04);
 }
 
-body.light-mode .stat-val {
+html.light-mode .stat-val {
   color: #1f2937;
 }
 
-body.light-mode .stat-lbl {
+html.light-mode .stat-lbl {
   color: #6b7280;
 }
 
-body.light-mode .skills-category h4 {
+html.light-mode .skills-category h4 {
   color: #4b5563;
 }
 
-body.light-mode .dsa-topic-name {
+html.light-mode .dsa-topic-name {
   color: #1f2937;
 }
 
-body.light-mode .dsa-progress-bar-bg {
+html.light-mode .dsa-progress-bar-bg {
   background: rgba(0, 0, 0, 0.05);
 }
 
-body.light-mode .resume-badge-card {
+html.light-mode .resume-badge-card {
   background: rgba(0, 0, 0, 0.01);
   border-color: rgba(0, 0, 0, 0.05);
 }
 
-body.light-mode .resume-badge-card.earned {
+html.light-mode .resume-badge-card.earned {
   border-color: rgba(6, 182, 212, 0.2);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
 }
 
-body.light-mode .resume-badge-card.earned:hover {
+html.light-mode .resume-badge-card.earned:hover {
   border-color: var(--accent);
   box-shadow: 0 6px 20px rgba(6, 182, 212, 0.1);
 }
 
-body.light-mode .resume-badge-name {
+html.light-mode .resume-badge-name {
   color: #1f2937;
 }
 
-body.light-mode .resume-badge-desc {
+html.light-mode .resume-badge-desc {
   color: #6b7280;
 }
 
@@ -877,33 +877,33 @@ body.light-mode .resume-badge-desc {
 }
 
 /* Light mode overrides for AI Analyzer */
-body.light-mode .ats-circle {
+html.light-mode .ats-circle {
   background: #ffffff;
   border-color: var(--primary);
   box-shadow: 0 0 20px rgba(79, 70, 229, 0.15);
 }
 
-body.light-mode .analysis-section {
+html.light-mode .analysis-section {
   background: rgba(255, 255, 255, 0.6);
   border-color: rgba(0, 0, 0, 0.06);
 }
 
-body.light-mode .analysis-section:hover {
+html.light-mode .analysis-section:hover {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(124, 58, 237, 0.25);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
 }
 
-body.light-mode .analysis-list li {
+html.light-mode .analysis-list li {
   background: rgba(0, 0, 0, 0.015);
   color: #4b5563;
 }
 
-body.light-mode .analysis-list li:hover {
+html.light-mode .analysis-list li:hover {
   background: rgba(0, 0, 0, 0.03);
 }
 
-body.light-mode .analysis-title {
+html.light-mode .analysis-title {
   color: #1f2937;
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }

@@ -972,6 +972,15 @@ body {
         padding: 0.5rem 0.625rem;
         font-size: 0.85rem;
     }
+
+    .quiz-modal-content {
+        max-width: 95%;
+        max-height: 95vh;
+    }
+
+    .quiz-problem-panel {
+        padding: 1.25rem;
+    }
 }
 
 /* Active state for current page */
@@ -3566,6 +3575,7 @@ section[id] {
     display: flex;
     min-height: 500px;
     height: 100%;
+    overflow-x: hidden;
 }
 
 .quiz-problem-panel {
@@ -3575,6 +3585,7 @@ section[id] {
     background: var(--dark-bg);
     min-width: 0;
     overflow-y: auto;
+    overflow-wrap: break-word;
 }
 
 .quiz-editor-panel {
@@ -4922,7 +4933,7 @@ section[id] {
 }
 
 /* ===== DARK/LIGHT MODE ===== */
-body.light-mode {
+html.light-mode {
     --dark-bg: #ffffff;
     --dark-surface: #f8fafc;
     --dark-card: #e2e8f0;
@@ -6139,4 +6150,12 @@ body.light-mode {
     clip: rect(0, 0, 0, 0) !important;
     white-space: nowrap !important;
     border: 0 !important;
+}
+/* Line numbers global resize alignment fix */
+[class*="line-numbers"], [class*="code-textarea"] {
+  white-space: pre !important;
+  word-wrap: normal !important;
+}
+[class*="line-numbers"] {
+  overflow: hidden !important;
 }

@@ -1,0 +1,21 @@
+{
+  "projectType": "single-project",
+  "repositoryRoot": {
+    "hasPackageJson": true,
+    "hasTsConfig": false,
+    "hasEslint": false,
+    "hasPrettier": false,
+    "hasTests": false,
+    "dependencies": [
+      "cors",
+      "express",
+      "firebase-admin",
+      "mammoth",
+      "multer",
+      "pdf-parse",
+      "peer",
+      "socket.io"
+    ]
+  },
+  "packages": []
+}

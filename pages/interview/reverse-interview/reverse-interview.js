@@ -35,12 +35,12 @@ function initRIDarkMode() {
   if (!toggle) return;
   const icon = toggle.querySelector("i");
   if (localStorage.getItem("theme") === "light") {
-    document.body.classList.add("light-mode");
+    document.documentElement.classList.add("light-mode");
     if (icon) icon.classList.replace("fa-moon", "fa-sun");
   }
   toggle.addEventListener("click", () => {
-    document.body.classList.toggle("light-mode");
-    const isLight = document.body.classList.contains("light-mode");
+    document.documentElement.classList.toggle("light-mode");
+    const isLight = document.documentElement.classList.contains("light-mode");
     if (icon) { icon.classList.toggle("fa-moon", !isLight); icon.classList.toggle("fa-sun", isLight); }
     localStorage.setItem("theme", isLight ? "light" : "dark");
   });

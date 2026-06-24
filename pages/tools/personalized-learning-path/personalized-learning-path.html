@@ -17,7 +17,23 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     />
-  </head>
+  
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
   <body>
 
     <!-- Loading Screen -->
@@ -133,19 +149,19 @@
         <!-- Goal Cards -->
         <div class="goal-cards" role="radiogroup" aria-label="Select learning goal">
           <div class="goal-card" data-goal="beginner" role="radio" aria-checked="false" tabindex="0">
-            <span class="goal-card-icon"><i class="fas fa-seedling" style="color: #4ade80;"></i></span>
+            <span class="goal-card-icon"><i class="fas fa-seedling" style="color: #4ade80;" aria-hidden="true" focusable="false"></i></span>
             <h3>Beginner → Advanced</h3>
             <p>Master DSA from scratch with a structured, beginner-friendly roadmap covering all core topics.</p>
             <span class="goal-topics-count">9 Topics · ~80h</span>
           </div>
           <div class="goal-card" data-goal="placement" role="radio" aria-checked="false" tabindex="0">
-            <span class="goal-card-icon"><i class="fas fa-briefcase" style="color: #38bdf8;"></i></span>
+            <span class="goal-card-icon"><i class="fas fa-briefcase" style="color: #38bdf8;" aria-hidden="true" focusable="false"></i></span>
             <h3>Placement Preparation</h3>
             <p>Company-focused prep covering CS fundamentals, OOP, DBMS, and targeted DSA practice.</p>
             <span class="goal-topics-count">8 Topics · ~84h</span>
           </div>
           <div class="goal-card" data-goal="faang" role="radio" aria-checked="false" tabindex="0">
-            <span class="goal-card-icon"><i class="fas fa-rocket" style="color: #f472b6;"></i></span>
+            <span class="goal-card-icon"><i class="fas fa-rocket" style="color: #f472b6;" aria-hidden="true" focusable="false"></i></span>
             <h3>FAANG Preparation</h3>
             <p>Advanced roadmap for top-tier companies — complex algorithms, system design, and mock rounds.</p>
             <span class="goal-topics-count">9 Topics · ~130h</span>
@@ -244,7 +260,7 @@
         <div id="roadmapTimeline" class="roadmap-timeline" role="list" aria-label="Learning path steps">
           <!-- Empty state -->
           <div class="roadmap-empty">
-            <span class="empty-icon"><i class="fas fa-map-marked-alt" style="color: var(--primary);"></i></span>
+            <span class="empty-icon"><i class="fas fa-map-marked-alt" style="color: var(--primary);" aria-hidden="true" focusable="false"></i></span>
             <p>Select a learning goal above and click <strong>Generate My Roadmap</strong> to get started!</p>
           </div>
         </div>

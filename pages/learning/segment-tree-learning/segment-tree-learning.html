@@ -5,18 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Learn Segment Trees | Algo Infinity Verse</title>
     <meta name="description" content="Master Segment Trees: Range Queries, Point Updates, and Lazy Propagation for dynamic array processing." />
-    
-    <link href="[https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap)" rel="stylesheet" />
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)" />
-    
-    <!-- External Stylesheets -->
+
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="segment-tree-learning.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" integrity="sha512-W/zrbCncQnky/EzL+/AYwTtosvrM+YG/V6piQLSe2HuKS6cmbw89kjYkp3tWFn1dkWV7L1ruvJyKbLz73Vlgfg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
 </head>
 <body data-page="segment-tree-learning">
+
+    <div id="loading-screen">
+        <div class="loader">
+            <div class="infinity-loader">∞</div>
+            <h2>Algo Infinity Verse</h2>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <div id="navbar-placeholder"></div>
 
     <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="stars"></div>
+            <div class="stars2"></div>
+            <div class="stars3"></div>
+        </div>
         <div class="hero-content">
             <h1 class="hero-title">
                 <span class="title-line">Conquer Range Queries</span>
@@ -52,6 +87,9 @@
                 </div>
             </div>
         </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
     </section>
 
     <section id="seg-learning" class="section">
@@ -69,6 +107,7 @@
                 <div class="seg-progress-track">
                     <div class="seg-progress-fill" id="segProgressFill"></div>
                 </div>
+                <span class="seg-progress-percent" id="segProgressPercent">0%</span>
             </div>
 
             <div class="seg-layout">
@@ -129,7 +168,7 @@
                                 <li>Right child is at <code>2 * i + 1</code></li>
                             </ul>
                         </div>
-                        
+
                         <div class="seg-code-block seg-lang-container">
                             <div class="seg-lang-switcher-tabs">
                                 <button class="seg-lang-tab-btn active" onclick="switchSegLang(this, 'py')">Python</button>
@@ -194,7 +233,7 @@
                             <h4><i class="fas fa-clock"></i> The Core Idea</h4>
                             <p>When a node's range is completely covered by the update range, we update the node and <em>stop recursing</em>. We record the update in a <code>lazy[]</code> array for its children, promising to pass the update down ("propagate") only when those children are visited in future queries or updates.</p>
                         </div>
-                        
+
                         <div class="seg-code-block seg-lang-container">
                             <div class="seg-lang-switcher-tabs">
                                 <button class="seg-lang-tab-btn active" onclick="switchSegLang(this, 'py')">Python</button>
@@ -241,7 +280,7 @@
         <span class="tok-var">lazy</span>[<span class="tok-var">node</span>] = <span class="tok-num">0</span>;
     }
     <span class="tok-kw">if</span> (<span class="tok-var">start</span> &gt; <span class="tok-var">end</span> || <span class="tok-var">start</span> &gt; <span class="tok-var">r</span> || <span class="tok-var">end</span> &lt; <span class="tok-var">l</span>) <span class="tok-kw">return</span>;
-    
+
     <span class="tok-kw">if</span> (<span class="tok-var">l</span> &lt;= <span class="tok-var">start</span> &amp;&amp; <span class="tok-var">end</span> &lt;= <span class="tok-var">r</span>) {
         <span class="tok-var">tree</span>[<span class="tok-var">node</span>] += (<span class="tok-var">end</span> - <span class="tok-var">start</span> + <span class="tok-num">1</span>) * <span class="tok-var">val</span>;
         <span class="tok-kw">if</span> (<span class="tok-var">start</span> != <span class="tok-var">end</span>) {
@@ -265,11 +304,11 @@
                             <span class="seg-lesson-number">✨</span>
                             <h3>Practice Exercises</h3>
                         </div>
-                        
+
                         <div class="seg-exercise">
                             <div class="seg-exercise-title"><i class="fas fa-hammer"></i> Range Sum Query - Mutable</div>
                             <p>Implement a data structure that supports point updates and range sum queries. Sound familiar?</p>
-                            <button class="seg-exercise-toggle" aria-controls="sol-1" aria-expanded="false">Show Hint</button>
+                            <button class="seg-exercise-toggle" type="button" aria-controls="sol-1" aria-expanded="false">Show Hint</button>
                             <div class="seg-exercise-solution" id="sol-1">
                                 <p>You can use the basic Segment Tree here (no lazy propagation needed). Implement <code>build()</code>, a simple <code>update()</code> that climbs from a leaf up to the root, and the standard <code>query()</code> function.</p>
                             </div>
@@ -280,16 +319,16 @@
             </div>
         </div>
     </section>
-    
-    <!-- External Scripts -->
-    <script src="/script.js"></script>
+
+    <div id="footer-placeholder"></div>
+
     <script src="/auth.js"></script>
+    <script src="/script.js"></script>
     <script src="/theme.js"></script>
     <script src="segment-tree-learning.js"></script>
-
-  <script>
-    loadPartial('navbar-placeholder', '/partials/navbar.html');
-    loadPartial('footer-placeholder', '/partials/footer.html');
-  </script>
+    <script>
+        loadPartial('navbar-placeholder', '/partials/navbar.html');
+        loadPartial('footer-placeholder', '/partials/footer.html');
+    </script>
 </body>
 </html>

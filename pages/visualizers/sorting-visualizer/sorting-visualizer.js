@@ -6,6 +6,9 @@ let isPaused = false;
 let speed = 50; // default delay in ms
 let size = 30; // default array size
 let currentRunId = 0; // unique ID tracking current visualization run
+let audioCtx = null;
+let isSoundEnabled = true;
+let volume = 0.5;
 
 // DOM Elements
 const canvasWrapper = document.getElementById("canvasWrapper");
@@ -23,6 +26,9 @@ const bestTimeComplexity = document.getElementById("bestTimeComplexity");
 const avgTimeComplexity = document.getElementById("avgTimeComplexity");
 const worstTimeComplexity = document.getElementById("worstTimeComplexity");
 const spaceComplexity = document.getElementById("spaceComplexity");
+const soundToggle = document.getElementById("soundToggle");
+const volumeRange = document.getElementById("volumeRange");
+const volumeDisplay = document.getElementById("volumeDisplay");
 
 // Complexity Database
 const complexityData = {
@@ -50,6 +56,57 @@ const complexityData = {
 };
 
 // ===== HELPER FUNCTIONS =====
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playTone(val, type = 'compare') {
+  if (!isSoundEnabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Map value (5 to 95) to frequency (150 to 850 Hz)
+    const freq = 150 + (val - 5) * (850 - 150) / 90;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    if (type === 'compare') {
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(volume * 0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
+    } else if (type === 'swap') {
+      osc.type = 'triangle';
+      gain.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.08);
+    } else if (type === 'sorted') {
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.5, ctx.currentTime + 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.12);
+    }
+  } catch (e) {
+    console.warn("Audio Context failed to play tone:", e);
+  }
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -124,7 +181,11 @@ function markSorted(idx) {
 function markAllSorted(runId) {
   if (runId !== currentRunId) return;
   for (let i = 0; i < size; i++) {
-    markSorted(i);
+    setTimeout(() => {
+      if (runId !== currentRunId) return;
+      markSorted(i);
+      playTone(array[i], 'sorted');
+    }, i * Math.max(15, Math.min(50, speed / 2)));
   }
 }
 
@@ -141,12 +202,14 @@ async function bubbleSort(runId) {
 
       highlight(j, "comparing");
       highlight(j + 1, "comparing");
+      playTone(array[j], 'compare');
       await sleep(speed);
       if (runId !== currentRunId || !isSorting) return;
 
       if (array[j] > array[j + 1]) {
         highlight(j, "swapping");
         highlight(j + 1, "swapping");
+        playTone(array[j], 'swap');
         await sleep(speed);
         if (runId !== currentRunId || !isSorting) return;
 
@@ -166,6 +229,7 @@ async function bubbleSort(runId) {
     }
     if (runId !== currentRunId) return;
     markSorted(n - i - 1);
+    playTone(array[n - i - 1], 'sorted');
   }
   markAllSorted(runId);
 }
@@ -183,6 +247,7 @@ async function selectionSort(runId) {
       if (runId !== currentRunId || !isSorting) return;
 
       highlight(j, "comparing");
+      playTone(array[j], 'compare');
       await sleep(speed);
       if (runId !== currentRunId || !isSorting) return;
 
@@ -198,6 +263,7 @@ async function selectionSort(runId) {
     if (minIdx !== i) {
       highlight(i, "swapping");
       highlight(minIdx, "swapping");
+      playTone(array[minIdx], 'swap');
       await sleep(speed);
       if (runId !== currentRunId || !isSorting) return;
 
@@ -216,6 +282,7 @@ async function selectionSort(runId) {
     unhighlight(i);
     if (runId !== currentRunId) return;
     markSorted(i);
+    playTone(array[i], 'sorted');
   }
   markAllSorted(runId);
 }
@@ -228,6 +295,7 @@ async function insertionSort(runId) {
     let j = i - 1;
 
     highlight(i, "swapping");
+    playTone(key, 'swap');
     await sleep(speed);
     if (runId !== currentRunId || !isSorting) return;
 
@@ -238,6 +306,7 @@ async function insertionSort(runId) {
 
       highlight(j, "comparing");
       highlight(j + 1, "swapping");
+      playTone(array[j], 'compare');
       await sleep(speed);
       if (runId !== currentRunId || !isSorting) return;
 
@@ -258,6 +327,7 @@ async function insertionSort(runId) {
     renderBars();
     
     highlight(j + 1, "sorted");
+    playTone(key, 'sorted');
     await sleep(speed);
     if (runId !== currentRunId || !isSorting) return;
     unhighlight(j + 1);
@@ -267,6 +337,9 @@ async function insertionSort(runId) {
 
 // ===== CONTROLLER LOGIC =====
 async function startSorting() {
+  // Resume AudioContext on user interaction
+  getAudioContext();
+
   if (isSorting) {
     if (isPaused) {
       isPaused = false;
@@ -420,6 +493,33 @@ function initHeroTyping() {
   }
 }
 
+// Sound state and bindings helper
+function initAudioControls() {
+  if (soundToggle) {
+    isSoundEnabled = soundToggle.checked;
+    soundToggle.addEventListener("change", (e) => {
+      isSoundEnabled = e.target.checked;
+      // Resume context as safety on user action
+      if (isSoundEnabled) {
+        getAudioContext();
+      }
+    });
+  }
+
+  if (volumeRange && volumeDisplay) {
+    const val = parseInt(volumeRange.value, 10);
+    volume = val / 100;
+    volumeDisplay.textContent = `${val}%`;
+    volumeRange.addEventListener("input", (e) => {
+      const v = parseInt(e.target.value, 10);
+      volume = v / 100;
+      volumeDisplay.textContent = `${v}%`;
+      // Resume context on user action
+      getAudioContext();
+    });
+  }
+}
+
 // ===== INITIALIZATION =====
 let isInitialized = false;
 
@@ -429,6 +529,7 @@ function init() {
   
   generateNewArray();
   initHeroTyping();
+  initAudioControls();
   
   // Hide loader if script.js didn't trigger
   setTimeout(() => {

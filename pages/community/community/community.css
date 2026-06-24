@@ -512,7 +512,8 @@ body {
     margin-top: 1rem;
 }
 
-.add-comment-form input {
+.add-comment-form input,
+.add-comment-form textarea {
     flex: 1;
     padding: 12px 16px;
     font-size: 1rem;
@@ -597,56 +598,123 @@ body {
    LIGHT MODE
 ========================= */
 
-body.light-mode .glass-card,
-body.light-mode .post-card {
+html.light-mode .glass-card,
+html.light-mode .post-card {
     background: rgba(255, 255, 255, 0.95);
     color: #1f2937;
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-body.light-mode .create-post-form input,
-body.light-mode .create-post-form textarea,
-body.light-mode .search-input,
-body.light-mode .add-comment-form input {
+html.light-mode .create-post-form input,
+html.light-mode .create-post-form textarea,
+html.light-mode .search-input,
+html.light-mode .add-comment-form input,
+html.light-mode .add-comment-form textarea {
     background: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
 }
 
-body.light-mode .post-title,
-body.light-mode .sidebar-card h3,
-body.light-mode .community-header,
-body.light-mode .post-content,
-body.light-mode .comment-text,
-body.light-mode .guidelines-list li {
+html.light-mode .post-title,
+html.light-mode .sidebar-card h3,
+html.light-mode .community-header,
+html.light-mode .post-content,
+html.light-mode .comment-text,
+html.light-mode .guidelines-list li {
     color: #111827;
 }
 
-body.light-mode .post-meta,
-body.light-mode .comment-meta,
-body.light-mode .section-subtitle {
+html.light-mode .post-meta,
+html.light-mode .comment-meta,
+html.light-mode .section-subtitle {
     color: #6b7280;
 }
 
-body.light-mode .post-action-btn {
+html.light-mode .post-action-btn {
     background: #f3f4f6;
     color: #111827;
 }
 
-body.light-mode .vote-actions {
+html.light-mode .vote-actions {
     background: #f3f4f6;
 }
 
-body.light-mode .post-tag,
-body.light-mode .tag {
+html.light-mode .post-tag,
+html.light-mode .tag {
     background: rgba(139, 92, 246, 0.12);
     color: #6d28d9;
 }
 
-body.light-mode .comments-section {
+html.light-mode .comments-section {
     border-top: 1px solid #e5e7eb;
 }
 
-body.light-mode .comment {
+html.light-mode .comment {
     background: #f9fafb;
+}
+
+/* =========================
+   MARKDOWN STYLES
+========================= */
+
+.markdown-body p { margin-bottom: 0.5rem; }
+.markdown-body p:last-child { margin-bottom: 0; }
+.markdown-body a { color: var(--accent, #a78bfa); text-decoration: none; }
+.markdown-body a:hover { text-decoration: underline; }
+.markdown-body pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Fira Code', Consolas, monospace;
+    font-size: 0.9em;
+    margin: 0.5rem 0;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.markdown-body code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Fira Code', Consolas, monospace;
+    font-size: 0.9em;
+}
+.markdown-body pre code {
+    background: transparent;
+    padding: 0;
+}
+.markdown-body blockquote {
+    border-left: 4px solid var(--accent, #a78bfa);
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+    color: var(--text-secondary, #9ca3af);
+    font-style: italic;
+    background: rgba(255,255,255,0.02);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+.markdown-body ul, .markdown-body ol {
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.markdown-body img {
+    max-width: 100%;
+    border-radius: 6px;
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3, 
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+html.light-mode .markdown-body pre {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+}
+html.light-mode .markdown-body code {
+    background: rgba(0, 0, 0, 0.05);
+}
+html.light-mode .markdown-body blockquote {
+    background: rgba(0,0,0,0.02);
+    color: #6b7280;
 }

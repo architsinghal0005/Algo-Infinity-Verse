@@ -20,7 +20,23 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-  </head>
+  
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
   <body data-page="sorting-visualizer">
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -129,6 +145,33 @@
                   id="speedRange"
                   min="5"
                   max="1000"
+                  value="50"
+                  class="slider-custom"
+                />
+              </div>
+
+              <!-- Sound Toggle -->
+              <div class="control-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                  <label for="soundToggle" style="margin-bottom: 0;">Sound Effects</label>
+                  <label class="switch-custom">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="slider-switch"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Volume Control -->
+              <div class="control-group" id="volumeControlGroup">
+                <label for="volumeRange"
+                  >Volume
+                  <span class="val-display" id="volumeDisplay">50%</span></label
+                >
+                <input
+                  type="range"
+                  id="volumeRange"
+                  min="0"
+                  max="100"
                   value="50"
                   class="slider-custom"
                 />

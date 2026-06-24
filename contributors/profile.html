@@ -35,6 +35,22 @@
       .profile-stats { grid-template-columns: 1fr; }
     }
   </style>
+
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
 </head>
 <body data-page="contributor-profile">
   <div id="navbar-placeholder"></div>
@@ -126,7 +142,7 @@
       }
 
       container.innerHTML = '<div class="profile-card">' +
-        '<div class="profile-avatar-large"><img src="' + info.avatar + '" alt="' + info.name + '"></div>' +
+        '<div class="profile-avatar-large"><img loading="lazy" src="' + info.avatar + '" alt="' + info.name + '"></div>' +
         '<h1 class="profile-name">' + info.name + '</h1>' +
         '<p class="profile-username">@' + info.username + '</p>' +
         '<div class="profile-stats">' +

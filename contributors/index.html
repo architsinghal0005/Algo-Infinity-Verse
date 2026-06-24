@@ -10,7 +10,7 @@
   <style>
     .contributors-container { max-width: 1200px; margin: 0 auto; padding: 6rem 1.5rem 2rem; }
     .contributors-header { text-align: center; padding: 2rem 0 3rem; }
-    .contributors-header h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .contributors-header h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
     .contributors-header p { color: #9ca3af; font-size: 1.1rem; margin-top: 0.5rem; }
     .leaderboard-section { margin: 2rem 0; }
     .leaderboard { display: flex; flex-direction: column; gap: 0.5rem; background: #1f2937; border-radius: 12px; padding: 1rem; }
@@ -30,14 +30,25 @@
     .contributor-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .contributor-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: #f3f4f6; }
     .contributor-username { color: #9ca3af; font-size: 0.9rem; margin-bottom: 0.75rem; }
-    .contributor-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 0.75rem; }
-    .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-    .badge-gold { background: #fbbf24; color: #78350f; }
-    .badge-silver { background: #e5e7eb; color: #374151; }
-    .badge-bronze { background: #f59e0b; color: #78350f; }
-    .badge-blue { background: #93c5fd; color: #1e3a5f; }
-    .badge-green { background: #6ee7b7; color: #064e3b; }
-    .badge-purple { background: #c4b5fd; color: #4c1d95; }
+    .contributor-badges { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-bottom: 1rem; min-height: 28px; }
+    .badge { display: inline-flex; align-items: center; justify-content: center; width: auto !important; height: auto !important; gap: 5px; font-size: 12px; font-weight: 500; letter-spacing: 0.01em; padding: 4px 10px; border-radius: 6px; border: 0.5px solid; transition: opacity 0.15s; white-space: nowrap; }
+    .badge i { font-size: 13px; }
+
+    /* Dark mode defaults (your site's default) */
+    .badge-gold   { background: #412402; color: #FAC775; border-color: #854F0B; }
+    .badge-silver { background: #2C2C2A; color: #D3D1C7; border-color: #5F5E5A; }
+    .badge-bronze { background: #4A1B0C; color: #F0997B; border-color: #993C1D; }
+    .badge-purple { background: #26215C; color: #CECBF6; border-color: #534AB7; }
+    .badge-green  { background: #04342C; color: #9FE1CB; border-color: #0F6E56; }
+    .badge-blue   { background: #042C53; color: #B5D4F4; border-color: #185FA5; }
+
+    /* Light mode overrides */
+    .light-mode .badge-gold   { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+    .light-mode .badge-silver { background: #F1EFE8; color: #444441; border-color: #B4B2A9; }
+    .light-mode .badge-bronze { background: #FAECE7; color: #71230B; border-color: #F0997B; }
+    .light-mode .badge-purple { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+    .light-mode .badge-green  { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+    .light-mode .badge-blue   { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
     .contributor-stats { display: flex; justify-content: space-around; padding-top: 0.75rem; border-top: 1px solid #374151; }
     .stat { text-align: center; }
     .stat-value { font-size: 1.25rem; font-weight: 700; display: block; color: #f3f4f6; }
@@ -45,9 +56,10 @@
     .error-text { color: #f87171; text-align: center; font-size: 1.1rem; }
     .loading-spinner { text-align: center; padding: 3rem; font-size: 1.2rem; color: #667eea; }
 
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding-top: 4rem; box-sizing: border-box; }
     .modal-overlay.active { display: flex; }
-    .modal-card { background: #1f2937; border-radius: 16px; padding: 2rem; max-width: 520px; width: 92%; max-height: 88vh; overflow-y: auto; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .modal-card { background: #1f2937; border-radius: 16px; padding: 2rem; max-width: 520px; width: 92%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); -ms-overflow-style: none; scrollbar-width: none; }
+    .modal-card::-webkit-scrollbar { display: none; }
     .modal-close { position: absolute; top: 0.9rem; right: 1.1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9ca3af; }
     .modal-close:hover { color: #f3f4f6; }
     .modal-avatar { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; background: #4b5563; overflow: hidden; }
@@ -56,14 +68,14 @@
     .modal-username { color: #9ca3af; text-align: center; margin-bottom: 1.4rem; }
     .modal-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin-bottom: 1.4rem; }
     .modal-stat { background: #374151; border-radius: 12px; padding: 0.9rem; text-align: center; }
-    .modal-stat-value { font-size: 1.35rem; font-weight: 700; color: #667eea; }
+    .modal-stat-value { font-size: 1.35rem; font-weight: 700; color: #60a5fa; }
     .modal-stat-label { font-size: 0.82rem; color: #9ca3af; }
     .modal-section { margin-top: 1.1rem; }
     .modal-section h4 { font-size: 1rem; margin-bottom: 0.6rem; color: #e5e7eb; }
     .modal-list { list-style: none; padding: 0; margin: 0; }
     .modal-list li { padding: 0.55rem 0.7rem; background: #374151; border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; color: #f3f4f6; line-height: 1.4; }
-    .modal-list li i { color: #667eea; flex-shrink: 0; }
-    .modal-list a { color: #667eea; text-decoration: none; word-break: break-word; }
+    .modal-list li i { color: #60a5fa; flex-shrink: 0; }
+    .modal-list a { color: #60a5fa; text-decoration: none; word-break: break-word; }
     .modal-list a:hover { text-decoration: underline; }
     .meta-open { color: #f59e0b; font-size: 0.8rem; }
     .meta-closed { color: #9ca3af; font-size: 0.8rem; }
@@ -100,6 +112,22 @@
       .modal-stats-grid { grid-template-columns: 1fr; }
     }
   </style>
+
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
 </head>
 <body data-page="contributors">
   <div id="navbar-placeholder"></div>
@@ -191,11 +219,21 @@
 
     function getBadges(contributions, rank) {
       const badges = [];
-      if (rank <= 3) badges.push({ label: rank === 1 ? '🥇 Gold' : rank === 2 ? '🥈 Silver' : '🥉 Bronze', cls: rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze' });
-      else if (rank <= 10) badges.push({ label: '⭐ Top 10', cls: 'purple' });
-      if (contributions >= 50) badges.push({ label: '🔥 50+ Commits', cls: 'green' });
-      else if (contributions >= 20) badges.push({ label: '🚀 20+ Commits', cls: 'blue' });
-      else if (contributions >= 10) badges.push({ label: '💪 10+ Commits', cls: 'blue' });
+      if (rank === 1)
+        badges.push({ label: '<i class="fas fa-trophy"></i> 1st place', cls: 'gold' });
+      else if (rank === 2)
+        badges.push({ label: '<i class="fas fa-medal"></i> 2nd place', cls: 'silver' });
+      else if (rank === 3)
+        badges.push({ label: '<i class="fas fa-award"></i> 3rd place', cls: 'bronze' });
+      else if (rank <= 10)
+        badges.push({ label: '<i class="fas fa-star"></i> Top 10', cls: 'purple' });
+
+      if (contributions >= 50)
+        badges.push({ label: '<i class="fas fa-fire"></i> 50+ commits', cls: 'green' });
+      else if (contributions >= 20)
+        badges.push({ label: '<i class="fas fa-rocket"></i> 20+ commits', cls: 'blue' });
+      else if (contributions >= 10)
+        badges.push({ label: '<i class="fas fa-code"></i> 10+ commits', cls: 'blue' });
       return badges;
     }
 
@@ -220,7 +258,7 @@
               <span><i class="fas fa-code-commit"></i> ${c.contributions || 0} commits</span>
             </div>
           </div>
-          <div>${badges.map(b => '<span class="badge badge-' + b.cls + '">' + b.label + '</span>').join(' ')}</div>
+          <div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center;flex-shrink:0;">${badges.map(b => '<span class="badge badge-' + b.cls + '">' + b.label + '</span>').join('')}</div>
         `;
         item.addEventListener('click', () => openModal(c, badges));
         leaderboard.appendChild(item);
@@ -260,18 +298,43 @@
       const rank = rankIdx >= 0 ? rankIdx + 1 : '?';
 
       content.innerHTML = `
-        <div class="modal-avatar"><img src="${contributor.avatar_url}" alt="${contributor.login}"></div>
+        <div class="modal-avatar"><img loading="lazy" src="${contributor.avatar_url}" alt="${contributor.login}"></div>
         <div class="modal-name">${contributor.login}</div>
-        <div class="modal-username">@${contributor.login} · <a href="${contributor.html_url}" target="_blank" rel="noopener" style="color:#667eea;">GitHub Profile</a></div>
+        <div class="modal-username">@${contributor.login} · <a href="${contributor.html_url}" target="_blank" rel="noopener" style="color:#60a5fa;">GitHub Profile</a></div>
         <div class="modal-stats-grid">
           <div class="modal-stat"><div class="modal-stat-value">#${rank}</div><div class="modal-stat-label">Rank</div></div>
           <div class="modal-stat"><div class="modal-stat-value">${contributor.contributions || 0}</div><div class="modal-stat-label">Total Commits</div></div>
         </div>
         <div class="modal-section">
           <h4>🏅 Achievements</h4>
-          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">${badges.map(b => '<span class="badge badge-' + b.cls + '">' + b.label + '</span>').join(' ')}</div>
+          <div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:6px;justify-content:flex-start;align-items:center;margin-top:0.5rem;">${badges.map(b => '<span class="badge badge-' + b.cls + '">' + b.label + '</span>').join('')}</div>
+        </div>
+        <div class="modal-section" id="modalCommits">
+          <h4>🔄 Latest Commits</h4>
+          <div class="loading-spinner" style="padding: 1rem; font-size: 0.9rem;"><i class="fas fa-spinner fa-spin"></i> Fetching commits...</div>
         </div>
       `;
+
+      try {
+        const commitsData = await ghJSON('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/commits?author=' + encodeURIComponent(contributor.login) + '&per_page=5');
+        const commitsContainer = document.getElementById('modalCommits');
+        if (commitsData && commitsData.length > 0) {
+          const commitsList = commitsData.map(c => {
+            const msg = c.commit.message.split('\n')[0];
+            const url = c.html_url;
+            const date = new Date(c.commit.author.date).toLocaleDateString('en-GB'); // formats as dd/mm/yyyy
+            return `<li><i class="fas fa-code-commit"></i> <a href="${url}" target="_blank" rel="noopener" style="flex: 1;">${msg}</a> <span class="meta-closed" style="margin-left: auto; white-space: nowrap; flex-shrink: 0;">(${date})</span></li>`;
+          }).join('');
+          commitsContainer.innerHTML = `<h4>🔄 Latest Commits</h4><ul class="modal-list">${commitsList}</ul>`;
+        } else {
+          commitsContainer.innerHTML = `<h4>🔄 Latest Commits</h4><p style="color:#9ca3af; font-size: 0.9rem;">No recent commits found.</p>`;
+        }
+      } catch (err) {
+        const commitsContainer = document.getElementById('modalCommits');
+        if (commitsContainer) {
+          commitsContainer.innerHTML = `<h4>🔄 Latest Commits</h4><p style="color:#f87171; font-size: 0.9rem;">Could not load commits.</p>`;
+        }
+      }
     }
 
     document.getElementById('modalClose').addEventListener('click', () => document.getElementById('contributorModal').classList.remove('active'));
@@ -287,7 +350,9 @@
         await renderContributors(filtered);
       } catch (err) {
         try {
-          const fallback = await fetch('/contributors/contributors.json').then(r => r.json());
+          const fallbackRes = await fetch('/contributors/contributors.json');
+          if (!fallbackRes.ok) throw new Error('Fallback JSON not found');
+          const fallback = await fallbackRes.json();
           const filtered = fallback.filter(c => c.type === 'User' || !c.type);
           setCachedData(filtered);
           await renderContributors(filtered);
@@ -295,7 +360,11 @@
           const leaderboard = document.getElementById('leaderboard');
           const grid = document.getElementById('contributorsGrid');
           let msg = 'Failed to load contributors.';
-          if (err.message === 'RATE_LIMIT') msg = 'GitHub API rate limit reached. Showing limited data.';
+          if (err.message === 'RATE_LIMIT') msg = 'GitHub API rate limit reached. Please try again later.';
+          if (cached) {
+            // we already rendered cached above, but just in case
+            return;
+          }
           leaderboard.innerHTML = '<p class="error-text">' + msg + '</p>';
           grid.innerHTML = '<p class="error-text">' + msg + '</p>';
         }

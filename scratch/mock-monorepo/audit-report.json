@@ -1,0 +1,37 @@
+{
+  "projectType": "monorepo-npm",
+  "repositoryRoot": {
+    "hasPackageJson": true,
+    "hasTsConfig": false,
+    "hasEslint": false,
+    "hasPrettier": false,
+    "hasTests": false,
+    "dependencies": []
+  },
+  "packages": [
+    {
+      "name": "apps\\web",
+      "path": "apps\\web",
+      "findings": {
+        "hasPackageJson": true,
+        "hasTsConfig": false,
+        "hasEslint": false,
+        "hasPrettier": false,
+        "hasTests": false,
+        "dependencies": []
+      }
+    },
+    {
+      "name": "packages\\ui",
+      "path": "packages\\ui",
+      "findings": {
+        "hasPackageJson": true,
+        "hasTsConfig": false,
+        "hasEslint": false,
+        "hasPrettier": false,
+        "hasTests": false,
+        "dependencies": []
+      }
+    }
+  ]
+}

@@ -15,7 +15,23 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-  </head>
+  
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
   <body data-page="sparse-table-learning">
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -77,7 +93,7 @@
         </div>
       </div>
       <a
-        href="`#sparse-table-learning`"
+        href="#sparse-table-learning"
         class="scroll-indicator"
         aria-label="Scroll to Sparse Table learning section"
         style="text-decoration: none; color: inherit;"

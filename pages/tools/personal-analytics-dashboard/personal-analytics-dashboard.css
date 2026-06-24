@@ -296,7 +296,7 @@ body {
   padding: 0.8rem 0;
 }
 
-body.light-mode {
+html.light-mode {
   background:
     radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 28rem),
     radial-gradient(circle at top right, rgba(167, 139, 250, 0.14), transparent 22rem),

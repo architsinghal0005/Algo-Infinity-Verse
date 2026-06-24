@@ -1,4 +1,4 @@
-import { executeJavaScriptSandbox } from "./backend/jsSandboxRunner.js";
+import { executeJavaScriptSandbox } from "/backend/jsSandboxRunner.js";
 
 const SAMPLE_TESTS = [
   { name: "reverse-1", input: [[1, 2, 3]], expected: [3, 2, 1] },
@@ -20,9 +20,9 @@ function safePretty(v) {
 function escapeHtml(s) {
   return String(s)
     .replaceAll("&", "&amp;")
-    .replaceAll("<", "<")
-    .replaceAll(">", ">")
-    .replaceAll('"', """)
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
 
@@ -67,53 +67,21 @@ function renderResults(data) {
               )}</pre></div>`
             : ""
         }
-      `}
-    `;
 
-    testsList.appendChild(row);
-  });
-}
+        results.push({
+            name: test.name,
+            pass,
+            actual,
+            expected: test.expected,
+            stdout: stdoutBuf,
+            error
+        });
+    }
 
-async function run({ hidden = false }) {
-  const exportName = $("exportName")?.value.trim() || "solve";
-  const userCode = $("userCode")?.value || "";
-  const debug = $("showSteps")?.checked || false;
-
-  // Hidden tests MVP: same format; add more cases later.
-  const hiddenTests = [
-    { name: "reverse-3", input: [[0]], expected: [0] },
-    { name: "reverse-4", input: [[]], expected: [] },
-  ];
-
-  const tests = hidden ? [...SAMPLE_TESTS, ...hiddenTests] : SAMPLE_TESTS;
-
-  setTranscript("running...");
-
-  const result = await executeJavaScriptSandbox({
-    userCode,
-    exportName,
-    tests,
-    debug,
-    timeLimitMsPerTest: 750,
-    maxOutputBytes: 20000,
-  });
-
-  renderResults(result);
-
-  if (debug) {
-    const stdout = result.tests
-      .filter((t) => t.stdout && t.stdout.trim().length)
-      .map((t) => `--- ${t.name} ---\n${t.stdout}`)
-      .join("\n\n");
-
-    setTranscript(stdout || "(no console output captured)");
-  } else {
-    setTranscript("(enable “Show my steps” to capture logs/output)");
-  }
+    return { tests: results };
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   $("runSample")?.addEventListener("click", () => run({ hidden: false }));
   $("runHidden")?.addEventListener("click", () => run({ hidden: true }));
 });
-

@@ -236,6 +236,8 @@ let userProgress = {
   completedRoadmapSteps: [],
   lastActive: null,
   quizScores: {},
+  dailyGoals: {},
+
   bestQuizTimes: {},
   activityData: {},
   xpHistory: [],
@@ -249,8 +251,10 @@ let userProgress = {
 if (localStorage.getItem("algoInfinityVerse")) {
   try {
     const loaded = JSON.parse(localStorage.getItem("algoInfinityVerse"));
-    if (loaded && typeof loaded === "object") {
-      Object.assign(userProgress, loaded);
+  if (loaded && typeof loaded === "object") {
+    Object.assign(userProgress, loaded);
+    if (!userProgress.dailyGoals) userProgress.dailyGoals = {};
+
       if (loaded.quizScores) userProgress.quizScores = { ...(userProgress.quizScores || {}), ...loaded.quizScores };
       if (!userProgress.revisionSchedule) userProgress.revisionSchedule = {};
       ["arrays", "strings", "linkedlist", "trees", "graphs", "dp"].forEach(topic => {
@@ -296,6 +300,7 @@ function handleQuizCompletionForRevision(topicId, scorePercentage) {
 
 function injectRevisionSchedulerUI(topicId) {
   if (!userProgress.revisionSchedule?.[topicId]) return;
+
   const targetHeader = document.querySelector(".arr-lesson-header") || document.querySelector("h3") || document.querySelector("h2");
   if (!targetHeader) { console.warn("[Scheduler] No target header found."); return; }
   const existing = document.getElementById("revision-scheduler-badge");
@@ -324,12 +329,14 @@ function injectRevisionSchedulerUI(topicId) {
 // ============================================
 let currentProblem = null;
 
-// ============================================
-// INITIALIZATION
-// ============================================
+// ==========================================
+// 1. SINGLE CENTRALIZED INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded fired, initializing app...');
   loadUserData();
+  initFlashcardsRevision();
+
   initLoadingScreen();
   initNavbar();
   initHeroSection();
@@ -371,7 +378,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================
 function initLoadingScreen() {
   setTimeout(() => {
-    document.getElementById("loading-screen").classList.add("hidden");
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) loadingScreen.classList.add("hidden");
     initializeAnimations();
   }, 2000);
 }
@@ -379,6 +387,28 @@ function initLoadingScreen() {
 // ============================================
 // NAVBAR
 // ============================================
+let scrollPosition = 0;
+
+function lockBodyScroll() {
+  scrollPosition = window.scrollY;
+
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollPosition}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+
+function unlockBodyScroll() {
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+
+  window.scrollTo(0, scrollPosition);
+}
+
 let navbarInitialized = false;
 
 function initNavbar() {
@@ -393,7 +423,11 @@ function initNavbar() {
     navLinks.classList.toggle("active", isOpen);
     menuToggle.setAttribute("aria-expanded", isOpen);
     if (overlay) overlay.classList.toggle("active", isOpen);
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      lockBodyScroll();
+    } else {
+      unlockBodyScroll();
+    }
     const icon = menuToggle.querySelector("i");
     if (icon) { icon.classList.toggle("fa-bars", !isOpen); icon.classList.toggle("fa-times", isOpen); }
   };
@@ -543,14 +577,20 @@ function initTopicOfTheDay() {
   const totdIcon = document.getElementById("totdIcon");
   if (!totdIcon) return;
   totdIcon.textContent = topic.icon;
-  document.getElementById("totdTitle").textContent = topic.name;
-  document.getElementById("totdDesc").textContent = topic.description;
+  const totdTitle = document.getElementById("totdTitle");
+  if (totdTitle) totdTitle.textContent = topic.name;
+  const totdDesc = document.getElementById("totdDesc");
+  if (totdDesc) totdDesc.textContent = topic.description;
   const diffEl = document.getElementById("totdDifficulty");
-  diffEl.textContent = topic.difficulty;
-  diffEl.className = `totd-difficulty difficulty-badge ${getDifficultyClass(topic.difficulty)}`;
+  if (diffEl) {
+    diffEl.textContent = topic.difficulty;
+    diffEl.className = `totd-difficulty difficulty-badge ${getDifficultyClass(topic.difficulty)}`;
+  }
   const progress = getTopicProgress(topic.name);
-  document.getElementById("totdProblems").textContent = `${progress.completed}/${progress.total} solved`;
-  document.getElementById("totdBtn").addEventListener("click", () => openTopicModal(topic));
+  const totdProblems = document.getElementById("totdProblems");
+  if (totdProblems) totdProblems.textContent = `${progress.completed}/${progress.total} solved`;
+  const totdBtn = document.getElementById("totdBtn");
+  if (totdBtn) totdBtn.addEventListener("click", () => openTopicModal(topic));
 }
 
 function getTopicProgress(topicName) {
@@ -589,23 +629,50 @@ function getDifficultyClass(difficulty) {
 
 function openTopicModal(topic) {
   const modal = document.getElementById("topicModal");
-  document.getElementById("modalTitle").textContent = topic.name;
-  document.getElementById("modalTheory").innerHTML = topic.theory;
-  document.getElementById("modalDifficulty").innerHTML = `<span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span>`;
+  if (!modal) return;
+  const modalTitle = document.getElementById("modalTitle");
+  if (modalTitle) modalTitle.textContent = topic.name;
+  const modalTheory = document.getElementById("modalTheory");
+  if (modalTheory) modalTheory.innerHTML = topic.theory;
+  const modalDifficulty = document.getElementById("modalDifficulty");
+  if (modalDifficulty) modalDifficulty.innerHTML = `<span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span>`;
   const problemsList = document.getElementById("modalProblems");
-  problemsList.innerHTML = topic.problems.map(p => `<li class="sample-problem-item" style="cursor:pointer; padding:0.6rem 1rem; margin:0.4rem 0; border-radius:8px; border:1px solid var(--glass-border); list-style:none; transition:all 0.2s ease;" onclick="selectSampleProblem(this, '${p}')">${p}</li>`).join("");
+  if (problemsList) {
+    problemsList.innerHTML = topic.problems
+      .map(
+        (p) => `
+        <li style="list-style:none; margin:0.4rem 0;">
+          <button
+            type="button"
+            class="sample-problem-item"
+            data-problem-name="${p.replace(/"/g, "&quot;")}"
+            style="width:100%; text-align:left; cursor:pointer; padding:0.6rem 1rem; border-radius:8px; border:1px solid var(--glass-border); transition:all 0.2s ease;"
+          >${p}</button>
+        </li>`
+      )
+      .join("");
+
+    problemsList.querySelectorAll(".sample-problem-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectSampleProblem(btn, btn.dataset.problemName || "");
+      });
+    });
+  }
   const startBtn = document.getElementById("startPracticeBtn");
-  startBtn.textContent = "Start Practicing";
-  startBtn.onclick = () => {
-    const selected = document.querySelector(".selected-problem");
-    const problemName = selected ? selected.textContent.trim() : null;
-    closeTopicModal();
-    document.getElementById("practice").scrollIntoView({ behavior: "smooth" });
-    setTimeout(() => {
-      const match = practiceProblems.find(p => p.title.toLowerCase() === (problemName || "").toLowerCase());
-      if (match) openQuizEditor(match);
-    }, 600);
-  };
+  if (startBtn) {
+    startBtn.textContent = "Start Practicing";
+    startBtn.onclick = () => {
+      const selected = document.querySelector(".selected-problem");
+      const problemName = selected ? selected.textContent.trim() : null;
+      closeTopicModal();
+      const practice = document.getElementById("practice");
+      if (practice) practice.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        const match = practiceProblems.find(p => p.title.toLowerCase() === (problemName || "").toLowerCase());
+        if (match) openQuizEditor(match);
+      }, 600);
+    };
+  }
   modal.classList.add("active");
 }
 
@@ -615,10 +682,11 @@ function selectSampleProblem(el, problemName) {
   el.style.background = "var(--primary)";
   el.style.color = "var(--dark-bg)";
   el.style.border = "1px solid var(--primary)";
-  document.getElementById("startPracticeBtn").textContent = `Start Practicing: ${problemName}`;
+  const practiceBtn = document.getElementById("startPracticeBtn");
+  if (practiceBtn) practiceBtn.textContent = `Start Practicing: ${problemName}`;
 }
 
-function closeTopicModal() { document.getElementById("topicModal").classList.remove("active"); }
+function closeTopicModal() { const el = document.getElementById("topicModal"); if (el) el.classList.remove("active"); }
 
 function getQuizTopicKey(topic) {
   const normalize = s => String(s).trim().toLowerCase().replace(/\s+/g, " ");
@@ -678,10 +746,14 @@ function startQuiz(topic) {
   if (!questions || questions.length === 0) { showNotification('No quiz questions available!', 'error'); return; }
   const resultEl = document.getElementById("topicQuizResult");
   if (resultEl) { resultEl.classList.add("hidden"); resultEl.innerHTML = ""; }
-  document.getElementById("topicQuizQuestionText").style.display = "block";
-  document.getElementById("topicQuizOptions").style.display = "block";
-  document.getElementById("topicQuizProgress").style.display = "block";
-  document.getElementById("topicQuizCounter").style.display = "block";
+  const qText = document.getElementById("topicQuizQuestionText");
+  if (qText) qText.style.display = "block";
+  const qOpts = document.getElementById("topicQuizOptions");
+  if (qOpts) qOpts.style.display = "block";
+  const qProg = document.getElementById("topicQuizProgress");
+  if (qProg) qProg.style.display = "block";
+  const qCount = document.getElementById("topicQuizCounter");
+  if (qCount) qCount.style.display = "block";
   currentQuiz = { topic: topicKey, questions: shuffleArray([...questions]), currentQuestionIndex: 0, score: 0, answers: [] };
   openQuizModal();
   startQuizTimer(topicKey);
@@ -754,6 +826,7 @@ function selectQuizAnswer(selectedIndex) {
   currentQuiz.answers.push({ questionId: question.id, selected: selectedIndex, correct: question.correct, isCorrect: isCorrect });
   if (isCorrect) currentQuiz.score++;
   const optionsEl = document.getElementById("topicQuizOptions");
+  if (!optionsEl) return;
   optionsEl.querySelectorAll(".quiz-option").forEach((opt, idx) => {
     opt.classList.add("selected");
     if (idx === question.correct) opt.classList.add("correct");
@@ -781,15 +854,19 @@ function finishQuiz() {
   recordDailyActivity(1);
   if (typeof handleQuizCompletionForRevision === "function") handleQuizCompletionForRevision(topicKey, percentage);
   saveUserData();
-  document.getElementById("topicQuizQuestionText").style.display = "none";
-  document.getElementById("topicQuizOptions").style.display = "none";
+  const qText = document.getElementById("topicQuizQuestionText");
+  if (qText) qText.style.display = "none";
+  const qOpts = document.getElementById("topicQuizOptions");
+  if (qOpts) qOpts.style.display = "none";
   lastQuizReview = JSON.parse(JSON.stringify(currentQuiz));
   lastQuizResultData = { score, total, percentage, xpEarned, completionTime };
   const resultEl = document.getElementById("topicQuizResult");
   if (resultEl) resultEl.classList.remove("hidden");
   showQuizResults(score, total, percentage, xpEarned, completionTime);
-  document.getElementById("topicQuizProgress").style.display = "none";
-  document.getElementById("topicQuizCounter").style.display = "none";
+  const qProg = document.getElementById("topicQuizProgress");
+  if (qProg) qProg.style.display = "none";
+  const qCount = document.getElementById("topicQuizCounter");
+  if (qCount) qCount.style.display = "none";
   updateQuizProgressDisplay(topicKey);
   updateDashboard();
   updateGamification();
@@ -974,10 +1051,48 @@ function renderProblemCards(problems) {
     return `<div class="problem-card animate-in" data-id="${problem.id}"><div class="problem-header"><h3 class="problem-title">${recBadge}${problem.title}</h3><div class="problem-actions"><button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${problem.id}" aria-label="Favorite problem"><i class="fas fa-heart"></i></button><button class="notes-btn ${hasNotes ? 'has-notes' : ''}" data-id="${problem.id}" aria-label="Problem notes"><i class="fas fa-sticky-note"></i></button><span class="difficulty-badge ${problem.difficulty}">${problem.difficulty}</span></div></div><div class="problem-tags">${problem.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div><div class="problem-meta"><span class="acceptance-rate"><i class="fas fa-users"></i> ${problem.acceptance} acceptance</span>${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> Completed</span>' : ''}</div></div>`;
   }).join("");
   
-  addProblemCardEventListeners(problemsGrid);
+  // Use event delegation for problem cards (listeners are attached once).
+  if (!problemsGrid.dataset.listenersAttached) {
+    attachProblemGridEventDelegation(problemsGrid);
+    problemsGrid.dataset.listenersAttached = "true";
+  }
 }
 
-// Add event listeners to problem cards
+// Attach event listeners once using delegation
+function attachProblemGridEventDelegation(grid) {
+  if (!grid) return;
+
+  grid.addEventListener("click", (e) => {
+    const favoriteBtn = e.target.closest(".favorite-btn");
+    if (favoriteBtn && grid.contains(favoriteBtn)) {
+      e.stopPropagation();
+      e.preventDefault();
+      const problemId = parseInt(favoriteBtn.dataset.id);
+      toggleFavorite(problemId);
+      renderProblems();
+      return;
+    }
+
+    const notesBtn = e.target.closest(".notes-btn");
+    if (notesBtn && grid.contains(notesBtn)) {
+      e.stopPropagation();
+      e.preventDefault();
+      const problemId = parseInt(notesBtn.dataset.id);
+      currentNotesProblemId = problemId;
+      openNotesModal(problemId);
+      return;
+    }
+
+    const card = e.target.closest(".problem-card");
+    if (card && grid.contains(card)) {
+      const problemId = parseInt(card.dataset.id);
+      handleProblemClick(problemId);
+    }
+  });
+}
+
+
+// Legacy: addProblemCardEventListeners kept for compatibility, but no longer used
 function addProblemCardEventListeners(grid) {
   grid.querySelectorAll(".favorite-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -1052,16 +1167,20 @@ function openNotesModal(problemId) {
   currentNotesProblemId = problemId;
   const modal = document.getElementById("notesModal");
   const textarea = document.getElementById("problemNotesInput");
+  if (!modal || !textarea) return;
   textarea.value = userProgress.problemNotes[problemId] || "";
   modal.classList.add("active");
 }
 
 function closeNotesModal() {
-  document.getElementById("notesModal").classList.remove("active");
+  const el = document.getElementById("notesModal");
+  if (el) el.classList.remove("active");
 }
 
 function saveProblemNotes() {
-  const note = document.getElementById("problemNotesInput").value.trim();
+  const input = document.getElementById("problemNotesInput");
+  if (!input) return;
+  const note = input.value.trim();
   if (currentNotesProblemId !== null) {
     userProgress.problemNotes[currentNotesProblemId] = note;
     saveUserData();
@@ -1106,7 +1225,9 @@ const advancedRoadmapSteps = [
 ];
 
 let roadmapTabsInitialized = false;
+let roadmapStagesInitialized = false;
 let currentQuizAnswers = {};
+let currentRoadmapSearch = '';
 
 /* Temporarily disabled because roadmapAdvancedTab is not present in the current HTML structure.*/
 function initRoadmap() {
@@ -1119,27 +1240,78 @@ function initRoadmap() {
       basicTab.addEventListener("click", () => { basicTab.classList.add("active"); 
         //advancedTab.classList.remove("active"); 
         overviewTab.classList.remove("active"); 
-        document.getElementById("basicRoadmapContainer").classList.add("active"); 
+        const basicContainer = document.getElementById("basicRoadmapContainer");
+        if (basicContainer) basicContainer.classList.add("active"); 
         //document.getElementById("advancedRoadmapContainer").classList.remove("active"); 
-        document.getElementById("overviewRoadmapContainer").classList.remove("active"); });
+        const overviewContainer = document.getElementById("overviewRoadmapContainer");
+        if (overviewContainer) overviewContainer.classList.remove("active"); });
       /*advancedTab.addEventListener("click", () => { advancedTab.classList.add("active"); basicTab.classList.remove("active"); overviewTab.classList.remove("active"); document.getElementById("advancedRoadmapContainer").classList.add("active"); document.getElementById("basicRoadmapContainer").classList.remove("active"); document.getElementById("overviewRoadmapContainer").classList.remove("active"); });*/
       overviewTab.addEventListener("click", () => { overviewTab.classList.add("active"); basicTab.classList.remove("active"); 
         //advancedTab.classList.remove("active"); 
-        document.getElementById("overviewRoadmapContainer").classList.add("active"); document.getElementById("basicRoadmapContainer").classList.remove("active"); 
+        const overviewContainer2 = document.getElementById("overviewRoadmapContainer");
+        if (overviewContainer2) overviewContainer2.classList.add("active");
+        const basicContainer2 = document.getElementById("basicRoadmapContainer");
+        if (basicContainer2) basicContainer2.classList.remove("active"); 
         //document.getElementById("advancedRoadmapContainer").classList.remove("active"); });
     });
     const closeBtn = document.getElementById("roadmapStepModalClose");
     const closeBtn2 = document.getElementById("roadmapStepModalCloseBtn");
     const modal = document.getElementById("roadmapStepModal");
-    if (closeBtn) closeBtn.addEventListener("click", () => modal.classList.remove("active"));
-    if (closeBtn2) closeBtn2.addEventListener("click", () => modal.classList.remove("active"));
+    if (closeBtn && modal) closeBtn.addEventListener("click", () => modal.classList.remove("active"));
+    if (closeBtn2 && modal) closeBtn2.addEventListener("click", () => modal.classList.remove("active"));
     if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("active"); });
+
+    const roadmapSearchInput = document.getElementById("roadmapSearchInput");
+    const clearRoadmapSearchBtn = document.getElementById("clearRoadmapSearchBtn");
+    
+    if (roadmapSearchInput) {
+      roadmapSearchInput.addEventListener("input", (e) => {
+        currentRoadmapSearch = e.target.value;
+        if (currentRoadmapSearch.length > 0) clearRoadmapSearchBtn.classList.add("visible");
+        else clearRoadmapSearchBtn.classList.remove("visible");
+        renderBasicRoadmap();
+        renderAdvancedRoadmap();
+      });
+    }
+    
+    if (clearRoadmapSearchBtn) {
+      clearRoadmapSearchBtn.addEventListener("click", () => {
+        if (roadmapSearchInput) roadmapSearchInput.value = "";
+        currentRoadmapSearch = "";
+        clearRoadmapSearchBtn.classList.remove("visible");
+        renderBasicRoadmap();
+        renderAdvancedRoadmap();
+        if (roadmapSearchInput) roadmapSearchInput.focus();
+      });
+    }
+
     roadmapTabsInitialized = true;
   }
   renderBasicRoadmap();
   //renderAdvancedRoadmap();
   const progressBar = document.getElementById("roadmapProgress");
   const stages = document.querySelectorAll(".stage");
+  if (!roadmapStagesInitialized) {
+    stages.forEach((stage) => {
+      stage.style.cursor = "pointer";
+
+      stage.addEventListener("click", () => {
+        const level = stage.dataset.level;
+
+        if (level === "beginner") {
+          document.getElementById("roadmapBasicTab")?.click();
+        } else if (level === "intermediate") {
+          document.getElementById("roadmapOverviewTab")?.click();
+        } else if (level === "advanced") {
+          document
+            .querySelector(".roadmap-container")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+
+    roadmapStagesInitialized = true;
+  }
   if (progressBar && stages.length >= 3) {
     const progress = Math.min((userProgress.completedProblems.length / practiceProblems.length) * 100, 100);
     setTimeout(() => {
@@ -1160,8 +1332,22 @@ function isRoadmapStepCompleted(step) {
 function renderBasicRoadmap() {
   const timeline = document.getElementById("basicRoadmapTimeline");
   if (!timeline) return;
+
+  const searchLower = currentRoadmapSearch.toLowerCase().trim();
+  const filteredSteps = roadmapSteps.filter(step => {
+    return step.title.toLowerCase().includes(searchLower) || 
+           step.desc.toLowerCase().includes(searchLower) ||
+           step.theory.toLowerCase().includes(searchLower);
+  });
+
+  if (filteredSteps.length === 0) {
+    timeline.innerHTML = `<div class="empty-state" style="text-align:center; padding:3rem; color:var(--text-secondary);"><p>No roadmap steps found matching "${currentRoadmapSearch}".</p></div>`;
+    return;
+  }
+
   let html = "";
-  roadmapSteps.forEach((step, index) => {
+  filteredSteps.forEach((step) => {
+    const index = roadmapSteps.indexOf(step);
     const isCompleted = isRoadmapStepCompleted(step);
     let isUnlocked = index === 0 || isRoadmapStepCompleted(roadmapSteps[index - 1]);
     let statusClass = "locked", statusText = "Locked", statusTagClass = "locked-tag";
@@ -1181,8 +1367,22 @@ function renderBasicRoadmap() {
 function renderAdvancedRoadmap() {
   const timeline = document.getElementById("advancedRoadmapTimeline");
   if (!timeline) return;
+
+  const searchLower = currentRoadmapSearch.toLowerCase().trim();
+  const filteredSteps = advancedRoadmapSteps.filter(step => {
+    return step.title.toLowerCase().includes(searchLower) || 
+           step.desc.toLowerCase().includes(searchLower) ||
+           step.theory.toLowerCase().includes(searchLower);
+  });
+
+  if (filteredSteps.length === 0) {
+    timeline.innerHTML = `<div class="empty-state" style="text-align:center; padding:3rem; color:var(--text-secondary);"><p>No roadmap steps found matching "${currentRoadmapSearch}".</p></div>`;
+    return;
+  }
+
   let html = "";
-  advancedRoadmapSteps.forEach((step, index) => {
+  filteredSteps.forEach((step) => {
+    const index = advancedRoadmapSteps.indexOf(step);
     const isCompleted = isRoadmapStepCompleted(step);
     let isUnlocked = index === 0 || isRoadmapStepCompleted(advancedRoadmapSteps[index - 1]);
     let statusClass = "locked", statusText = "Locked", statusTagClass = "locked-tag";
@@ -1206,27 +1406,32 @@ function openRoadmapStepModal(stepIndex, type = 'basic') {
   const modal = document.getElementById("roadmapStepModal");
   if (!modal) return;
   currentQuizAnswers = {};
-  document.getElementById("roadmapStepBadge").textContent = `Step ${step.id}`;
-  document.getElementById("roadmapStepModalTitle").textContent = step.title;
-  document.getElementById("roadmapStepTheoryContent").innerHTML = step.theory;
+  const badgeEl = document.getElementById("roadmapStepBadge");
+  if (badgeEl) badgeEl.textContent = `Step ${step.id}`;
+  const titleEl = document.getElementById("roadmapStepModalTitle");
+  if (titleEl) titleEl.textContent = step.title;
+  const theoryEl = document.getElementById("roadmapStepTheoryContent");
+  if (theoryEl) theoryEl.innerHTML = step.theory;
   const complexitySection = document.getElementById("roadmapStepComplexitySection");
-  if (step.complexity && step.complexity.length > 0) {
+  if (step.complexity && step.complexity.length > 0 && complexitySection) {
     complexitySection.classList.remove("hidden");
     const body = document.getElementById("roadmapStepComplexityBody");
-    body.innerHTML = step.complexity.map(item => `<tr><td>${item.op}</td><td>${item.time}</td><td>${item.space}</td></tr>`).join("");
-  } else complexitySection.classList.add("hidden");
+    if (body) body.innerHTML = step.complexity.map(item => `<tr><td>${item.op}</td><td>${item.time}</td><td>${item.space}</td></tr>`).join("");
+  } else if (complexitySection) complexitySection.classList.add("hidden");
   const quizSection = document.getElementById("roadmapStepQuizSection");
   const problemsSection = document.getElementById("roadmapStepProblemsSection");
-  if (step.type === "quiz") {
+  if (step.type === "quiz" && quizSection && problemsSection) {
     quizSection.classList.remove("hidden");
     problemsSection.classList.add("hidden");
     const quizContent = document.getElementById("roadmapStepQuizContent");
     const isCompleted = userProgress.completedRoadmapSteps.includes(step.id);
-    quizContent.innerHTML = step.quiz.map((q, qIndex) => `<div class="quiz-question-container" data-qindex="${qIndex}"><div class="quiz-question-text">${qIndex + 1}. ${q.question}</div><ul class="quiz-options-list">${q.options.map((opt, oIndex) => `<li class="quiz-option-item" ${isCompleted && oIndex === q.correct ? 'class="quiz-option-item correct"' : ''} ${isCompleted ? 'style="pointer-events:none; cursor:default;"' : ''} data-oindex="${oIndex}" onclick="${isCompleted ? '' : `selectQuizOption(${step.id}, ${qIndex}, ${oIndex}, this)`}">${opt}</li>`).join("")}</ul><div class="quiz-feedback ${isCompleted ? 'correct' : 'hidden'}">${isCompleted ? `Correct! ${q.explanation}` : ''}</div></div>`).join("");
+    if (quizContent) quizContent.innerHTML = step.quiz.map((q, qIndex) => `<div class="quiz-question-container" data-qindex="${qIndex}"><div class="quiz-question-text">${qIndex + 1}. ${q.question}</div><ul class="quiz-options-list">${q.options.map((opt, oIndex) => `<li class="quiz-option-item" ${isCompleted && oIndex === q.correct ? 'class="quiz-option-item correct"' : ''} ${isCompleted ? 'style="pointer-events:none; cursor:default;"' : ''} data-oindex="${oIndex}" onclick="${isCompleted ? '' : `selectQuizOption(${step.id}, ${qIndex}, ${oIndex}, this)`}">${opt}</li>`).join("")}</ul><div class="quiz-feedback ${isCompleted ? 'correct' : 'hidden'}">${isCompleted ? `Correct! ${q.explanation}` : ''}</div></div>`).join("");
     const submitBtn = document.getElementById("roadmapStepSubmitQuizBtn");
-    if (isCompleted) submitBtn.style.display = "none";
-    else { submitBtn.style.display = "block"; submitBtn.onclick = () => submitRoadmapQuiz(stepIndex, type); }
-  } else {
+    if (submitBtn) {
+      if (isCompleted) submitBtn.style.display = "none";
+      else { submitBtn.style.display = "block"; submitBtn.onclick = () => submitRoadmapQuiz(stepIndex, type); }
+    }
+  } else if (quizSection && problemsSection) {
     quizSection.classList.add("hidden");
     problemsSection.classList.remove("hidden");
     const problemsList = document.getElementById("roadmapStepProblemsList");
@@ -1248,7 +1453,8 @@ function selectQuizOption(stepId, qIndex, oIndex, element) {
 }
 
 function openCodingProblem(problemId) {
-  document.getElementById("roadmapStepModal").classList.remove("active");
+  const modal = document.getElementById("roadmapStepModal");
+  if (modal) modal.classList.remove("active");
   handleProblemClick(problemId);
 }
 
@@ -1276,7 +1482,8 @@ function submitRoadmapQuiz(stepIndex, type = 'basic') {
   });
   if (allCorrect) {
     if (!userProgress.completedRoadmapSteps.includes(step.id)) { userProgress.completedRoadmapSteps.push(step.id); addXP(50); saveUserData(); showNotification(`🎉 Quiz Passed! Step ${step.id} Completed. +50 XP!`, "success"); updateDashboard(); updateGamification(); initRoadmap(); }
-    document.getElementById("roadmapStepSubmitQuizBtn").style.display = "none";
+    const submitBtn = document.getElementById("roadmapStepSubmitQuizBtn");
+    if (submitBtn) submitBtn.style.display = "none";
   } else {
     showNotification("Some answers were incorrect. Please review and try again!", "error");
     setTimeout(() => {
@@ -1446,7 +1653,8 @@ function checkLevelUp() {
   for (let i = levels.length - 1; i >= 0; i--) { if (userProgress.xp >= levels[i]) { newLevel = i + 1; break; } }
   if (newLevel > userProgress.level) showNotification(`🎉 Level Up! You're now Level ${newLevel} - ${levelNames[newLevel - 1]}`, "success");
   userProgress.level = newLevel;
-  document.getElementById("levelBadge").textContent = `Level ${newLevel} - ${levelNames[newLevel - 1]}`;
+  const levelBadge = document.getElementById("levelBadge");
+  if (levelBadge) levelBadge.textContent = `Level ${newLevel} - ${levelNames[newLevel - 1]}`;
 }
 
 function updateGamification() { updateXPBar(); updateBadges(); }
@@ -1465,7 +1673,12 @@ function updateXPBar() {
   const currentLevelXP = levels[currentLevel - 1] || 0;
   const nextLevelXP = levels[currentLevel] || 100000;
   const xpProgress = ((userProgress.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-  setTimeout(() => { document.getElementById("xpBar").style.width = `${Math.min(xpProgress, 100)}%`; document.getElementById("xpText").textContent = `${userProgress.xp} / ${nextLevelXP} XP`; }, 300);
+  setTimeout(() => { 
+    const xpBar = document.getElementById("xpBar");
+    const xpText = document.getElementById("xpText");
+    if (xpBar) xpBar.style.width = `${Math.min(xpProgress, 100)}%`; 
+    if (xpText) xpText.textContent = `${userProgress.xp} / ${nextLevelXP} XP`; 
+  }, 300);
 }
 
 // ============================================
@@ -1528,11 +1741,22 @@ function addChatMessage(message, sender, { html = false } = {}) {
   const messagesContainer = document.getElementById("chatbotMessages");
   const messageEl = document.createElement("div");
   messageEl.className = `message ${sender}`;
-  if (html) messageEl.innerHTML = message;
-  else messageEl.textContent = message;
+
+  if (html) {
+    // Never trust user-influenced HTML. Sanitize before injecting.
+    if (typeof window !== 'undefined' && window.DOMSanitizer?.sanitizeHTML) {
+      messageEl.innerHTML = window.DOMSanitizer.sanitizeHTML(message);
+    } else {
+      messageEl.textContent = String(message ?? '');
+    }
+  } else {
+    messageEl.textContent = message;
+  }
+
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
 
 function getBotResponse(question) {
   const q = question.toLowerCase();
@@ -1648,9 +1872,9 @@ async function getAuthenticatedSession() {
 function loadUserData() {
   try {
     const saved = localStorage.getItem("algoInfinityVerse");
-    if (saved) { const data = JSON.parse(saved); Object.assign(userProgress, data); if (!userProgress.quizScores) userProgress.quizScores = {}; if (!userProgress.completedRoadmapSteps) userProgress.completedRoadmapSteps = []; if (!userProgress.activityData) userProgress.activityData = {}; if (!userProgress.xpHistory) userProgress.xpHistory = []; if (!userProgress.quizAttempts) userProgress.quizAttempts = []; if (!userProgress.practiceEvents) userProgress.practiceEvents = []; if (!userProgress.codingPersonality) userProgress.codingPersonality = { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }; if (!userProgress.mistakeDna) userProgress.mistakeDna = { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }; backfillActivityData(); }
-    else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
-  } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
+    if (saved) { const data = JSON.parse(saved); Object.assign(userProgress, data); if (!userProgress.quizScores) userProgress.quizScores = {}; if (!userProgress.completedRoadmapSteps) userProgress.completedRoadmapSteps = []; if (!userProgress.activityData) userProgress.activityData = {}; if (!userProgress.xpHistory) userProgress.xpHistory = []; if (!userProgress.quizAttempts) userProgress.quizAttempts = []; if (!userProgress.practiceEvents) userProgress.practiceEvents = []; if (!userProgress.codingPersonality) userProgress.codingPersonality = { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }; if (!userProgress.mistakeDna) userProgress.mistakeDna = { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }; if (!userProgress.dailyGoals) userProgress.dailyGoals = {}; backfillActivityData(); }
+    else { userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, dailyGoals: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
+  } catch (e) { console.error("Error loading user data:", e); userProgress = { name: "Learner", avatar: "🚀", completedProblems: [], completedDailyChallenges: [], codingPersonality: { type: "brute-force first", bruteForceCount: 1, slowAccurateCount: 0, greedyCount: 0, overOptimizerCount: 0 }, favoriteProblems: [], recentProblems: [], problemNotes: {}, xp: 0, level: 1, streak: 0, freezes: 0, freezeHistory: [], badges: [], completedRoadmapSteps: [], lastActive: null, quizScores: {}, bestQuizTimes: {}, dailyGoals: {}, activityData: {}, xpHistory: [], quizAttempts: [], practiceEvents: [], mistakeDna: { offByOneCount: 0, recursionBaseCaseCount: 0, wrongLogicCount: 0, recentLogs: [] }, revisionSchedule: { arrays: { currentStage: 0, nextReviewDate: null, history: [] }, strings: { currentStage: 0, nextReviewDate: null, history: [] }, linkedlist: { currentStage: 0, nextReviewDate: null, history: [] }, trees: { currentStage: 0, nextReviewDate: null, history: [] }, graphs: { currentStage: 0, nextReviewDate: null, history: [] }, dp: { currentStage: 0, nextReviewDate: null, history: [] } } }; saveUserData(); }
   updateProfile();
   getAuthenticatedSession().then(session => { if (session?.user?.name) { userProgress.name = session.user.name; updateProfile(); saveUserData(); } else { userProgress.name = "Learner"; updateProfile(); saveUserData(); } initProfile(); });
 }
@@ -1809,22 +2033,37 @@ function getDaysDifference(date1, date2) {
 function openQuizEditor(problem) {
   currentProblem = problem;
   const modal = document.getElementById("quizEditorModal");
-  document.getElementById("quizTitle").textContent = problem.title;
-  document.getElementById("quizTopicBadge").textContent = problem.tags.join(", ");
-  document.getElementById("quizDifficulty").textContent = problem.difficulty;
-  document.getElementById("quizDifficulty").className = "quiz-difficulty difficulty-" + problem.difficulty;
+  if (!modal) return;
+  const quizTitle = document.getElementById("quizTitle");
+  if (quizTitle) quizTitle.textContent = problem.title;
+  const quizTopicBadge = document.getElementById("quizTopicBadge");
+  if (quizTopicBadge) quizTopicBadge.textContent = problem.tags.join(", ");
+  const quizDifficulty = document.getElementById("quizDifficulty");
+  if (quizDifficulty) {
+    quizDifficulty.textContent = problem.difficulty;
+    quizDifficulty.className = "quiz-difficulty difficulty-" + problem.difficulty;
+  }
   const descEl = document.getElementById("quizDescription");
-  if (problem.description) {
-    let descHTML = problem.description;
-    if (problem.constraints) descHTML += "<br><br><strong>Constraints:</strong><br>" + problem.constraints.map(c => `• ${c}`).join("<br>");
-    descEl.innerHTML = descHTML;
-  } else descEl.textContent = `Solve the "${problem.title}" problem.`;
-  document.getElementById("quizExamples").innerHTML = generateExamples(problem);
+  if (descEl) {
+    if (problem.description) {
+      let descHTML = problem.description;
+      if (problem.constraints) descHTML += "<br><br><strong>Constraints:</strong><br>" + problem.constraints.map(c => `• ${c}`).join("<br>");
+      descEl.innerHTML = descHTML;
+    } else descEl.textContent = `Solve the "${problem.title}" problem.`;
+  }
+  const quizExamples = document.getElementById("quizExamples");
+  if (quizExamples) quizExamples.innerHTML = generateExamples(problem);
   renderTestCases(generateTestCases(problem));
   const editor = document.getElementById("codeEditor");
-  const lang = document.getElementById("languageSelect").value;
+  const langSelect = document.getElementById("languageSelect");
+  const lang = langSelect ? langSelect.value : "javascript";
   const savedDraft = getEditorDraft(problem.id);
-  editor.value = savedDraft !== null ? savedDraft : getDefaultCode(lang, problem);
+  if (editor) {
+    editor.value = savedDraft !== null ? savedDraft : getDefaultCode(lang, problem);
+    editor.scrollTop = 0;
+    editor.scrollLeft = 0;
+    editor.dispatchEvent(new Event('input'));
+  }
   updateEditorDisplayMode();
   clearQuizOutput();
   const outputPanel = document.getElementById('outputPanel');
@@ -1832,9 +2071,6 @@ function openQuizEditor(problem) {
   if (outputPanel) outputPanel.classList.remove('collapsed');
   if (outputIcon) { outputIcon.classList.remove('fa-chevron-up'); outputIcon.classList.add('fa-chevron-down'); }
   modal.classList.add("active");
-  editor.scrollTop = 0;
-  editor.scrollLeft = 0;
-  editor.dispatchEvent(new Event('input'));
   updateLineNumbers();
   syncScroll();
 }
@@ -1857,18 +2093,23 @@ function generateTestCases(problem) {
 
 function renderTestCases(testCases) {
   const container = document.getElementById("quizTestCasesContainer");
+  if (!container) return;
   container.innerHTML = testCases.map(tc => `<div class="test-case"><span class="test-case-input">${tc.input}</span><span class="test-case-result ${tc.passed ? 'passed' : 'failed'}">${tc.passed ? '✓ PASS' : '✗ FAIL'}</span></div>`).join("");
 }
 
-function clearQuizOutput() { document.getElementById("quizOutputContent").innerHTML = '<p class="output-placeholder">Run your code to see output...</p>'; }
+function clearQuizOutput() { const el = document.getElementById("quizOutputContent"); if (el) el.innerHTML = '<p class="output-placeholder">Run your code to see output...</p>'; }
 
 function runQuizCode() {
   const editor = document.getElementById("codeEditor");
+  if (!editor) return;
   const code = editor.value;
   const output = document.getElementById("quizOutputContent");
+  if (!output) return;
   if (!code.trim()) { output.innerHTML = '<p class="output-error">❌ Error: Please write some code first.</p>'; return; }
   output.innerHTML = '<p class="output-running">⏳ Running code...</p>';
-  setTimeout(() => { try { const result = executeCode(code, document.getElementById("languageSelect").value); output.innerHTML = `<pre class="output-success">✅ Output:\n${result}</pre>`; } catch (e) { output.innerHTML = `<pre class="output-error">❌ Error:\n${e.message}</pre>`; } }, 500);
+  const langSelect = document.getElementById("languageSelect");
+  const lang = langSelect ? langSelect.value : "javascript";
+  setTimeout(() => { try { const result = executeCode(code, lang); output.innerHTML = `<pre class="output-success">✅ Output:\n${result}</pre>`; } catch (e) { output.innerHTML = `<pre class="output-error">❌ Error:\n${e.message}</pre>`; } }, 500);
 }
 
 function executeCode(code, lang) {
@@ -1878,10 +2119,18 @@ function executeCode(code, lang) {
 
 function submitQuizCode() {
   const editor = document.getElementById("codeEditor");
+  if (!editor) return;
   const code = editor.value;
   if (!code.trim()) { showNotification("Please write some code before submitting!", "error"); return; }
   if (!currentProblem) { showNotification("No problem selected!", "error"); return; }
   if (userProgress.completedProblems.includes(currentProblem.id)) { showNotification("Already completed!", "info"); return; }
+  if (!userProgress.submittedSolutions) userProgress.submittedSolutions = {};
+  const langSelect = document.getElementById("languageSelect");
+  userProgress.submittedSolutions[currentProblem.id] = {
+    code: code,
+    lang: langSelect ? langSelect.value : 'javascript',
+    date: new Date().toISOString()
+  };
   userProgress.completedProblems.push(currentProblem.id);
   const difficulty = currentProblem.difficulty;
   addXP(getXPForDifficulty(difficulty));
@@ -1901,7 +2150,7 @@ function submitQuizCode() {
 
 function getXPForDifficulty(difficulty) { const map = { easy: 100, medium: 250, hard: 500 }; return map[difficulty.toLowerCase()] || 100; }
 
-function closeQuizEditor() { document.getElementById("quizEditorModal").classList.remove("active"); currentProblem = null; }
+function closeQuizEditor() { const el = document.getElementById("quizEditorModal"); if (el) el.classList.remove("active"); currentProblem = null; }
 
 function saveEditorDraft(problemId, code) { try { localStorage.setItem(`editorDraft_${problemId}`, code); } catch (e) { console.warn('Could not save draft:', e); } }
 
@@ -1909,9 +2158,15 @@ function getEditorDraft(problemId) { try { return localStorage.getItem(`editorDr
 
 function clearEditorDraft(problemId) { try { localStorage.removeItem(`editorDraft_${problemId}`); } catch (e) { console.warn('Could not clear draft:', e); } }
 
+window.addEventListener("resize", () => {
+  if (typeof updateLineNumbers === 'function') updateLineNumbers();
+  if (typeof syncScroll === 'function') syncScroll();
+});
+
 function updateLineNumbers() {
   const editor = document.getElementById("codeEditor");
   const lineNumbers = document.getElementById("lineNumbers");
+  if (!editor || !lineNumbers) return;
   const lines = editor.value.split("\n").length;
   lineNumbers.innerHTML = Array.from({ length: Math.max(lines, 1) }, (_, i) => i + 1).join("\n");
 }
@@ -1934,6 +2189,7 @@ function updateEditorDisplayMode() {
 
 function insertSnippet(type) {
   const editor = document.getElementById("codeEditor");
+  if (!editor) return;
   const snippets = { for: "for (let i = 0; i < array.length; i++) {\n    \n}", if: "if (condition) {\n    \n} else {\n    \n}", function: "function functionName(params) {\n    \n    return;\n}", while: "while (condition) {\n    \n}", switch: "switch (expression) {\n    case value:\n        break;\n    default:\n        break;\n}" };
   const snippet = snippets[type] || "";
   const start = editor.selectionStart;
@@ -1949,6 +2205,7 @@ function insertSnippet(type) {
 
 function formatCode() {
   const editor = document.getElementById("codeEditor");
+  if (!editor) return;
   editor.value = editor.value.split("\n").map(line => line.trimEnd()).join("\n");
   editor.dispatchEvent(new Event("input"));
   updateLineNumbers();
@@ -1998,7 +2255,8 @@ function openPersonalityQuiz() {
     modal.id = "personalityQuizModal";
     modal.innerHTML = `<div class="modal-content personality-quiz-modal-content"><div class="modal-header"><h3>Coding Personality Profiler</h3><button class="modal-close" id="personalityQuizClose">&times;</button></div><div class="modal-body" id="personalityQuizBody"></div></div>`;
     document.body.appendChild(modal);
-    document.getElementById("personalityQuizClose").addEventListener("click", () => modal.classList.remove("active"));
+    const closeBtn = document.getElementById("personalityQuizClose");
+    if (closeBtn) closeBtn.addEventListener("click", () => { if (modal) modal.classList.remove("active"); });
   }
   currentQuizIndex = 0;
   quizSelections = [];
@@ -2038,7 +2296,8 @@ function finishPersonalityQuiz() {
   saveUserData();
   renderPersonalityCard();
   if (typeof renderProblems === "function") { const searchInput = document.getElementById("searchInput"); const filterActive = document.querySelector(".filter-btn.active"); renderProblems(); }
-  document.getElementById("personalityQuizModal").classList.remove("active");
+  const pModal = document.getElementById("personalityQuizModal");
+  if (pModal) pModal.classList.remove("active");
   showNotification(`Quiz complete! Your coding personality is: ${dominantType.replace("-", " ").toUpperCase()} 🧠`, "success");
 }
 
@@ -2057,7 +2316,8 @@ function renderPersonalityCard() {
   else if (cp.type === "slow but accurate") { icon = "🔵"; desc = "You take your time to design solutions. You have low error rates."; adaptation = "Focus: Medium problems, speed practice"; }
   else if (cp.type === "greedy thinker") { icon = "🟢"; desc = "You look for immediate local optimizations."; adaptation = "Focus: Greedy & Dynamic Programming concepts"; }
   pCard.innerHTML = `<h3>🧠 Coding Personality</h3><div class="personality-profile-content"><div class="personality-header-info"><div class="personality-badge-icon">${icon}</div><div class="personality-type-group"><h4 style="text-transform:capitalize;">${cp.type.replace("-", " ")}</h4><span class="adaptation-badge">${adaptation}</span></div></div><p class="personality-description">${desc}</p><div class="style-progress-bars"><div class="style-bar-group"><span class="style-label">Brute-Force First (${pctBrute}%)</span><div class="style-bar-track"><div class="style-bar-fill" id="barBrute" style="width:${pctBrute}%;"></div></div></div><div class="style-bar-group"><span class="style-label">Over-Optimizer (${pctOpt}%)</span><div class="style-bar-track"><div class="style-bar-fill" id="barOpt" style="width:${pctOpt}%;"></div></div></div><div class="style-bar-group"><span class="style-label">Slow but Accurate (${pctSlow}%)</span><div class="style-bar-track"><div class="style-bar-fill" id="barSlow" style="width:${pctSlow}%;"></div></div></div><div class="style-bar-group"><span class="style-label">Greedy Thinker (${pctGreedy}%)</span><div class="style-bar-track"><div class="style-bar-fill" id="barGreedy" style="width:${pctGreedy}%;"></div></div></div></div><div class="personality-actions"><button class="btn btn-secondary btn-mini" id="personalityQuizBtn"><i class="fas fa-redo"></i> Retake Profiler Quiz</button></div></div>`;
-  document.getElementById("personalityQuizBtn").addEventListener("click", openPersonalityQuiz);
+  const quizBtn = document.getElementById("personalityQuizBtn");
+  if (quizBtn) quizBtn.addEventListener("click", openPersonalityQuiz);
 }
 
 // ============================================
@@ -2098,7 +2358,12 @@ function formatMistakeDate(dateStr) {
   try { const d = new Date(dateStr); const now = new Date(); const diffMs = now - d; const diffMins = Math.floor(diffMs / 60000); if (diffMins < 1) return "Just now"; if (diffMins < 60) return `${diffMins}m ago`; const diffHours = Math.floor(diffMins / 60); if (diffHours < 24) return `${diffHours}h ago`; return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { return "Recently"; }
 }
 
-function escapeHtml(text) { const div = document.createElement("div"); div.textContent = text; return div.innerHTML; }
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 
 // ============================================
 // NEWSLETTER
@@ -2197,7 +2462,7 @@ window.addEventListener('hashchange', () => {
 // RUN PERL
 // ============================================
 let isRunning = false;
-document.addEventListener("DOMContentLoaded", () => {
+function initPerlEditor() {
   const codeEl = document.getElementById("perlEditor");
   const outputEl = document.getElementById("perlOutput");
   const runBtn = document.getElementById("runBtn");
@@ -2206,7 +2471,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (runBtn) runBtn.addEventListener("click", runPerl);
   if (resetBtn) resetBtn.addEventListener("click", () => { if (codeEl) codeEl.value = ""; if (outputEl) outputEl.textContent = "Run code to see output..."; });
   if (sampleBtn) sampleBtn.addEventListener("click", () => { if (codeEl) codeEl.value = `print "Hello World\\n";\n\nmy $name = "DSA Learner";\nprint "Welcome $name\\n";`; });
-});
+}
 
 async function runPerl() {
   if (isRunning) return;
@@ -2223,3 +2488,16 @@ async function runPerl() {
   } catch (err) { if (output) output.textContent = "Error: " + err.message; }
   isRunning = false;
 }
+
+
+
+// Inject Report Issue Feature on educational pages
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+  if (path.includes('/pages/learning/') || path.includes('/pages/visualizers/') || path.includes('/pages/resources/')) {
+    const script = document.createElement('script');
+    script.src = '/scripts/report-issue.js';
+    document.body.appendChild(script);
+  }
+});
+

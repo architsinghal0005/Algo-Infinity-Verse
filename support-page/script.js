@@ -46,14 +46,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedMode = localStorage.getItem("theme");
     const isLightMode = savedMode === "light";
     if (isLightMode) {
-      document.body.classList.add("light-mode");
+      document.documentElement.classList.add("light-mode");
       darkModeToggle.querySelector("i").classList.replace("fa-moon", "fa-sun");
     }
 
     darkModeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("light-mode");
+      document.documentElement.classList.toggle("light-mode");
       const icon = darkModeToggle.querySelector("i");
-      if (document.body.classList.contains("light-mode")) {
+      if (document.documentElement.classList.contains("light-mode")) {
         icon.classList.replace("fa-moon", "fa-sun");
         localStorage.setItem("theme", "light");
       } else {

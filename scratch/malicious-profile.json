@@ -1,0 +1,12 @@
+{
+  "name": "<img src=1 onerror=\"window.XSS_DETECTED=1; console.log('XSS in Name!');\">",
+  "email": "<script>window.XSS_DETECTED=2; console.log('XSS in Email!');</script>",
+  "avatar": "🚀",
+  "xp": 1337,
+  "level": 42,
+  "completedProblems": [1, 2, 3],
+  "solved": 3,
+  "streak": 5,
+  "badges": [1],
+  "joinDate": "<iframe src=\"javascript:window.XSS_DETECTED=3; console.log('XSS in JoinDate!');\"></iframe>"
+}

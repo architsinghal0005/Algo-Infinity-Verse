@@ -278,7 +278,7 @@
     font-family: Poppins, sans-serif;
   }
 
-  body.light-mode, body {
+  html.light-mode, body {
     --text-primary: #1a202c !important;
     --text-secondary: #4a5568 !important;
   }

@@ -423,73 +423,73 @@
 }
 
 /* Light Mode Support */
-body.light-mode .feedback-card-wrapper {
+html.light-mode .feedback-card-wrapper {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-body.light-mode .type-card {
+html.light-mode .type-card {
   background: #f3f4f6;
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-body.light-mode .type-card:hover {
+html.light-mode .type-card:hover {
   background: #e5e7eb;
 }
 
-body.light-mode .type-card .card-label {
+html.light-mode .type-card .card-label {
   color: #4b5563;
 }
 
-body.light-mode .type-card.selected {
+html.light-mode .type-card.selected {
   background: rgba(124, 58, 237, 0.08);
   border-color: var(--primary);
 }
 
-body.light-mode .type-card.selected[data-value="Suggestion"] {
+html.light-mode .type-card.selected[data-value="Suggestion"] {
   background: rgba(251, 191, 36, 0.08);
   border-color: #d97706;
 }
 
-body.light-mode .type-card.selected[data-value="Bug Report"] {
+html.light-mode .type-card.selected[data-value="Bug Report"] {
   background: rgba(239, 68, 68, 0.08);
   border-color: #dc2626;
 }
 
-body.light-mode .type-card.selected[data-value="Feature Request"] {
+html.light-mode .type-card.selected[data-value="Feature Request"] {
   background: rgba(6, 182, 212, 0.08);
   border-color: #0891b2;
 }
 
-body.light-mode .type-card.selected[data-value="General Feedback"] {
+html.light-mode .type-card.selected[data-value="General Feedback"] {
   background: rgba(167, 139, 250, 0.08);
   border-color: #7c3aed;
 }
 
-body.light-mode .type-card.selected .card-label {
+html.light-mode .type-card.selected .card-label {
   color: #1f2937;
 }
 
-body.light-mode .input-wrapper input,
-body.light-mode .input-wrapper textarea {
+html.light-mode .input-wrapper input,
+html.light-mode .input-wrapper textarea {
   background: #f9fafb;
   border-color: rgba(0, 0, 0, 0.1);
   color: #1f2937;
 }
 
-body.light-mode .input-wrapper input:focus,
-body.light-mode .input-wrapper textarea:focus {
+html.light-mode .input-wrapper input:focus,
+html.light-mode .input-wrapper textarea:focus {
   background: #ffffff;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
-body.light-mode .success-modal {
+html.light-mode .success-modal {
   background: rgba(255, 255, 255, 0.95);
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-body.light-mode .success-modal p {
+html.light-mode .success-modal p {
   color: #4b5563;
 }
 

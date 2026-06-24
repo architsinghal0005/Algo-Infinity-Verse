@@ -16,7 +16,7 @@ var ST_COL = {
   ACTIVE  : { fill: 'rgba(168,85,247,0.25)',  stroke: '#a855f7',  text: '#e9d5ff' },
   MATCH   : { fill: 'rgba(34,197,94,0.25)',   stroke: '#22c55e',  text: '#bbf7d0' },
   PARTIAL : { fill: 'rgba(245,158,11,0.25)',  stroke: '#f59e0b',  text: '#fde68a' },
-  NONE    : { fill: 'rgba(239,68,68,0.10)',   stroke: '#ef4444',  text: '#fca5a5' },
+  NONE    : { fill: 'rgba(100,116,139,0.12)', stroke: '#64748b',  text: '#64748b' },
   UPDATED : { fill: 'rgba(6,182,212,0.25)',   stroke: '#06b6d4',  text: '#a5f3fc' },
 };
 
@@ -32,7 +32,26 @@ var stState = {
   playing   : false,
   timer     : null,
   built     : false,
+  hoveredIndex: null,
+  arrBackup : null,
+  treeBackup: null,
 };
+
+/* ─── Pulse Animation State ─── */
+var stPulseState = {
+  active: false,
+  type: '',      // 'descent', 'ascent', or 'ripple'
+  fromX: 0,
+  fromY: 0,
+  toX: 0,
+  toY: 0,
+  progress: 0,
+  radius: 0,
+  maxRadius: 0,
+  node: -1
+};
+
+var stAnimationFrameId = null;
 
 /* ─── Build Segment Tree ─── */
 function stBuild(arr) {
@@ -54,21 +73,21 @@ function stGenQuerySteps(tree, n, l, r) {
   var steps = [];
   function query(node, start, end, l, r) {
     if (r < start || end < l) {
-      steps.push({ type: 'visit', node: node, color: 'NONE',
+      steps.push({ type: 'visit', node: node, color: 'NONE', start: start, end: end,
         msg: 'Node ' + node + ' [' + start + '..' + end + '] — no overlap with [' + l + '..' + r + ']. Return 0.' });
       return 0;
     }
     if (l <= start && end <= r) {
-      steps.push({ type: 'visit', node: node, color: 'MATCH',
+      steps.push({ type: 'visit', node: node, color: 'MATCH', start: start, end: end,
         msg: 'Node ' + node + ' [' + start + '..' + end + '] — fully inside [' + l + '..' + r + ']. Return ' + tree[node] + '.' });
       return tree[node];
     }
-    steps.push({ type: 'visit', node: node, color: 'PARTIAL',
+    steps.push({ type: 'visit', node: node, color: 'PARTIAL', start: start, end: end,
       msg: 'Node ' + node + ' [' + start + '..' + end + '] — partial overlap. Recurse into children.' });
     var mid = Math.floor((start + end) / 2);
     var left  = query(2 * node, start, mid, l, r);
     var right = query(2 * node + 1, mid + 1, end, l, r);
-    steps.push({ type: 'return', node: node, color: 'ACTIVE',
+    steps.push({ type: 'return', node: node, color: 'ACTIVE', start: start, end: end,
       msg: 'Node ' + node + ': left=' + left + ' + right=' + right + ' = ' + (left + right) });
     return left + right;
   }
@@ -85,23 +104,23 @@ function stGenUpdateSteps(tree, n, idx, val, oldVal) {
   function update(node, start, end, idx, val) {
     if (start === end) {
       tree[node] += delta;
-      steps.push({ type: 'update', node: node, color: 'UPDATED',
+      steps.push({ type: 'update', node: node, color: 'UPDATED', idx: idx, val: tree[node], start: start, end: end,
         msg: 'Leaf node ' + node + ' [' + start + ']: value updated from ' + oldVal + ' to ' + val + '.' });
       return;
     }
     var mid = Math.floor((start + end) / 2);
-    steps.push({ type: 'visit', node: node, color: 'ACTIVE',
+    steps.push({ type: 'visit', node: node, color: 'ACTIVE', idx: idx, start: start, end: end,
       msg: 'Node ' + node + ' [' + start + '..' + end + ']: descending to find index ' + idx + '.' });
     if (idx <= mid) update(2 * node, start, mid, idx, val);
     else update(2 * node + 1, mid + 1, end, idx, val);
     tree[node] = tree[2 * node] + tree[2 * node + 1];
-    steps.push({ type: 'propagate', node: node, color: 'UPDATED',
+    steps.push({ type: 'propagate', node: node, color: 'UPDATED', idx: idx, val: tree[node], start: start, end: end,
       msg: 'Node ' + node + ' [' + start + '..' + end + ']: recalculated sum = ' + tree[node] + '.' });
   }
   steps.push({ type: 'start', node: -1, color: null,
     msg: 'Updating index ' + idx + ' from ' + oldVal + ' to ' + val + ' (delta=' + delta + ').' });
   update(1, 0, n - 1, idx, val);
-  steps.push({ type: 'result', node: -1, color: null,
+  steps.push({ type: 'result', node: -1, color: null, idx: idx, val: val,
     msg: 'Update complete. arr[' + idx + '] = ' + val + '.', result: val });
   return steps;
 }
@@ -174,20 +193,57 @@ function stDraw() {
 
   drawEdges(1, 0, n - 1);
 
+  // Draw pulse line / dot if active
+  if (stPulseState.active) {
+    ctx.save();
+    if (stPulseState.type === 'descent' || stPulseState.type === 'ascent') {
+      var px = stPulseState.fromX + (stPulseState.toX - stPulseState.fromX) * stPulseState.progress;
+      var py = stPulseState.fromY + (stPulseState.toY - stPulseState.fromY) * stPulseState.progress;
+      
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#06b6d4';
+      ctx.fillStyle = '#22d3ee';
+      ctx.beginPath();
+      ctx.arc(px, py, 6, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (stPulseState.type === 'ripple') {
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#06b6d4';
+      ctx.strokeStyle = 'rgba(6, 182, 212, ' + (1 - stPulseState.radius / stPulseState.maxRadius) + ')';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(stPulseState.fromX, stPulseState.fromY, stPulseState.radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   // Draw nodes
   function drawNodes(node, start, end) {
     var p   = pos[node];
     if (!p) return;
     var col = ST_COL[colors[node] || 'DEFAULT'];
 
+    var isHovered = (stState.hoveredIndex !== null && p.start === stState.hoveredIndex && p.end === stState.hoveredIndex);
+
     // Circle
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fillStyle   = col.fill;
     ctx.fill();
-    ctx.strokeStyle = col.stroke;
-    ctx.lineWidth   = 2;
+    ctx.strokeStyle = isHovered ? '#c084fc' : col.stroke;
+    ctx.lineWidth   = isHovered ? 4 : 2;
     ctx.stroke();
+
+    if (isHovered) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r + 4, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(168,85,247,0.4)';
+      ctx.lineWidth   = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // Value
     var val   = tree[node];
@@ -220,6 +276,189 @@ function stResetColors() {
   });
 }
 
+/* ─── Pulse Animations ─── */
+function stTriggerPulse(step) {
+  if (!stState.built) return;
+  var pos = stState.nodePos;
+  
+  stPulseState.active = false;
+  if (stAnimationFrameId) {
+    cancelAnimationFrame(stAnimationFrameId);
+    stAnimationFrameId = null;
+  }
+
+  var node = step.node;
+  if (!node || node <= 0 || !pos[node]) return;
+
+  if (step.type === 'visit') {
+    if (node === 1) {
+      stPulseState.active = true;
+      stPulseState.type = 'ripple';
+      stPulseState.fromX = pos[1].x;
+      stPulseState.fromY = pos[1].y;
+      stPulseState.radius = 0;
+      stPulseState.maxRadius = pos[1].r + 15;
+      stPulseState.node = 1;
+    } else {
+      var parent = Math.floor(node / 2);
+      if (pos[parent]) {
+        stPulseState.active = true;
+        stPulseState.type = 'descent';
+        stPulseState.fromX = pos[parent].x;
+        stPulseState.fromY = pos[parent].y;
+        stPulseState.toX = pos[node].x;
+        stPulseState.toY = pos[node].y;
+        stPulseState.progress = 0;
+        stPulseState.node = node;
+      }
+    }
+  } else if (step.type === 'update') {
+    stPulseState.active = true;
+    stPulseState.type = 'ripple';
+    stPulseState.fromX = pos[node].x;
+    stPulseState.fromY = pos[node].y;
+    stPulseState.radius = 0;
+    stPulseState.maxRadius = pos[node].r + 20;
+    stPulseState.node = node;
+  } else if (step.type === 'propagate') {
+    var childNode = -1;
+    var leftChild = 2 * node;
+    var rightChild = 2 * node + 1;
+    
+    if (pos[leftChild] && step.idx !== undefined && step.idx >= pos[leftChild].start && step.idx <= pos[leftChild].end) {
+      childNode = leftChild;
+    } else if (pos[rightChild] && step.idx !== undefined && step.idx >= pos[rightChild].start && step.idx <= pos[rightChild].end) {
+      childNode = rightChild;
+    }
+    
+    if (childNode !== -1 && pos[childNode]) {
+      stPulseState.active = true;
+      stPulseState.type = 'ascent';
+      stPulseState.fromX = pos[childNode].x;
+      stPulseState.fromY = pos[childNode].y;
+      stPulseState.toX = pos[node].x;
+      stPulseState.toY = pos[node].y;
+      stPulseState.progress = 0;
+      stPulseState.node = node;
+    }
+  }
+  
+  if (stPulseState.active) {
+    stAnimatePulse();
+  }
+}
+
+function stAnimatePulse() {
+  var lastTime = performance.now();
+  var duration = Math.max(100, stGetDelay() * 0.7);
+  
+  function frame(time) {
+    if (!stPulseState.active) return;
+    var dt = time - lastTime;
+    lastTime = time;
+    
+    if (stPulseState.type === 'ripple') {
+      stPulseState.radius += (stPulseState.maxRadius / duration) * dt;
+      if (stPulseState.radius >= stPulseState.maxRadius) {
+        stPulseState.active = false;
+      }
+    } else {
+      stPulseState.progress += dt / duration;
+      if (stPulseState.progress >= 1.0) {
+        stPulseState.progress = 1.0;
+        stPulseState.active = false;
+      }
+    }
+    
+    stDraw();
+    
+    if (stPulseState.active) {
+      stAnimationFrameId = requestAnimationFrame(frame);
+    }
+  }
+  
+  stAnimationFrameId = requestAnimationFrame(frame);
+}
+
+/* ─── Bottom Array Render ─── */
+function stRenderArray() {
+  var container = document.getElementById('stArrayLayout');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!stState.built) return;
+
+  var currentStep = stState.steps[stState.stepIdx - 1];
+  var cellClasses = new Array(stState.n).fill('');
+  
+  if (currentStep) {
+    if (currentStep.type === 'visit' || currentStep.type === 'return') {
+      var start = currentStep.start;
+      var end = currentStep.end;
+      var color = currentStep.color;
+      var cls = '';
+      if (color === 'MATCH') cls = 'highlight-match';
+      else if (color === 'PARTIAL') cls = 'highlight-partial';
+      else if (color === 'ACTIVE') cls = 'highlight-active';
+      else if (color === 'NONE') cls = 'highlight-none';
+      
+      if (cls && start !== undefined && end !== undefined) {
+        for (var i = start; i <= end; i++) {
+          cellClasses[i] = cls;
+        }
+      }
+    } else if (currentStep.type === 'update' || currentStep.type === 'propagate') {
+      if (currentStep.idx !== undefined) {
+        cellClasses[currentStep.idx] = 'highlight-updated';
+      }
+    } else if (currentStep.type === 'visit' && currentStep.idx !== undefined) {
+      cellClasses[currentStep.idx] = 'highlight-active';
+    }
+  }
+
+  for (var i = 0; i < stState.n; i++) {
+    var cell = document.createElement('div');
+    cell.className = 'st-array-cell ' + cellClasses[i];
+    cell.setAttribute('data-idx', i);
+    
+    if (stState.hoveredIndex === i) {
+      cell.classList.add('highlight-active');
+    }
+    
+    var idxSpan = document.createElement('span');
+    idxSpan.className = 'st-cell-idx';
+    idxSpan.textContent = i;
+    
+    var valSpan = document.createElement('span');
+    valSpan.className = 'st-cell-val';
+    valSpan.textContent = stState.arr[i];
+    
+    cell.appendChild(idxSpan);
+    cell.appendChild(valSpan);
+    
+    cell.addEventListener('mouseenter', (function(idx) {
+      return function() {
+        stState.hoveredIndex = idx;
+        stDraw();
+        this.classList.add('highlight-active');
+      };
+    })(i));
+    
+    cell.addEventListener('mouseleave', function() {
+      stState.hoveredIndex = null;
+      stDraw();
+      this.classList.remove('highlight-active');
+    });
+    
+    cell.addEventListener('click', (function(idx) {
+      return function() {
+        stPromptUpdate(idx);
+      };
+    })(i));
+    
+    container.appendChild(cell);
+  }
+}
+
 /* ─── Apply a single step ─── */
 function stApplyStep(step) {
   var statusEl = document.getElementById('stStatus');
@@ -228,8 +467,21 @@ function stApplyStep(step) {
     statusEl.className   = 'st-status-bar ' + (step.type === 'result' ? 'done' : step.type === 'propagate' || step.type === 'update' ? 'update' : 'query');
   }
 
+  stTriggerPulse(step);
+
   if (step.node && step.node > 0 && step.color) {
     stState.nodeColor[step.node] = step.color;
+  }
+
+  if (step.type === 'update' && step.node > 0 && step.val !== undefined) {
+    stState.tree[step.node] = step.val;
+    stState.arr[step.idx] = step.val;
+  } else if (step.type === 'propagate' && step.node > 0 && step.val !== undefined) {
+    stState.tree[step.node] = step.val;
+  } else if (step.type === 'result' && step.result !== undefined && step.idx !== undefined) {
+    stState.arr[step.idx] = step.val;
+    stState.arrBackup = null;
+    stState.treeBackup = null;
   }
 
   if (step.type === 'result') {
@@ -243,6 +495,7 @@ function stApplyStep(step) {
     }
   }
 
+  stRenderArray();
   stDraw();
 }
 
@@ -290,13 +543,23 @@ function stStep() {
 
 function stResetAnim() {
   stPause();
+  if (stState.arrBackup) {
+    stState.arr = stState.arrBackup.slice();
+    stState.tree = stState.treeBackup.slice();
+  }
   stState.stepIdx = 0;
   stResetColors();
+  stPulseState.active = false;
+  if (stAnimationFrameId) {
+    cancelAnimationFrame(stAnimationFrameId);
+    stAnimationFrameId = null;
+  }
   var resultPanel = document.getElementById('stResultPanel');
   if (resultPanel) resultPanel.classList.add('hidden');
   var statusEl = document.getElementById('stStatus');
   if (statusEl) { statusEl.textContent = 'Animation reset. Press Play or Step.'; statusEl.className = 'st-status-bar'; }
   stUpdateStepCounter();
+  stRenderArray();
   stDraw();
 }
 
@@ -337,6 +600,8 @@ function stDoBuild() {
   stState.stepIdx = 0;
   stState.built   = true;
   stState.playing = false;
+  stState.arrBackup = null;
+  stState.treeBackup = null;
 
   // Resize canvas
   var canvas = document.getElementById('stCanvas');
@@ -370,6 +635,7 @@ function stDoBuild() {
 
   stUpdateStepCounter();
   stUpdatePlaybackBtns();
+  stRenderArray();
   stDraw();
 }
 
@@ -390,6 +656,13 @@ function stDoQuery() {
     return;
   }
 
+  if (stState.arrBackup) {
+    stState.arr = stState.arrBackup.slice();
+    stState.tree = stState.treeBackup.slice();
+  }
+  stState.arrBackup = stState.arr.slice();
+  stState.treeBackup = stState.tree.slice();
+
   stResetColors();
   var resultPanel = document.getElementById('stResultPanel');
   if (resultPanel) resultPanel.classList.add('hidden');
@@ -401,6 +674,7 @@ function stDoQuery() {
 
   var statusEl = document.getElementById('stStatus');
   if (statusEl) { statusEl.textContent = 'Query sum [' + l + '..' + r + '] ready. Press Play or Step to animate.'; statusEl.className = 'st-status-bar query'; }
+  stRenderArray();
   stDraw();
 }
 
@@ -421,6 +695,13 @@ function stDoUpdate() {
     return;
   }
 
+  if (stState.arrBackup) {
+    stState.arr = stState.arrBackup.slice();
+    stState.tree = stState.treeBackup.slice();
+  }
+  stState.arrBackup = stState.arr.slice();
+  stState.treeBackup = stState.tree.slice();
+
   var oldVal = stState.arr[idx];
   stResetColors();
   var resultPanel = document.getElementById('stResultPanel');
@@ -438,7 +719,31 @@ function stDoUpdate() {
 
   var statusEl = document.getElementById('stStatus');
   if (statusEl) { statusEl.textContent = 'Update arr[' + idx + '] = ' + val + ' ready. Press Play or Step to animate propagation.'; statusEl.className = 'st-status-bar update'; }
+  stRenderArray();
   stDraw();
+}
+
+/* ─── Prompt Update dialog ─── */
+function stPromptUpdate(idx) {
+  var n = stState.n;
+  if (idx < 0 || idx >= n) return;
+  
+  var currentVal = stState.arr[idx];
+  var inputVal = prompt('Enter new value for index ' + idx + ' (current value: ' + currentVal + '):', currentVal);
+  if (inputVal === null) return;
+  
+  var val = parseInt(inputVal.trim());
+  if (isNaN(val)) {
+    alert('Please enter a valid integer.');
+    return;
+  }
+  
+  var idxEl = document.getElementById('stUpdateIdx');
+  var valEl = document.getElementById('stUpdateVal');
+  if (idxEl) idxEl.value = idx;
+  if (valEl) valEl.value = val;
+  
+  stDoUpdate();
 }
 
 /* ─── Init ─── */
@@ -465,6 +770,77 @@ function stInit() {
       var label = document.getElementById('stSpeedLabel');
       if (label) label.textContent = ST_SPEED_LABEL[speedSlider.value] || 'Normal';
       if (stState.playing) { stPause(); stPlay(); }
+    });
+  }
+
+  // Set up canvas interactions
+  var canvas = document.getElementById('stCanvas');
+  if (canvas) {
+    canvas.addEventListener('mousemove', function(e) {
+      if (!stState.built) return;
+      var rect = canvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      
+      var scaleX = canvas.width / rect.width;
+      var scaleY = canvas.height / rect.height;
+      x *= scaleX;
+      y *= scaleY;
+      
+      var foundIdx = null;
+      var pos = stState.nodePos;
+      for (var key in pos) {
+        if (pos.hasOwnProperty(key)) {
+          var p = pos[key];
+          if (p.start === p.end) {
+            var dist = Math.sqrt((x - p.x)*(x - p.x) + (y - p.y)*(y - p.y));
+            if (dist <= p.r) {
+              foundIdx = p.start;
+              break;
+            }
+          }
+        }
+      }
+      
+      if (stState.hoveredIndex !== foundIdx) {
+        stState.hoveredIndex = foundIdx;
+        stDraw();
+        stRenderArray();
+      }
+    });
+
+    canvas.addEventListener('mouseleave', function() {
+      if (stState.hoveredIndex !== null) {
+        stState.hoveredIndex = null;
+        stDraw();
+        stRenderArray();
+      }
+    });
+
+    canvas.addEventListener('click', function(e) {
+      if (!stState.built) return;
+      var rect = canvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      
+      var scaleX = canvas.width / rect.width;
+      var scaleY = canvas.height / rect.height;
+      x *= scaleX;
+      y *= scaleY;
+      
+      var pos = stState.nodePos;
+      for (var key in pos) {
+        if (pos.hasOwnProperty(key)) {
+          var p = pos[key];
+          if (p.start === p.end) {
+            var dist = Math.sqrt((x - p.x)*(x - p.x) + (y - p.y)*(y - p.y));
+            if (dist <= p.r) {
+              stPromptUpdate(p.start);
+              break;
+            }
+          }
+        }
+      }
     });
   }
 

@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initHeroTyping();
     initStatsAnimation();
     initExerciseToggles();
+    initCopyButtons();
     initSidebarSpy();
     initProgressTracker();
     initLangSwitching();
@@ -209,6 +210,41 @@ function initProgressTracker() {
     lessons.forEach((l) => observer.observe(l));
 }
 
+/* Copy Code Button */
+function initCopyButtons() {
+    document.querySelectorAll(".string-code-copy").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const code = btn.getAttribute("data-code");
+            if (!code) return;
+
+            try {
+                await navigator.clipboard.writeText(code);
+                btn.textContent = "Copied!";
+                btn.classList.add("copied");
+                setTimeout(() => {
+                    btn.textContent = "Copy";
+                    btn.classList.remove("copied");
+                }, 2000);
+            } catch {
+                const textarea = document.createElement("textarea");
+                textarea.value = code;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                btn.textContent = "Copied!";
+                btn.classList.add("copied");
+                setTimeout(() => {
+                    btn.textContent = "Copy";
+                    btn.classList.remove("copied");
+                }, 2000);
+            }
+        });
+    });
+}
+
 /* Language Tab Switching */
 function initLangSwitching() {
     window.switchStringLang = function (button, lang) {
@@ -233,6 +269,5 @@ function initLangSwitching() {
             pane.classList.add("active");
             pane.removeAttribute("hidden");
         }
-    };
     };
 }

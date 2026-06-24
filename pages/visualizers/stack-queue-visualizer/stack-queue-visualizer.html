@@ -20,6 +20,22 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css"
     integrity="sha512-W/zrbCncQnky/EzL+/AYwTtosvrM+YG/V6piQLSe2HuKS6cmbw89kjYkp3tWFn1dkWV7L1ruvJyKbLz73Vlgfg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
 </head>
 
 
@@ -164,8 +180,8 @@
             <li><a href="/pages/resources/system-design/system-design.html">System Design</a></li>
             <li><a href="/pages/learning/api-design-learning/api-design-learning.html">Learn API Design</a></li>
             <li><a href="/pages/community/community/community.html">Community</a></li>
-            <li><a href="about-us.html">About Us</a></li>
-            <li><a href="privacy-policy.html">Privacy</a></li>
+            <li><a href="/pages/resources/about-us.html">About Us</a></li>
+            <li><a href="/pages/resources/privacy-policy.html">Privacy</a></li>
           </ul>
         </div>
         <div class="footer-section">

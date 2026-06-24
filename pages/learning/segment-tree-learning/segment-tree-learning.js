@@ -154,9 +154,10 @@ function initSidebarSpy() {
 /* Progress Tracker */
 function initProgressTracker() {
     const STORAGE_KEY = "seg-learning-progress";
-    const TOTAL_TOPICS = 5; // matching data-topic 1 to 4 (ignoring introduction)
+    const TOTAL_TOPICS = 5;
     const fill = document.getElementById("segProgressFill");
     const count = document.getElementById("segProgressCount");
+    const percent = document.getElementById("segProgressPercent");
     const bar = document.querySelector(".seg-progress-bar");
 
     if (!fill || !count) return;
@@ -173,6 +174,7 @@ function initProgressTracker() {
         const pct = Math.min(100, Math.round((completed.size / TOTAL_TOPICS) * 100));
         fill.style.width = pct + "%";
         count.textContent = Math.min(TOTAL_TOPICS, completed.size);
+        if (percent) percent.textContent = pct + "%";
         if (bar) bar.setAttribute("aria-valuenow", pct);
     }
 

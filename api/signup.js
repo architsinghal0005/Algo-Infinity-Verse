@@ -1,6 +1,7 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import crypto from "crypto";
+import { verifyCsrfToken } from "../utils/csrf-verify.js"; // <-- ADDED CSRF IMPORT
 
 let db = null;
 let useFirestore = false;
@@ -254,6 +255,14 @@ export default async function handler(req, res) {
       error: "Method not allowed",
     });
   }
+
+  // --- ADDED SECURITY GATE: CSRF Validation ---
+  if (!verifyCsrfToken(req)) {
+      return res.status(403).json({ 
+          error: "CSRF token validation failed. Unauthorized cross-site request detected." 
+      });
+  }
+  // --------------------------------------------
 
   // ── Rate limit check ───────────────────────────────────────────────────────
   const clientId = getClientIdentifier(req);

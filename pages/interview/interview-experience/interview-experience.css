@@ -677,90 +677,90 @@
 }
 
 /* Light Mode */
-body.light-mode .iep-filters,
-body.light-mode .iep-submit-card {
+html.light-mode .iep-filters,
+html.light-mode .iep-submit-card {
   background: rgba(255, 255, 255, 0.85);
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-body.light-mode .iep-search-bar {
+html.light-mode .iep-search-bar {
   background: #f3f4f6;
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-body.light-mode .iep-search-bar input {
+html.light-mode .iep-search-bar input {
   color: #1f2937;
 }
 
-body.light-mode .iep-sort-select {
+html.light-mode .iep-sort-select {
   background: #f3f4f6;
   border-color: rgba(0, 0, 0, 0.1);
   color: #1f2937;
 }
 
-body.light-mode .iep-sort-select option {
+html.light-mode .iep-sort-select option {
   background: white;
   color: #1f2937;
 }
 
-body.light-mode .iep-card {
+html.light-mode .iep-card {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-body.light-mode .iep-card-content {
+html.light-mode .iep-card-content {
   color: #4b5563;
 }
 
-body.light-mode .iep-card-title {
+html.light-mode .iep-card-title {
   color: #111827;
 }
 
-body.light-mode .iep-form-group input,
-body.light-mode .iep-form-group select,
-body.light-mode .iep-form-group textarea {
+html.light-mode .iep-form-group input,
+html.light-mode .iep-form-group select,
+html.light-mode .iep-form-group textarea {
   background: #f9fafb;
   border-color: rgba(0, 0, 0, 0.1);
   color: #1f2937;
 }
 
-body.light-mode .iep-form-group select option {
+html.light-mode .iep-form-group select option {
   background: white;
   color: #1f2937;
 }
 
-body.light-mode .iep-modal {
+html.light-mode .iep-modal {
   background: rgba(255, 255, 255, 0.95);
 }
 
-body.light-mode .iep-modal-content {
+html.light-mode .iep-modal-content {
   color: #4b5563;
 }
 
-body.light-mode .iep-upvote-btn {
+html.light-mode .iep-upvote-btn {
   border-color: rgba(0, 0, 0, 0.1);
   background: #f3f4f6;
   color: #4b5563;
 }
 
-body.light-mode .iep-upvote-btn.voted {
+html.light-mode .iep-upvote-btn.voted {
   background: rgba(139, 92, 246, 0.12);
   border-color: #8b5cf6;
   color: #6d28d9;
 }
 
-body.light-mode .iep-card-footer {
+html.light-mode .iep-card-footer {
   border-top-color: rgba(0, 0, 0, 0.06);
 }
 
-body.light-mode .iep-card-stat {
+html.light-mode .iep-card-stat {
   color: #6b7280;
 }
 
-body.light-mode .iep-filter-label {
+html.light-mode .iep-filter-label {
   color: #6b7280;
 }
 
-body.light-mode .iep-hint {
+html.light-mode .iep-hint {
   color: #6b7280;
 }

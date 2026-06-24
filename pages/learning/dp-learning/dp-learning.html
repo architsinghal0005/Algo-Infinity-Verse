@@ -6,27 +6,67 @@
     <title>Learn Dynamic Programming | Algo Infinity Verse</title>
     <meta name="description" content="Master Dynamic Programming from fundamentals to advanced patterns including knapsack variations, LIS/LCS optimizations, tree DP, and digit DP." />
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
-    <!-- External Stylesheets -->
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="dp-learning.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" 
+      integrity="sha512-W/zrbCncQnky/EzL+/AYwTtosvrM+YG/V6piQLSe2HuKS6cmbw89kjYkp3tWFn1dkWV7L1ruvJyKbLz73Vlgfg==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
 </head>
-<body>
+<body data-page="dp-learning">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loader">
+        <div class="infinity-loader">∞</div>
+        <h2>Algo Infinity Verse</h2>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
     <div id="navbar-placeholder"></div>
 
     <section id="home" class="hero">
+        <div class="hero-background">
+          <div class="stars"></div>
+          <div class="stars2"></div>
+          <div class="stars3"></div>
+        </div>
         <div class="hero-content">
             <h1 class="hero-title">
                 <span class="title-line">Stop Recomputing, Start Remembering</span>
-                <span class="main-title gradient-text">Master Dynamic Programming</span>
+                <span class="main-title gradient-text" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Master Dynamic Programming</span>
                 <span class="subtitle">
                     From Knapsack to Tree DP &amp; Digit DP — Identify States, Build Transitions, Optimize Space
                 </span>
             </h1>
             <div class="typing-container">
-                <span class="typing-text_dp" id="typingTextDP"></span>
+                <span class="typing-text-dp" id="typingTextDP"></span>
                 <span class="typing-cursor">|</span>
             </div>
             <div class="hero-buttons">
@@ -52,6 +92,9 @@
                 </div>
             </div>
         </div>
+        <div class="scroll-indicator">
+          <i class="fas fa-chevron-down"></i>
+        </div>
     </section>
 
     <section id="dp-learning" class="section">
@@ -70,6 +113,7 @@
                 <div class="dp-progress-track">
                     <div class="dp-progress-fill" id="dpProgressFill"></div>
                 </div>
+                <span class="dp-progress-percent" id="dpProgressPercent">0%</span>
             </div>
 
             <div class="dp-layout">
@@ -169,6 +213,7 @@
                             <div class="dp-lang-pane active" data-lang="py">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">Python</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">def</span> <span class="tok-fn">knapsack_tab</span>(<span class="tok-var">wt</span>, <span class="tok-var">val</span>, <span class="tok-var">W</span>, <span class="tok-var">n</span>):
     <span class="tok-var">dp</span> = [[<span class="tok-num">0</span>] * (<span class="tok-var">W</span> + <span class="tok-num">1</span>) <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-fn">range</span>(<span class="tok-var">n</span> + <span class="tok-num">1</span>)]
@@ -183,6 +228,7 @@
                             <div class="dp-lang-pane" data-lang="cpp">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">C++</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">int</span> <span class="tok-fn">knapsackTab</span>(<span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">wt</span>, <span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">val</span>, <span class="tok-kw">int</span> <span class="tok-var">W</span>, <span class="tok-kw">int</span> <span class="tok-var">n</span>) {
     <span class="tok-kw">vector&lt;vector&lt;int&gt;&gt;</span> <span class="tok-var">dp</span>(<span class="tok-var">n</span>+<span class="tok-num">1</span>, <span class="tok-kw">vector&lt;int&gt;</span>(<span class="tok-var">W</span>+<span class="tok-num">1</span>, <span class="tok-num">0</span>));
@@ -230,6 +276,7 @@
                             <div class="dp-lang-pane active" data-lang="py">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">Python</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">def</span> <span class="tok-fn">unbounded_knapsack</span>(<span class="tok-var">wt</span>, <span class="tok-var">val</span>, <span class="tok-var">W</span>, <span class="tok-var">n</span>):
     <span class="tok-var">dp</span> = [<span class="tok-num">0</span>] * (<span class="tok-var">W</span> + <span class="tok-num">1</span>)
@@ -242,6 +289,7 @@
                             <div class="dp-lang-pane" data-lang="cpp">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">C++</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">int</span> <span class="tok-fn">unboundedKnapsack</span>(<span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">wt</span>, <span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">val</span>, <span class="tok-kw">int</span> <span class="tok-var">W</span>, <span class="tok-kw">int</span> <span class="tok-var">n</span>) {
     <span class="tok-kw">vector&lt;int&gt;</span> <span class="tok-var">dp</span>(<span class="tok-var">W</span>+<span class="tok-num">1</span>, <span class="tok-num">0</span>);
@@ -280,6 +328,7 @@
                             <div class="dp-lang-pane active" data-lang="py">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">Python</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">import</span> <span class="tok-var">bisect</span>
 <span class="tok-kw">def</span> <span class="tok-fn">lis_nlogn</span>(<span class="tok-var">arr</span>):
@@ -295,6 +344,7 @@
                             <div class="dp-lang-pane" data-lang="cpp">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">C++</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">int</span> <span class="tok-fn">lisNLogN</span>(<span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">arr</span>) {
     <span class="tok-kw">vector&lt;int&gt;</span> <span class="tok-var">tails</span>;
@@ -344,6 +394,7 @@
                             <div class="dp-lang-pane active" data-lang="py">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">Python</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
                                 <pre><code><span class="tok-kw">def</span> <span class="tok-fn">longest_common_subsequence</span>(<span class="tok-var">text1</span>, <span class="tok-var">text2</span>):
     <span class="tok-var">n</span>, <span class="tok-var">m</span> = <span class="tok-fn">len</span>(<span class="tok-var">text1</span>), <span class="tok-fn">len</span>(<span class="tok-var">text2</span>)
@@ -361,8 +412,9 @@
                             <div class="dp-lang-pane" data-lang="cpp">
                                 <div class="dp-code-header">
                                     <span class="dp-code-lang">C++</span>
+                                    <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
                                 </div>
-                                <pre><code><span class="tok-kw">int</span> <span class="tok-fn">longestCommonSubsequence</span>(<span class="tok-kw">string</span> <span class="tok-var">text1</span>, <span class="tok-kw">string</span> <span class="tok-var">text2</span>) {
+                                <pre><code><span class="tok-kw">int</span> <span class="tok-fn">longestCommonSubsequence</span>(<span class="tok-kw">string</span> <span class="tok-var">text1</span>, <span class="tok-var">text2</span>) {
     <span class="tok-kw">int</span> <span class="tok-var">n</span> = <span class="tok-var">text1</span>.length(), <span class="tok-var">m</span> = <span class="tok-var">text2</span>.length();
     <span class="tok-kw">vector&lt;vector&lt;int&gt;&gt;</span> <span class="tok-var">dp</span>(<span class="tok-var">n</span> + <span class="tok-num">1</span>, <span class="tok-kw">vector&lt;int&gt;</span>(<span class="tok-var">m</span> + <span class="tok-num">1</span>, <span class="tok-num">0</span>));
     
@@ -435,12 +487,18 @@
                             <button class="dp-exercise-toggle" aria-controls="sol-1" aria-expanded="false">Show Solution</button>
                             <div class="dp-exercise-solution" id="sol-1">
                                 <p><strong>Hint:</strong> This is perfectly equivalent to the Fibonacci sequence. The number of ways to reach step <code>i</code> is the sum of ways to reach step <code>i-1</code> and step <code>i-2</code>.</p>
-                                <pre><code><span class="tok-kw">def</span> <span class="tok-fn">climbStairs</span>(<span class="tok-var">n</span>):
+                                <div class="dp-code-block">
+                                    <div class="dp-code-header">
+                                        <span class="dp-code-lang">Python</span>
+                                        <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
+                                    </div>
+                                    <pre><code><span class="tok-kw">def</span> <span class="tok-fn">climbStairs</span>(<span class="tok-var">n</span>):
     <span class="tok-kw">if</span> <span class="tok-var">n</span> &lt;= <span class="tok-num">2</span>: <span class="tok-kw">return</span> <span class="tok-var">n</span>
     <span class="tok-var">a</span>, <span class="tok-var">b</span> = <span class="tok-num">1</span>, <span class="tok-num">2</span>
     <span class="tok-kw">for</span> <span class="tok-var">_</span> <span class="tok-kw">in</span> <span class="tok-fn">range</span>(<span class="tok-num">3</span>, <span class="tok-var">n</span> + <span class="tok-num">1</span>):
         <span class="tok-var">a</span>, <span class="tok-var">b</span> = <span class="tok-var">b</span>, <span class="tok-var">a</span> + <span class="tok-var">b</span>
     <span class="tok-kw">return</span> <span class="tok-var">b</span></code></pre>
+                                </div>
                             </div>
                         </div>
 
@@ -450,7 +508,12 @@
                             <button class="dp-exercise-toggle" aria-controls="sol-2" aria-expanded="false">Show Solution</button>
                             <div class="dp-exercise-solution" id="sol-2">
                                 <p><strong>Hint:</strong> For each house <code>i</code>, you either rob it (money[i] + max from <code>i-2</code>) or skip it (max from <code>i-1</code>).</p>
-                                <pre><code><span class="tok-kw">int</span> <span class="tok-fn">rob</span>(<span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">nums</span>) {
+                                <div class="dp-code-block">
+                                    <div class="dp-code-header">
+                                        <span class="dp-code-lang">C++</span>
+                                        <button class="dp-code-copy" type="button" aria-label="Copy code">Copy</button>
+                                    </div>
+                                    <pre><code><span class="tok-kw">int</span> <span class="tok-fn">rob</span>(<span class="tok-kw">vector&lt;int&gt;&amp;</span> <span class="tok-var">nums</span>) {
     <span class="tok-kw">int</span> <span class="tok-var">rob1</span> = <span class="tok-num">0</span>, <span class="tok-var">rob2</span> = <span class="tok-num">0</span>;
     <span class="tok-kw">for</span> (<span class="tok-kw">int</span> <span class="tok-var">n</span> : <span class="tok-var">nums</span>) {
         <span class="tok-kw">int</span> <span class="tok-var">temp</span> = <span class="tok-fn">max</span>(<span class="tok-var">n</span> + <span class="tok-var">rob1</span>, <span class="tok-var">rob2</span>);
@@ -459,6 +522,7 @@
     }
     <span class="tok-kw">return</span> <span class="tok-var">rob2</span>;
 }</code></pre>
+                                </div>
                             </div>
                         </div>
                     </article>
@@ -468,14 +532,13 @@
         </div>
     </section>
     
-    <!-- External Scripts -->
+    <!-- Footer -->
     <div id="footer-placeholder"></div>
 
-    <script src="/script.js"></script>
     <script src="/auth.js"></script>
+    <script src="/script.js"></script>
     <script src="/theme.js"></script>
-    <script src="/auth-gate.js"></script>
-    <script src="dp-learning.js"></script>
+    <script src="./dp-learning.js"></script>
 
     <script>
       loadPartial('navbar-placeholder', '/partials/navbar.html');

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -6,17 +6,64 @@
     <title>Learn Bitmask DP | Algo Infinity Verse</title>
     <meta name="description" content="Master Bitmask DP: Solve exponential problems using state compression, the Assignment Problem, and the Traveling Salesman Problem." />
     
-    <link href="[https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap)" rel="stylesheet" />
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)" />
-    
-    <!-- External Stylesheets -->
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="bitmask-dp-learning.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" 
+        integrity="sha512-W/zrbCncQnky/EzL+/AYwTtosvrM+YG/V6piQLSe2HuKS6cmbw89kjYkp3tWFn1dkWV7L1ruvJyKbLz73Vlgfg==" 
+        crossorigin="anonymous" 
+        referrerpolicy="no-referrer" 
+    />
+
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
 </head>
 <body data-page="bitmask-dp-learning">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loader">
+        <div class="infinity-loader">∞</div>
+        <h2>Algo Infinity Verse</h2>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Navigation Bar -->
     <div id="navbar-placeholder"></div>
 
+    <!-- Hero Section -->
     <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="stars" aria-hidden="true"></div>
+            <div class="stars2" aria-hidden="true"></div>
+            <div class="stars3" aria-hidden="true"></div>
+        </div>
         <div class="hero-content">
             <h1 class="hero-title">
                 <span class="title-line">State Compression Mastery</span>
@@ -52,8 +99,12 @@
                 </div>
             </div>
         </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
     </section>
 
+    <!-- Bitmask DP Learning Section -->
     <section id="bit-learning" class="section">
         <div class="container">
             <h2 class="section-title">
@@ -296,15 +347,16 @@
         </div>
     </section>
     
-    <!-- External Scripts -->
-    <script src="/script.js"></script>
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
     <script src="/auth.js"></script>
+    <script src="/script.js"></script>
     <script src="/theme.js"></script>
     <script src="bitmask-dp-learning.js"></script>
-
-  <script>
-    loadPartial('navbar-placeholder', '/partials/navbar.html');
-    loadPartial('footer-placeholder', '/partials/footer.html');
-  </script>
+    <script>
+      loadPartial('navbar-placeholder', '/partials/navbar.html');
+      loadPartial('footer-placeholder', '/partials/footer.html');
+    </script>
 </body>
 </html>

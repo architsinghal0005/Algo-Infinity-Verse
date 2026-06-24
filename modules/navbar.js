@@ -1,3 +1,25 @@
+let scrollPosition = 0;
+
+function lockBodyScroll() {
+  scrollPosition = window.scrollY;
+
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollPosition}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+
+function unlockBodyScroll() {
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+
+  window.scrollTo(0, scrollPosition);
+}
+
 export function initNavbar() {
   const menuToggle = document.getElementById("menuToggle");
   const navLinks = document.getElementById("navLinks");
@@ -14,7 +36,11 @@ export function initNavbar() {
     navLinks.classList.toggle("active", isOpen);
     menuToggle.setAttribute("aria-expanded", isOpen);
     overlay.classList.toggle("active", isOpen);
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      lockBodyScroll();
+    } else {
+      unlockBodyScroll();
+    }
 
     const icon = menuToggle.querySelector("i");
     if (icon) {

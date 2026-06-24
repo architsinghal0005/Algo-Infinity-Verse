@@ -445,7 +445,7 @@ async function getUserByEmail(email) {
     .limit(1)
     .get();
   if (snapshot.empty) return null;
-  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+  return { ...snapshot.docs[0].data(), id: snapshot.docs[0].id };
 }
 
 async function createUser(userData) {
@@ -456,7 +456,7 @@ async function createUser(userData) {
     return userData;
   }
   const docRef = await db.collection(COLLECTIONS.USERS).add(userData);
-  return { id: docRef.id, ...userData };
+  return { ...userData, id: docRef.id };
 }
 
 async function ensureUserStore() {
@@ -1322,6 +1322,10 @@ if (process.env.VERCEL !== "1") {
         const url = `http://${host}:${port}`;
         console.log(`Server running at ${url}`);
         if (!process.env.SESSION_SECRET) {
+          if (process.env.NODE_ENV === "production") {
+            console.error("FATAL: SESSION_SECRET is required in production mode.");
+            process.exit(1);
+          }
           console.warn(
             "Using a development SESSION_SECRET. Set SESSION_SECRET before deploying.",
           );

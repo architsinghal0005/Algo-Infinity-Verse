@@ -1,6 +1,7 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import crypto from "crypto";
+import { verifyCsrfToken } from "../utils/csrf-verify.js"; // <-- ADDED CSRF IMPORT
 
 let db = null;
 let useFirestore = false;
@@ -24,7 +25,13 @@ const LOGIN_RATE_LIMIT = 5;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const loginAttempts = new Map();
 
-function sessionSecret() { return process.env.SESSION_SECRET || "dev-only-change-me-with-SESSION_SECRET-before-deploying"; }
+function sessionSecret() {
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET is required in production.");
+  }
+  return "dev-only-change-me-with-SESSION_SECRET-before-deploying";
+}
 function sign(v) { return crypto.createHmac("sha256", sessionSecret()).update(v).digest("base64url"); }
 function b64u(i) { return Buffer.from(i).toString("base64").replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_"); }
 function fromB64u(i) { return Buffer.from(i.replace(/-/g,"+").replace(/_/g,"/"),"base64").toString("utf8"); }
@@ -48,7 +55,7 @@ async function storeRememberSession(user) {
       createdAt: new Date().toISOString()
     });
     return token;
-  } catch (e) { console.error(e); return null; }
+    } catch (e) { console.error(e); return null; }
 }
 
 function getClientIdentifier(req) {
@@ -61,23 +68,17 @@ function getClientIdentifier(req) {
 
 function isRateLimited(identifier) {
   const now = Date.now();
-
   const attempts = loginAttempts.get(identifier) || [];
-
   const recentAttempts = attempts.filter(
     (time) => now - time < LOGIN_WINDOW_MS
   );
-
   loginAttempts.set(identifier, recentAttempts);
-
   return recentAttempts.length >= LOGIN_RATE_LIMIT;
 }
 
 function recordLoginAttempt(identifier) {
   const attempts = loginAttempts.get(identifier) || [];
-
   attempts.push(Date.now());
-
   loginAttempts.set(identifier, attempts);
 }
 
@@ -89,6 +90,15 @@ async function normalizeAuthDelay() {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  
+  // --- ADDED SECURITY GATE: CSRF Validation ---
+  if (!verifyCsrfToken(req)) {
+      return res.status(403).json({ 
+          error: "CSRF token validation failed. Unauthorized cross-site request detected." 
+      });
+  }
+  // --------------------------------------------
+
   try {
     const {email,password}=req.body;
     const cleanEmail=String(email||"").trim().toLowerCase(),pwd=String(password||"");
@@ -96,8 +106,6 @@ export default async function handler(req, res) {
 
     if (isRateLimited(clientId)) {
       await normalizeAuthDelay();
-
-
       return res.status(429).json({
         error: "Authentication failed.",
       });
@@ -106,10 +114,7 @@ export default async function handler(req, res) {
     const user=users.find(u=>u.email===cleanEmail);
     if (!user || !passwordMatches(pwd, user.password)) {
       recordLoginAttempt(clientId);
-
       await normalizeAuthDelay();
-
-
       return res.status(401).json({
         error: "Authentication failed.",
       });

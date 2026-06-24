@@ -21,7 +21,31 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-  </head>
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"
+      }
+    }
+    </script>
+  
+    <!-- Theme Initialization Script -->
+    <script>
+      (function() {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
   <body data-page="index">
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -183,8 +207,62 @@
            </div>
       </div>
     </section>
+    <!-- DSA Flashcards Revision Section -->
+    <section id="flashcards" class="section flashcards-section">
+      <div class="container">
+        <h2 class="section-title">
+          <span class="title-icon">🗂️</span>
+          DSA Flashcards Revision
+        </h2>
+        <p class="section-subtitle">
+          Reveal answers, navigate cards, and persist your revision progress.
+        </p>
+
+        <div class="flashcards-controls" role="group" aria-label="Flashcard category filters">
+          <button class="filter-btn active" data-flashcards-category="arrays">Arrays</button>
+          <button class="filter-btn" data-flashcards-category="trees">Trees</button>
+          <button class="filter-btn" data-flashcards-category="graphs">Graphs</button>
+          <button class="filter-btn" data-flashcards-category="dp">DP</button>
+        </div>
+
+        <div class="flashcards-shell">
+          <div class="flashcards-header">
+            <div class="flashcards-meta">
+              <div class="flashcards-progress" id="flashcardsProgressText">Reviewed 0 / 0</div>
+              <div class="flashcards-total" id="flashcardsTotalText"></div>
+            </div>
+            <div class="flashcards-nav">
+              <button id="flashcardsPrevBtn" class="pagination-btn" disabled>
+                <i class="fas fa-chevron-left"></i> Prev
+              </button>
+              <button id="flashcardsNextBtn" class="pagination-btn">
+                Next <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flashcards-stage">
+            <div class="flashcard" id="flashcardRoot" aria-live="polite">
+              <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front" id="flashcardQuestion"></div>
+                <div class="flashcard-face flashcard-back" id="flashcardAnswer"></div>
+              </div>
+            </div>
+
+            <div class="flashcards-actions">
+              <button id="flashcardsRevealBtn" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Reveal Answer
+              </button>
+              <div class="flashcards-small muted" id="flashcardsSmallHint"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Rust Playground Section -->
     <section id="rust-playground" class="section rust-playground-section">
+
       <div class="container">
         <div class="rust-hero">
           <h2 class="section-title">
@@ -258,10 +336,10 @@
         
         <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 2.5rem; flex-wrap: wrap;">
             <a href="/pages/learning/algorithm-universe/algorithm-universe.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-project-diagram"></i> Interactive Universe Map
+                <i class="fas fa-project-diagram" aria-hidden="true"></i> Interactive Universe Map
             </a>
             <a href="/pages/tools/personalized-learning-path/personalized-learning-path.html" class="btn btn-secondary" style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-route"></i> Personalized Learning Path
+                <i class="fas fa-route" aria-hidden="true"></i> Personalized Learning Path
             </a>
         </div>
 
@@ -309,6 +387,25 @@
                 <li>Competitive Programming</li>
               </ul>
             </div>
+          </div>
+        </div>
+
+        <!-- Roadmap Controls -->
+        <div class="roadmap-controls" style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="roadmapSearchInput"
+              placeholder="Search algorithms, data structures, or topics..."
+            />
+            <button
+              id="clearRoadmapSearchBtn"
+              class="clear-search-btn"
+              aria-label="Clear search"
+            >
+              &times;
+            </button>
           </div>
         </div>
 
@@ -555,14 +652,37 @@
               </div>
               <div class="interview-card">
             <div class="card-icon">
-              <i class="fas fa-sword"></i>
+              <i class="fas fa-shield-halved"></i>
             </div>
             <h3>Algorithm Arena</h3>
             <p>Watch algorithms battle head-to-head with live visualizations and real-time performance metrics.</p>
-            <a href="algorithm-arena.html" class="card-btn" aria-label="Enter Algorithm Gladiator Arena"
+            <a href="/pages/tools/algorithm-arena/algorithm-arena.html" class="card-btn" aria-label="Enter Algorithm Gladiator Arena"
               style="text-decoration: none; display: inline-block; text-align: center;">
               Enter Arena
             </a>
+          </div>
+          <div class="interview-card">
+            <div class="card-icon">
+              <i class="fas fa-code-branch"></i>
+            </div>
+            <h3>Repository Analyzer</h3>
+            <p>Scan your GitHub repository for functional CI/CD automation and best practices.</p>
+            <a href="/pages/repo-analyzer/repo-analyzer.html" class="card-btn" aria-label="Open Repository Analyzer"
+              style="text-decoration: none; display: inline-block; text-align: center;">
+              Analyze Repo
+            </a>
+          </div>
+          <div class="interview-card">
+            <div class="card-icon">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <h3>Bulk Repository Analyzer</h3>
+            <p>Upload a CSV to analyze hundreds of GitHub workflows asynchronously using distributed background workers.</p>
+            <a href="/pages/repo-analyzer/bulk-analyzer.html" class="card-btn" aria-label="Open Bulk Analyzer"
+                style="text-decoration: none; display: inline-block; text-align: center;">
+                Bulk Audit
+            </a>
+          </div>
           </div>
         </div>
       </div>
@@ -1149,21 +1269,21 @@
                       onclick="insertSnippet('function')"
                       title="Insert function"
                     >
-                      <i class="fas fa-code"></i> Function
+                      <i class="fas fa-code"></i><span class="btn-text"> Function</span>
                     </button>
                     <button
                       class="editor-btn"
                       onclick="formatCode()"
                       title="Format code"
                     >
-                      <i class="fas fa-indent"></i> Format
+                      <i class="fas fa-indent"></i><span class="btn-text"> Format</span>
                     </button>
                     <button
                       class="editor-btn"
                       onclick="toggleLineComment()"
                       title="Toggle comment"
                     >
-                      <i class="fas fa-comment"></i> //
+                      <i class="fas fa-comment"></i><span class="btn-text"> //</span>
                     </button>
                   </div>
                 </div>
@@ -1182,8 +1302,8 @@
                   <div class="syntax-highlight" id="syntaxHighlight"></div>
                 </div>
                 <div class="editor-shortcuts">
-                  <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Run Code</span>
-                  <span><kbd>Ctrl</kbd>+<kbd>S</kbd> Submit</span>
+                  <span aria-label="Run Code shortcut: Control plus Enter"><kbd>Ctrl</kbd>+<kbd>Enter</kbd><span class="shortcut-label"> Run Code</span></span>
+                  <span aria-label="Submit shortcut: Control plus S"><kbd>Ctrl</kbd>+<kbd>S</kbd><span class="shortcut-label"> Submit</span></span>
                 </div>
                 <div class="output-panel" id="outputPanel">
                   <div class="output-header" onclick="toggleOutputPanel()">
@@ -1454,8 +1574,10 @@
 
     <div class="modal" id="changePasswordModal">
   <div class="modal-content">
+
     <div class="modal-header">
       <h3>Change Password</h3>
+
       <button
         class="modal-close"
         id="changePasswordClose"
@@ -1468,37 +1590,103 @@
     <div class="modal-body">
       <div class="profile-edit-form">
 
-        <label for="currentPassword">
-          Current Password
-        </label>
+        <div
+          id="changePasswordMessage"
+          class="password-message"
+          role="alert"
+        ></div>
 
-        <input
-          type="password"
-          id="currentPassword"
-          placeholder="Enter current password"
-        />
+        <!-- Current Password -->
+        <div class="password-field">
+          <label for="currentPassword">Current Password</label>
 
-        <label for="newPassword">
-          New Password
-        </label>
+          <div class="password-input-wrapper">
+            <input
+              type="password"
+              id="currentPassword"
+              placeholder="Enter current password"
+            />
 
-        <input
-          type="password"
-          id="newPassword"
-          placeholder="Enter new password"
-        />
+            <button
+              type="button"
+              class="password-toggle"
+              data-target="currentPassword"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
 
-        <label for="confirmNewPassword">
-          Confirm New Password
-        </label>
+        <!-- New Password -->
+        <div class="password-field">
+          <label for="newPassword">New Password</label>
 
-        <input
-          type="password"
-          id="confirmNewPassword"
-          placeholder="Confirm new password"
-        />
+          <div class="password-input-wrapper">
+            <input
+              type="password"
+              id="newPassword"
+              placeholder="Create a strong password"
+            />
 
-        <p id="changePasswordMessage"></p>
+            <button
+              type="button"
+              class="password-toggle"
+              data-target="newPassword"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <div class="password-strength">
+            <div
+              id="passwordStrengthBar"
+              class="strength-bar"
+            ></div>
+          </div>
+
+          <span
+            id="passwordStrengthText"
+            class="strength-text"
+          >
+            Password strength
+          </span>
+
+          <ul class="password-rules">
+            <li id="ruleLength">Minimum 8 characters</li>
+            <li id="ruleUpper">One uppercase letter</li>
+            <li id="ruleLower">One lowercase letter</li>
+            <li id="ruleNumber">One number</li>
+            <li id="ruleSpecial">One special character</li>
+          </ul>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="password-field">
+          <label for="confirmNewPassword">
+            Confirm New Password
+          </label>
+
+          <div class="password-input-wrapper">
+            <input
+              type="password"
+              id="confirmNewPassword"
+              placeholder="Confirm new password"
+            />
+
+            <button
+              type="button"
+              class="password-toggle"
+              data-target="confirmNewPassword"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <small
+            id="confirmPasswordError"
+            class="field-error"
+          ></small>
+        </div>
 
       </div>
     </div>
@@ -1518,6 +1706,7 @@
         Change Password
       </button>
     </div>
+
   </div>
 </div>
 
@@ -1558,14 +1747,14 @@
         </div>
         <div class="auth-gate-actions">
           <a
-            href="/login"
+            href="login.html"
             id="authGateLoginBtn"
             class="btn btn-primary auth-gate-btn"
           >
             <i class="fas fa-sign-in-alt"></i> Login
           </a>
           <a
-            href="/signup"
+            href="signup.html"
             id="authGateSignupBtn"
             class="btn btn-secondary auth-gate-btn"
           >
@@ -1581,10 +1770,12 @@
     </div>
 
     <script src="/pages/learning/rust-learning.js"></script>
+    <script type="module" src="./modules/firebase-client.js"></script>
     <script src="auth.js"></script>
-    <script src="script.js?v=20260601"></script>
+    <script src="script.js"></script>
     <script src="theme.js"></script>
     <script src="auth-gate.js"></script>
+    <script src="/scripts/lazy-load.js" defer></script>
 
     <script>
       loadPartial("navbar-placeholder", "/partials/navbar.html").then(() => {

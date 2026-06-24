@@ -1,17 +1,14 @@
-/*
- * dp-learning.js
- * Interactivity for the Dynamic Programming Learning page
- */
 document.addEventListener("DOMContentLoaded", () => {
     initHeroTyping();
     initStatsAnimation();
     initExerciseToggles();
+    initCopyButtons();
     initSidebarSpy();
+    initSmoothScroll();
     initProgressTracker();
     initLangSwitching();
 });
 
-/* Hero Typing Animation */
 function initHeroTyping() {
     const el = document.getElementById("typingTextDP");
     if (!el) return;
@@ -65,7 +62,6 @@ function initHeroTyping() {
     tick();
 }
 
-/* Stats Counter Animation */
 function initStatsAnimation() {
     const statNumbers = document.querySelectorAll(".stat-number[data-target]");
     if (!statNumbers.length) return;
@@ -95,7 +91,6 @@ function initStatsAnimation() {
     statNumbers.forEach((s) => observer.observe(s));
 }
 
-/* Exercise Show / Hide Toggle */
 function initExerciseToggles() {
     document.querySelectorAll(".dp-exercise-toggle").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -110,13 +105,46 @@ function initExerciseToggles() {
     });
 }
 
-/* Sidebar Scroll-Spy */
+function initCopyButtons() {
+    document.querySelectorAll(".dp-code-copy").forEach((button) => {
+        button.addEventListener("click", async () => {
+            const codeEl = button
+                .closest(".dp-code-block")
+                ?.querySelector("code");
+
+            if (!codeEl) return;
+
+            const code = codeEl.innerText;
+
+            try {
+                await navigator.clipboard.writeText(code);
+
+                const originalText = button.textContent;
+                button.textContent = "Copied!";
+                button.classList.add("copied");
+                button.setAttribute("aria-label", "Code copied");
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove("copied");
+                    button.setAttribute("aria-label", "Copy code");
+                }, 2000);
+            } catch {
+                button.textContent = "Failed";
+                setTimeout(() => {
+                    button.textContent = "Copy";
+                }, 2000);
+            }
+        });
+    });
+}
+
 function initSidebarSpy() {
     const links = document.querySelectorAll(".dp-sidebar-nav a");
     const lessons = document.querySelectorAll(".dp-lesson");
     if (!links.length || !lessons.length) return;
 
-    const NAV_HEIGHT = 110;
+    const NAV_HEIGHT = 80;
 
     function getActiveId() {
         let bestId = null;
@@ -154,12 +182,35 @@ function initSidebarSpy() {
     onScroll();
 }
 
-/* Progress Tracker */
+function initSmoothScroll() {
+    document.querySelectorAll(".dp-sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            const targetId = link.getAttribute("href");
+            const target = document.querySelector(targetId);
+
+            if (!target) return;
+
+            const offsetTop = target.getBoundingClientRect().top + window.scrollY - 80;
+
+            window.scrollTo({
+                top: offsetTop,
+                behavior: "smooth",
+            });
+
+            document.querySelectorAll(".dp-sidebar-nav a").forEach((l) => l.classList.remove("active"));
+            link.classList.add("active");
+        });
+    });
+}
+
 function initProgressTracker() {
     const STORAGE_KEY = "dp-learning-progress";
-    const TOTAL_TOPICS = 6; // matching data-topic 1 to 6
+    const TOTAL_TOPICS = 6;
     const fill = document.getElementById("dpProgressFill");
     const count = document.getElementById("dpProgressCount");
+    const percent = document.getElementById("dpProgressPercent");
     const bar = document.querySelector(".dp-progress-bar");
 
     if (!fill || !count) return;
@@ -168,15 +219,13 @@ function initProgressTracker() {
     try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
         if (Array.isArray(saved)) completed = new Set(saved);
-    } catch {
-        /* ignore parse errors */
-    }
+    } catch {}
 
     function updateUI() {
-        // Ensure percentage does not exceed 100%
         const pct = Math.min(100, Math.round((completed.size / TOTAL_TOPICS) * 100));
         fill.style.width = pct + "%";
         count.textContent = Math.min(TOTAL_TOPICS, completed.size);
+        if (percent) percent.textContent = pct + "%";
         if (bar) bar.setAttribute("aria-valuenow", pct);
     }
 
@@ -198,9 +247,7 @@ function initProgressTracker() {
             if (changed) {
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
-                } catch {
-                    /* ignore storage quota errors */
-                }
+                } catch {}
                 updateUI();
             }
         },
@@ -210,7 +257,6 @@ function initProgressTracker() {
     lessons.forEach((l) => observer.observe(l));
 }
 
-/* Language Tab Switching (Python / C++) */
 function initLangSwitching() {
     window.switchDPLang = function (button, lang) {
         const container = button.closest(".dp-lang-container");
