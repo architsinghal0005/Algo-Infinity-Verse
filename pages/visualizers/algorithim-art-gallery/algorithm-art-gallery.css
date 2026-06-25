@@ -58,8 +58,8 @@
 .canvas-wrapper {
   width: 100%;
   min-height: 500px;
-  height: 600vh;
-   max-height: 700px;
+  height: 600px;
+  max-height: 700px;
   border-radius: 12px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.45);
