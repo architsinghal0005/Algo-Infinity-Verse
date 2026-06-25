@@ -8153,3 +8153,68 @@ img { content-visibility: auto; }
   }
 }
 
+/* ===== LIGHT MODE - ABOUT US CONTENT FIX ===== */
+html.light-mode .about-stat,
+html.light-mode .about-card,
+html.light-mode .goal-card,
+html.light-mode .tech-card,
+html.light-mode .team-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+html.light-mode .about-stat h3,
+html.light-mode .goal-card h3,
+html.light-mode .tech-card h3,
+html.light-mode .team-card h3 {
+  color: #7c3aed;
+}
+
+html.light-mode .about-stat p,
+html.light-mode .about-card p,
+html.light-mode .goal-card p,
+html.light-mode .tech-card p,
+html.light-mode .team-card p {
+  color: #2d3748;
+}
+
+html.light-mode .goal-card i,
+html.light-mode .tech-card i,
+html.light-mode .team-card i {
+  color: #7c3aed;
+}
+
+/* ===== LIGHT MODE - SECTION BACKGROUND FIX ===== */
+html.light-mode .section,
+html.light-mode .hero {
+  background: #f8fafc;
+}
+
+html.light-mode .section-subtitle {
+  color: #4a5568;
+}
+
+/* ===== LIGHT MODE - SOCIAL LINKS FIX ===== */
+html.light-mode .social-links a {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #1a202c;
+}
+
+html.light-mode .social-links a:hover {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+/* ===== LIGHT MODE - REPORT ISSUE BUTTON FIX ===== */
+html.light-mode .report-issue-btn {
+  background: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+}
+
+html.light-mode .report-issue-btn:hover {
+  background: #6d28d9;
+  box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+}
