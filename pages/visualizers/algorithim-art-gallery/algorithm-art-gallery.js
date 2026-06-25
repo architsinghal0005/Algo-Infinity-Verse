@@ -260,6 +260,8 @@ let stopDrawing = false;
       ctx.arc(x, y, 2, 0, Math.PI * 2);
 
       ctx.fill();
+      shapes++;
+      if (shapeCount) shapeCount.textContent = shapes;
 
       await sleep(8);
     }
