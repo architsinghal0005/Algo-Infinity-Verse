@@ -431,6 +431,9 @@ async function handleApi(req, res, pathname) {
   
   if (pathname === "/api/execute" && req.method === "POST") {
     try {
+     
+      const payload = await readJsonBody(req);
+      const { sourceCode, language, stdin } = payload;
       const session = getSession(req);
       if (!session) {
         return sendJson(res, 401, {
@@ -894,6 +897,12 @@ async function handleApi(req, res, pathname) {
 
 if (pathname === "/api/session" && req.method === "GET") {
     const session = getSession(req);
+    
+    
+    if (!session) {
+      return sendJson(res, 200, { authenticated: false, user: null });
+    }
+    
     if (!session) {
       return sendJson(res, 200, { authenticated: false, user: null });
     }
@@ -2270,7 +2279,63 @@ const io = new SocketIOServer(server);
 io.on("connection", (socket) => {
 console.log("🟢 New client connected:", socket.id);
 
- 
+
+
+
+// ==========================================
+// AI INTERVIEWER - GEMINI API INTEGRATION
+// ==========================================
+socket.on('ai-evaluate-code', async (data = {}) => {
+    // Bot Fix 1: Validate payload first
+    if (typeof data !== 'object' || typeof data.code !== 'string' || typeof data.language !== 'string' || typeof data.problem !== 'string') {
+        return socket.emit('ai-interviewer-feedback', { hint: 'Unable to analyze code right now.' });
+    }
+
+    console.log(`🤖 AI Interviewer analyzing code...`);
+    
+    try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            socket.emit('ai-interviewer-feedback', { hint: "Backend Error: GEMINI_API_KEY is missing in .env!" });
+            return;
+        }
+
+        // The Real Gemini Prompt
+        const prompt = `You are an expert FAANG technical interviewer. A candidate is solving the "${data.problem}" problem in ${data.language}.
+        Here is their current code:
+        
+        ${data.code}
+        
+        Your task: Give a short, strategic hint (max 2-3 sentences) to guide them. 
+        CRITICAL RULES:
+        1. Do NOT give the exact code solution. 
+        2. Focus on time/space complexity, pointing out edge cases, or spotting logical flaws.
+        3. Keep the tone encouraging, professional, and directly address the logic in their code.`;
+
+        // Real API Call to Gemini
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.candidates && result.candidates.length > 0) {
+            let aiHint = result.candidates[0].content.parts[0].text;
+            aiHint = aiHint.replace(/\*/g, '').replace(/\`/g, ''); // Clean markdown
+            socket.emit('ai-interviewer-feedback', { hint: aiHint });
+        } else {
+            socket.emit('ai-interviewer-feedback', { hint: "Hmm, your logic is interesting... keep going!" });
+        }
+        
+    } catch (error) {
+        console.error("Gemini API Error:", error);
+        socket.emit('ai-interviewer-feedback', { hint: "My AI brain is taking a break. Keep coding!" });
+    }
+});
 
 // Draw events (whiteboard)
 socket.on('draw', (data) => {

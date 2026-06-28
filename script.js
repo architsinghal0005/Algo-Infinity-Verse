@@ -526,12 +526,166 @@ document.addEventListener("DOMContentLoaded", () => {
   initDailyChallenge();
   initChatbot();
   initProfile();
+  initAiInterviewer();
   initNewsletterValidation();
   initScrollEffects();
   initFooterCurrentDate();
   updateProfile();
 });
 
+// ============================================
+// AGENTIC AI INTERVIEW COMPANION (ISSUE #578)
+// ============================================
+let isAiInterviewerActive = false;
+let workspaceSocket = null;
+
+// 1. Claude's Floating UI Styles
+(function injectAiHintStyles() {
+  if (document.getElementById('ai-hint-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'ai-hint-styles';
+ style.textContent = `
+    #ai-hint-bubble { position: absolute; bottom: 70px; right: 16px; width: 300px; max-width: calc(100% - 32px); background: #0f1f1a; border: 1px solid #10b981; border-left: 4px solid #10b981; border-radius: 12px; padding: 14px 16px; z-index: 99999; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); font-family: 'Poppins', sans-serif; animation: ai-hint-slide-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: all; }
+    #ai-hint-bubble.ai-hint-dismissing { animation: ai-hint-slide-out 0.2s ease-in forwards; }
+    @keyframes ai-hint-slide-in { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes ai-hint-slide-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(12px); } }
+    #ai-hint-bubble .ai-hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    #ai-hint-bubble .ai-hint-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: #10b981; letter-spacing: 0.3px; font-family: 'Orbitron', sans-serif; }
+    #ai-hint-bubble .ai-hint-close { background: none; border: none; cursor: pointer; color: #64748b; font-size: 18px; line-height: 1; padding: 0; transition: color 0.15s ease; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; }
+    #ai-hint-bubble .ai-hint-close:hover { color: #e2e8f0; background: rgba(255, 255, 255, 0.06); }
+    #ai-hint-bubble .ai-hint-body { font-size: 13.5px; color: #cbd5e1; line-height: 1.6; font-family: 'Poppins', sans-serif; }
+    #ai-hint-bubble .ai-hint-footer { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(16, 185, 129, 0.15); }
+    #ai-hint-bubble .ai-hint-pulse { width: 7px; height: 7px; background: #10b981; border-radius: 50%; flex-shrink: 0; animation: ai-hint-pulse 1.6s ease-in-out infinite; }
+    @keyframes ai-hint-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.85); } }
+    #ai-hint-bubble .ai-hint-footer-text { font-size: 11px; color: #475569; font-family: 'Fira Code', monospace; }
+  `;
+  document.head.appendChild(style);
+}());
+
+// 2. The Main Init Function
+// ============================================
+// AGENTIC AI INTERVIEW COMPANION LOGIC
+// ============================================
+function initAiInterviewer() {
+    const editor = document.getElementById('codeEditor');
+    
+    if (!workspaceSocket && typeof io !== 'undefined') {
+        workspaceSocket = io();
+    }
+
+    if (!editor || !workspaceSocket) {
+        console.warn('AI Interviewer: editor or socket not ready', { editor: !!editor, socket: !!workspaceSocket });
+        return;
+    }
+
+    // Debounce to prevent spamming API
+    const sendLiveCodeToAi = debounce((code) => {
+        if (!isAiInterviewerActive || code.trim().length < 10) return;
+        const lang = document.getElementById('languageSelect')?.value || 'javascript';
+        const problemTitle = currentProblem ? currentProblem.title : "Free Workspace";
+
+        // Bot Fix: Removed userId completely to avoid PII leak
+        workspaceSocket.emit('ai-evaluate-code', {
+            code: code,
+            language: lang,
+            problem: problemTitle
+        });
+        console.log("🕵️‍♂️ Sent live code to AI Interviewer for analysis...");
+    }, 2500);
+
+    // Trigger on typing
+    editor.addEventListener('input', (e) => {
+        if (isAiInterviewerActive) {
+            sendLiveCodeToAi(e.target.value);
+        }
+    });
+
+    // Receive Claude's Beautiful Bubble
+    workspaceSocket.on('ai-interviewer-feedback', (data) => {
+        if (!data || !data.hint) return;
+
+        const existing = document.getElementById('ai-hint-bubble');
+        if (existing) existing.remove();
+
+        const bubble = document.createElement('div');
+        bubble.id = 'ai-hint-bubble';
+        bubble.setAttribute('role', 'status');
+        bubble.setAttribute('aria-live', 'polite');
+
+        const hintText = document.createTextNode(data.hint);
+        const hintSpan = document.createElement('span');
+        hintSpan.appendChild(hintText);
+
+        bubble.innerHTML = `
+            <div class="ai-hint-header">
+            <div class="ai-hint-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                AI Interviewer
+            </div>
+            <button class="ai-hint-close" aria-label="Dismiss hint">&#x2715;</button>
+            </div>
+            <div class="ai-hint-body"></div>
+            <div class="ai-hint-footer">
+            <div class="ai-hint-pulse"></div>
+            <span class="ai-hint-footer-text">Observing your code live</span>
+            </div>
+        `;
+
+        bubble.querySelector('.ai-hint-body').appendChild(hintSpan);
+
+        // Inject inside modal, not body — fixes the "outside editor" bug
+        const target = document.querySelector('.quiz-modal-content') 
+                       || document.getElementById('quizEditorModal') 
+                       || document.body;
+        if (target !== document.body) {
+            target.style.position = 'relative';
+        }
+        target.appendChild(bubble);
+
+        const closeBtn = bubble.querySelector('.ai-hint-close');
+        closeBtn.addEventListener('click', () => {
+            bubble.classList.add('ai-hint-dismissing');
+            bubble.addEventListener('animationend', () => bubble.remove(), { once: true });
+        });
+
+        const autoDismiss = setTimeout(() => {
+            if (document.getElementById('ai-hint-bubble')) {
+                bubble.classList.add('ai-hint-dismissing');
+                bubble.addEventListener('animationend', () => bubble.remove(), { once: true });
+            }
+        }, 18000);
+
+        closeBtn.addEventListener('click', () => clearTimeout(autoDismiss), { once: true });
+    });
+}
+
+function toggleAiInterviewer() {
+    isAiInterviewerActive = !isAiInterviewerActive;
+    
+    // Bot Fix: Sync Accessibility (aria-pressed) for screen readers
+    const toggleBtn = document.getElementById('aiInterviewerToggle');
+    if (toggleBtn) {
+        toggleBtn.setAttribute('aria-pressed', isAiInterviewerActive.toString());
+    }
+
+    if (isAiInterviewerActive) {
+        // Re-init if socket not ready yet
+        if (!workspaceSocket && typeof io !== 'undefined') {
+            workspaceSocket = io();
+            initAiInterviewer();
+        }
+        showNotification("🤖 Agentic AI Interviewer is now observing your code.", "success");
+        // Bot Fix: Removed the forced 'Test' emit completely. The real debounce will handle it now.
+    } else {
+        showNotification("🤖 Agentic AI Interviewer deactivated.", "info");
+        // Also remove bubble if user turns off AI
+        const existing = document.getElementById('ai-hint-bubble');
+        if (existing) {
+            existing.classList.add('ai-hint-dismissing');
+            existing.addEventListener('animationend', () => existing.remove(), { once: true });
+        }
+    }
+}
 // ============================================
 // LOADING SCREEN
 // ============================================
@@ -2750,6 +2904,7 @@ const API_BASE = (location.hostname === 'localhost' || location.hostname === '12
 
 async function executeViaApi(lang, code) {
   // Make sure this points to your new secure Node.js route
+  const response = await fetch('/api/execute', {
   const response = await fetch(`${API_BASE}/api/execute`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -2878,6 +3033,7 @@ async function runQuizCode() {
     if (result.metrics && result.metrics.cpuTime) {
       const metricText = `\n\n⏱️ Execution Time: ${result.metrics.cpuTime} sec\n💾 Memory Used: ${result.metrics.memory} KB`;
       const el = document.getElementById("quizOutputContent");
+      if (el) el.innerHTML += `<pre style="color:var(--accent); margin-top:10px;">${metricText}</pre>`;
       if (el) {
         const metricsEl = document.createElement("pre");
         metricsEl.style.color = "var(--accent)";
@@ -3468,8 +3624,19 @@ window.addEventListener('hashchange', () => {
   const currentHash = window.location.hash || '#home';
   if (currentHash === '#home' || currentHash === '') {
     document.querySelectorAll('*').forEach(element => {
-      if (element.id?.toLowerCase().includes('quiz') || element.className?.toString().toLowerCase().includes('quiz') || element.id?.toLowerCase().includes('assistant')) element.style.display = 'none';
-      else if (element.classList.contains('hidden') && element.id !== 'loading-screen') { element.classList.remove('hidden'); element.style.display = ''; }
+      const id = element.id ? element.id.toLowerCase() : '';
+      const className = element.className ? element.className.toString().toLowerCase() : '';
+      if (id.includes('quiz') || className.includes('quiz') || id.includes('assistant')) {
+        element.style.display = 'none';
+      if (id.includes('quiz') || className.includes('quiz') || id.includes('assistant')) {
+        element.dataset.routeHidden = 'true';
+        element.style.display = 'none';
+      } else if (element.dataset.routeHidden === 'true') {
+        delete element.dataset.routeHidden;
+        element.classList.remove('hidden');
+        element.style.display = '';
+      }
+      }
     });
     if (typeof tQuiz !== 'undefined') tQuiz = null;
   }
