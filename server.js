@@ -1798,14 +1798,6 @@ if (pathname === "/api/forgot-password" && req.method === "POST") {
     // Always return success to prevent email enumeration
     return sendJson(res, 200, { message: "Reset email sent if account exists." });
   }
-  if (pathname === "/api/logout" && req.method === "POST") {
-    return sendJson(
-      res,
-      200,
-      { ok: true },
-      { "Set-Cookie": clearAuthCookies() },
-    );
-  }
 
   if (pathname === "/api/feedback" && req.method === "POST") {
     const session = getSession(req);
