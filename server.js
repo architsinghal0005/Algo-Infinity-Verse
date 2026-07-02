@@ -4,6 +4,7 @@ import http from "http";
 import { execFile } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
+import { FieldValue } from "firebase-admin/firestore";
 import { initializeFirebase, getDb, COLLECTIONS } from "./firebase.js";
 import { verifyCsrfToken } from "./utils/csrf-verify.js";
 import multer from "multer";
